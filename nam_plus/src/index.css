@@ -1,0 +1,327 @@
+:root {
+  font-family:
+    Inter,
+    system-ui,
+    Avenir,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  color: #f5f7fa;
+  background: #090d11;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  background: #090d11;
+}
+
+/* ========================= */
+/* LOGIN ÑAM+ */
+/* ========================= */
+
+.auth-wrap {
+  min-height: 100vh;
+
+  display: grid;
+  place-items: center;
+
+  padding: 24px;
+
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(65, 210, 135, 0.10),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(255, 166, 82, 0.10),
+      transparent 32%
+    ),
+    #090d11;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+
+  padding: 32px;
+
+  background:
+    rgba(15, 20, 26, 0.96);
+
+  border:
+    1px solid #1d2630;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 18px 50px
+    rgba(0, 0, 0, 0.40);
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* Logo de Ñam+ */
+
+.nam-logo-img {
+  width: 150px;
+  height: 150px;
+
+  display: block;
+
+  margin: 0 auto 18px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+
+  border:
+    3px solid
+    rgba(255, 173, 87, 0.45);
+
+  box-shadow:
+    0 14px 36px
+    rgba(0, 0, 0, 0.38);
+}
+
+.brand h1 {
+  margin: 0;
+
+  font-size: 32px;
+  font-weight: 800;
+
+  letter-spacing: -1px;
+}
+
+.muted {
+  color: #929eaa;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+.brand .muted {
+  max-width: 310px;
+
+  margin:
+    8px auto
+    0;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.input-group {
+  display: grid;
+  gap: 7px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #bec8d1;
+}
+
+.input-group input {
+  width: 100%;
+
+  border:
+    1px solid #27313b;
+
+  background: #0c1116;
+
+  color: #f2f5f7;
+
+  padding:
+    13px
+    14px;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.input-group input::placeholder {
+  color: #5f6b77;
+}
+
+.input-group input:focus {
+  border-color: #62d99a;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(98, 217, 154, 0.10);
+}
+
+.pass {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    auto;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.ghost {
+  border: none;
+
+  background: transparent;
+
+  color: #69dca0;
+
+  cursor: pointer;
+
+  padding: 8px;
+
+  font-weight: 600;
+}
+
+.ghost:hover {
+  color: #8cebb7;
+}
+
+.btn {
+  border: 0;
+
+  padding:
+    13px
+    14px;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+.btn.primary {
+  margin-top: 4px;
+
+  color: #08110d;
+
+  background:
+    linear-gradient(
+      135deg,
+      #00c3ff,
+      #00c3ff
+    );
+
+  box-shadow:
+    0 10px 26px
+    rgba(83, 217, 146, 0.14);
+
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.btn.primary:hover {
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 14px 30px
+    rgba(83, 217, 146, 0.20);
+}
+
+.btn.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.alert {
+  background:
+    rgba(117, 34, 34, 0.28);
+
+  border:
+    1px solid
+    rgba(184, 67, 67, 0.55);
+
+  color: #ffd0d0;
+
+  padding:
+    10px
+    12px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+}
+
+.footer-links {
+  margin-top: 20px;
+
+  display: flex;
+
+  gap: 7px;
+
+  justify-content: center;
+
+  align-items: center;
+}
+
+.link {
+  color: #00f7ff;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 520px) {
+  .auth-wrap {
+    padding: 16px;
+  }
+
+  .auth-card {
+    padding: 26px 22px;
+  }
+
+  .nam-logo-img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .brand h1 {
+    font-size: 29px;
+  }
+}
