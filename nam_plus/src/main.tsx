@@ -1,3 +1,16 @@
+/*
+  ARCHIVO: main.tsx
+
+  FUNCIÓN:
+  Define las rutas principales de la aplicación.
+
+  MODIFICACIONES REALIZADAS:
+  - Se agregó la ruta /codigo.
+  - Se agregó la ruta /qr.
+  - Ambas rutas están protegidas con ProtectedRoute.
+  - Solo los usuarios con sesión iniciada pueden acceder.
+  - Si no existe token, ProtectedRoute redirige al login.
+*/
 import React from "react";
 import ReactDOM from "react-dom/client";
 

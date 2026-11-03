@@ -1,10 +1,33 @@
+/*
+  ARCHIVO: qr.tsx
+
+  FUNCIÓN:
+  Esta pantalla permite escanear un código QR usando la cámara
+  del dispositivo.
+
+  MODIFICACIONES REALIZADAS:
+  - Se agregó la librería html5-qrcode para acceder a la cámara.
+  - Se agregó lectura automática del contenido del QR.
+  - Se guarda el código detectado en scannedCode.
+  - Se agregó un mensaje cuando el QR es detectado correctamente.
+  - Se agregó la opción de detener la cámara después de leer un QR.
+  - Se agregó el botón "Continuar" para procesar el código detectado.
+  - Se agregó el botón "Escanear otro" para reiniciar el lector.
+  - Se conectó esta pantalla con redeemCode().
+  - QR e ingreso manual ahora utilizan la misma función de validación.
+  - Más adelante redeemCode() se conectará al backend real.
+*/
+
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
+import { redeemCode } from "../services/redeem.service";
 import "../styles/qr.css";
 
 export default function Qr() {
   const [message, setMessage] = useState("");
   const [scannedCode, setScannedCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
@@ -26,7 +49,10 @@ export default function Qr() {
             setScannedCode(decodedText);
             setMessage("Código QR detectado correctamente.");
 
-            console.log("Código QR detectado:", decodedText);
+            console.log(
+              "Código QR detectado:",
+              decodedText
+            );
 
             try {
               await scanner.stop();
@@ -39,7 +65,10 @@ export default function Qr() {
           }
         );
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Error al iniciar la cámara:",
+          error
+        );
 
         setMessage(
           "No se pudo acceder a la cámara. Revisa los permisos del navegador."
@@ -51,29 +80,56 @@ export default function Qr() {
 
     return () => {
       if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop().catch(() => {});
+        scannerRef.current
+          .stop()
+          .catch(() => {});
       }
     };
   }, []);
 
-  function processCode() {
+  async function processCode() {
     if (!scannedCode) {
-      setMessage("Primero escanea un código QR.");
+      setMessage(
+        "Primero escanea un código QR."
+      );
+
       return;
     }
 
-    console.log(
-      "Código listo para enviar al backend:",
-      scannedCode
-    );
+    setLoading(true);
+    setMessage("");
 
-    setMessage(
-      `Código ${scannedCode} listo para procesarse.`
-    );
+    try {
+      const result = await redeemCode(
+        scannedCode
+      );
+
+      setMessage(result.message);
+
+      console.log(
+        "Resultado del QR:",
+        result
+      );
+    } catch (error) {
+      console.error(
+        "Error procesando el QR:",
+        error
+      );
+
+      setMessage(
+        "No se pudo procesar el código QR."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   function scanAgain() {
     window.location.reload();
+  }
+
+  function goBack() {
+    window.location.href = "/dashboard";
   }
 
   return (
@@ -84,15 +140,15 @@ export default function Qr() {
             <h1>Escanear QR</h1>
 
             <p>
-              Escanea el código QR de tu ticket para obtener tus puntos.
+              Escanea el código QR de tu ticket
+              para obtener tus puntos.
             </p>
           </div>
 
           <button
+            type="button"
             className="qr-back-btn"
-            onClick={() => {
-              window.location.href = "/dashboard";
-            }}
+            onClick={goBack}
           >
             Volver
           </button>
@@ -104,8 +160,13 @@ export default function Qr() {
 
         {scannedCode && (
           <div className="qr-result">
-            <p>Código detectado</p>
-            <strong>{scannedCode}</strong>
+            <p>
+              Código detectado
+            </p>
+
+            <strong>
+              {scannedCode}
+            </strong>
           </div>
         )}
 
@@ -113,15 +174,21 @@ export default function Qr() {
           {scannedCode && (
             <>
               <button
+                type="button"
                 className="qr-primary-btn"
                 onClick={processCode}
+                disabled={loading}
               >
-                Continuar
+                {loading
+                  ? "Validando..."
+                  : "Continuar"}
               </button>
 
               <button
+                type="button"
                 className="qr-secondary-btn"
                 onClick={scanAgain}
+                disabled={loading}
               >
                 Escanear otro
               </button>

@@ -1,3 +1,20 @@
+/*
+  ARCHIVO: dashboard.tsx
+
+  FUNCIÓN:
+  Es la pantalla principal del usuario después de iniciar sesión.
+
+  MODIFICACIONES REALIZADAS:
+  - Se agregó navegación hacia la pantalla de escaneo QR.
+  - Se agregó navegación hacia la pantalla de ingreso manual de código.
+  - Se mantiene el sistema de idioma Español / English.
+  - Se mantiene el tema claro / oscuro.
+  - Se mantiene el acceso a Preferencias.
+  - Se mantiene el cierre de sesión.
+  - El botón "Escanear QR" dirige a /qr.
+  - El botón "Ingresar código" dirige a /codigo.
+  - El dashboard solo dirige al usuario; la validación se realiza en redeemCode().
+*/
 import logo from "../assets/logo.jpeg";
 import "../styles/dashboard.css";
 

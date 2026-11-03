@@ -1,3 +1,23 @@
+/*
+  ARCHIVO: configuracion.tsx
+
+  FUNCIÓN:
+  Permite que el usuario personalice la apariencia
+  y el idioma de la aplicación.
+
+  MODIFICACIONES REALIZADAS:
+  - Se agregó la selección de tema oscuro y claro.
+  - Se guarda el tema elegido en localStorage.
+  - Se agregó la selección de idioma Español / English.
+  - Se guarda el idioma elegido en localStorage.
+  - La pantalla cambia sus textos según el idioma seleccionado.
+  - El tema seleccionado también se aplica visualmente en esta pantalla.
+  - Se agregó el botón para volver al dashboard.
+  - Las preferencias quedan guardadas aunque el usuario recargue la página.
+  - El dashboard consulta estas preferencias para mostrar el tema
+    y el idioma correspondientes.
+*/
+
 import { useEffect, useState } from "react";
 import "../styles/configuracion.css";
 

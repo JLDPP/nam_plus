@@ -1,5 +1,25 @@
+/*
+  ARCHIVO: codigo.tsx
+
+  FUNCIÓN:
+  Esta pantalla permite que el usuario ingrese manualmente
+  el código de un ticket para validarlo.
+
+  MODIFICACIONES REALIZADAS:
+  - Se agregó un campo para ingresar el código del ticket.
+  - Se valida que el código no esté vacío.
+  - Se valida que el código tenga una longitud mínima.
+  - Se agregó un estado de carga mientras se procesa el código.
+  - Se bloquea temporalmente el input y el botón durante la validación.
+  - Se muestran mensajes de resultado al usuario.
+  - Se conectó esta pantalla con redeemCode().
+  - El código manual y el QR utilizan la misma lógica.
+  - Más adelante redeemCode() enviará el código al backend.
+*/
+
 import { useState } from "react";
 import "../styles/codigo.css";
+import { redeemCode } from "../services/redeem.service";
 
 export default function Codigo() {
   const [code, setCode] = useState("");
@@ -27,23 +47,19 @@ export default function Codigo() {
     setMessage("");
 
     try {
-      // AQUÍ conectaremos el backend después.
-      // Por ahora simulamos que recibimos el código.
+      const result = await redeemCode(cleanCode);
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, 500)
-      );
-
-      setMessage(
-        `Código ${cleanCode} recibido correctamente.`
-      );
+      setMessage(result.message);
 
       console.log(
-        "Código listo para enviar al backend:",
-        cleanCode
+        "Resultado del código:",
+        result
       );
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Error procesando el código:",
+        error
+      );
 
       setMessage(
         "No se pudo procesar el código."
@@ -67,6 +83,7 @@ export default function Codigo() {
           </div>
 
           <button
+            type="button"
             className="code-back-btn"
             onClick={() => {
               window.location.href = "/dashboard";
@@ -93,6 +110,7 @@ export default function Codigo() {
             }
             placeholder="Ej. NAM-4F7K92"
             autoComplete="off"
+            disabled={loading}
           />
 
           <button
