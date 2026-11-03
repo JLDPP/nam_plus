@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Configuracion from "./pages/configuracion";
 
 import {
   BrowserRouter,
@@ -12,6 +11,7 @@ import {
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
+import Configuracion from "./pages/configuracion";
 import ProtectedRoute from "./routes/protected.route";
 
 import "./index.css";
@@ -38,6 +38,15 @@ ReactDOM.createRoot(
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/configuracion"
+          element={
+            <ProtectedRoute>
+              <Configuracion />
             </ProtectedRoute>
           }
         />
