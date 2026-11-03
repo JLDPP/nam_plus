@@ -63,9 +63,10 @@ export default function Login() {
         </div>
 
         <form
-          className="auth-form"
-          onSubmit={onSubmit}
-        >
+         className="auth-form"
+         onSubmit={onSubmit}
+         autoComplete="off"
+          >
           <div className="input-group">
             <label htmlFor="email">
               Correo electrónico
@@ -79,7 +80,7 @@ export default function Login() {
               onChange={(e) =>
                 setEmail(e.target.value)
               }
-              autoComplete="email"
+              autoComplete="off"
               required
             />
           </div>
@@ -98,7 +99,7 @@ export default function Login() {
                 onChange={(e) =>
                   setPassword(e.target.value)
                 }
-                autoComplete="current-password"
+                autoComplete="off"
                 required
               />
 

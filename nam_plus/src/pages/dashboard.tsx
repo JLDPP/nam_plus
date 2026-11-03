@@ -1,7 +1,79 @@
+/*
+  ARCHIVO: dashboard.tsx
+
+  FUNCIÓN:
+  Es la pantalla principal del usuario después de iniciar sesión.
+
+  MODIFICACIONES REALIZADAS:
+  - Se agregó navegación hacia la pantalla de escaneo QR.
+  - Se agregó navegación hacia la pantalla de ingreso manual de código.
+  - Se mantiene el sistema de idioma Español / English.
+  - Se mantiene el tema claro / oscuro.
+  - Se mantiene el acceso a Preferencias.
+  - Se mantiene el cierre de sesión.
+  - El botón "Escanear QR" dirige a /qr.
+  - El botón "Ingresar código" dirige a /codigo.
+  - El dashboard solo dirige al usuario; la validación se realiza en redeemCode().
+*/
+import logo from "../assets/logo.jpeg";
+import "../styles/dashboard.css";
+
 export default function Dashboard() {
   const user = JSON.parse(
     localStorage.getItem("user") || "{}"
   );
+
+  const theme =
+    (localStorage.getItem("theme") as "dark" | "light") || "dark";
+
+  const language =
+    (localStorage.getItem("language") as "es" | "en") || "es";
+
+  const translations = {
+    es: {
+      welcome: "Bienvenido de nuevo, disfruta tus recompensas",
+      hello: "Hola",
+      settings: "Configuración",
+      logout: "Cerrar sesión",
+      points: "Mis puntos",
+      keepEarning: "Sigue acumulando para más recompensas",
+      promotions: "Promociones destacadas",
+      discount: "20% de descuento",
+      restaurant: "Restaurante Demo",
+      freeDrink: "Bebida gratis",
+      purchaseOver: "Con compras mayores a $300",
+      redeem: "Canjear ticket",
+      scanQR: "Escanear QR",
+      enterCode: "Ingresar código",
+      activity: "Actividad reciente",
+      purchasePoints: "+100 puntos por compra",
+      redeemPoints: "-500 puntos por canje",
+      userFallback: "Usuario",
+    },
+
+    en: {
+      welcome: "Welcome back, enjoy your rewards",
+      hello: "Hello",
+      settings: "Settings",
+      logout: "Log out",
+      points: "My points",
+      keepEarning: "Keep earning points for more rewards",
+      promotions: "Featured promotions",
+      discount: "20% discount",
+      restaurant: "Demo Restaurant",
+      freeDrink: "Free drink",
+      purchaseOver: "With purchases over $300",
+      redeem: "Redeem ticket",
+      scanQR: "Scan QR",
+      enterCode: "Enter code",
+      activity: "Recent activity",
+      purchasePoints: "+100 points for purchase",
+      redeemPoints: "-500 points for redemption",
+      userFallback: "User",
+    },
+  };
+
+  const t = translations[language];
 
   function logout() {
     localStorage.removeItem("token");
@@ -10,63 +82,134 @@ export default function Dashboard() {
     window.location.href = "/login";
   }
 
+  function goToSettings() {
+    window.location.href = "/configuracion";
+  }
+
+  function goToCode() {
+    window.location.href = "/codigo";
+  }
+
+  function goToQr() {
+    window.location.href = "/qr";
+  }
+
   return (
-    <div>
-      <header>
-        <h1>Ñam+</h1>
+    <div className={`dashboard-page ${theme}`}>
+      <div className="dashboard-bg dashboard-bg-left"></div>
+      <div className="dashboard-bg dashboard-bg-right"></div>
 
-        <div>
-          <span>
-            Hola, {user.name || "Usuario"}
-          </span>
-
-          <button onClick={logout}>
-            Cerrar sesión
-          </button>
-        </div>
-      </header>
-
-      <main>
-        <section>
-          <p>Mis puntos</p>
-          <h2>1,250 pts</h2>
-        </section>
-
-        <section>
-          <h2>Promociones destacadas</h2>
-
-          <div>
-            <div>
-              <h3>20% de descuento</h3>
-              <p>Restaurante Demo</p>
-            </div>
+      <div className="dashboard-container">
+        <header className="dashboard-header">
+          <div className="dashboard-brand">
+            <img
+              src={logo}
+              alt="Logo Ñam+"
+              className="brand-logo"
+            />
 
             <div>
-              <h3>Bebida gratis</h3>
-              <p>Con compras mayores a $300</p>
+              <h1 className="dashboard-logo">
+                Ñam+
+              </h1>
+
+              <p className="dashboard-subtitle">
+                {t.welcome}
+              </p>
             </div>
           </div>
-        </section>
 
-        <section>
-          <h2>Canjear ticket</h2>
+          <div className="dashboard-user-box">
+            <span className="dashboard-user">
+              {t.hello}, {user.name || t.userFallback}
+            </span>
 
-          <button>
-            Escanear QR
-          </button>
+            <button
+              className="settings-btn"
+              onClick={goToSettings}
+            >
+              ⚙ {t.settings}
+            </button>
 
-          <button>
-            Ingresar código
-          </button>
-        </section>
+            <button
+              className="logout-btn"
+              onClick={logout}
+            >
+              {t.logout}
+            </button>
+          </div>
+        </header>
 
-        <section>
-          <h2>Actividad reciente</h2>
+        <main className="dashboard-grid">
+          <section className="dashboard-card points-card">
+            <p className="card-label">
+              {t.points}
+            </p>
 
-          <p>+100 puntos por compra</p>
-          <p>-500 puntos por canje</p>
-        </section>
-      </main>
+            <h2>1,250 pts</h2>
+
+            <span className="card-extra">
+              {t.keepEarning}
+            </span>
+          </section>
+
+          <section className="dashboard-card">
+            <h2 className="section-title">
+              {t.promotions}
+            </h2>
+
+            <div className="promo-list">
+              <div className="promo-card">
+                <h3>{t.discount}</h3>
+                <p>{t.restaurant}</p>
+              </div>
+
+              <div className="promo-card">
+                <h3>{t.freeDrink}</h3>
+                <p>{t.purchaseOver}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="dashboard-card">
+            <h2 className="section-title">
+              {t.redeem}
+            </h2>
+
+            <div className="action-buttons">
+              <button
+                className="primary-btn"
+                onClick={goToQr}
+              >
+                {t.scanQR}
+              </button>
+
+              <button
+                className="secondary-btn"
+                onClick={goToCode}
+              >
+                {t.enterCode}
+              </button>
+            </div>
+          </section>
+
+          <section className="dashboard-card">
+            <h2 className="section-title">
+              {t.activity}
+            </h2>
+
+            <div className="activity-list">
+              <div className="activity-item">
+                {t.purchasePoints}
+              </div>
+
+              <div className="activity-item">
+                {t.redeemPoints}
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
