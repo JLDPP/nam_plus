@@ -13,80 +13,106 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <div className="brand">
-          <img
-            src={logo}
-            alt="Logo Ñam+"
-            className="brand-logo"
-          />
+    <div className="dashboard-page">
+      <div className="dashboard-bg dashboard-bg-left"></div>
+      <div className="dashboard-bg dashboard-bg-right"></div>
 
-          <div>
-            <h1>Ñam+</h1>
-            <p>
-              Bienvenido de nuevo, disfruta tus recompensas
+      <div className="dashboard-container">
+        <header className="dashboard-header">
+          <div className="dashboard-brand">
+            <img
+              src={logo}
+              alt="Logo Ñam+"
+              className="brand-logo"
+            />
+
+            <div>
+              <h1 className="dashboard-logo">Ñam+</h1>
+
+              <p className="dashboard-subtitle">
+                Bienvenido de nuevo, disfruta tus recompensas
+              </p>
+            </div>
+          </div>
+
+          <div className="dashboard-user-box">
+            <span className="dashboard-user">
+              Hola, {user.name || "Usuario"}
+            </span>
+
+            <button
+              className="logout-btn"
+              onClick={logout}
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </header>
+
+        <main className="dashboard-grid">
+          <section className="dashboard-card points-card">
+            <p className="card-label">
+              Mis puntos
             </p>
-          </div>
-        </div>
 
-        <div className="user-box">
-          <span>Hola, {user.name || "Usuario"}</span>
+            <h2>1,250 pts</h2>
 
-          <button onClick={logout}>
-            Cerrar sesión
-          </button>
-        </div>
-      </header>
+            <span className="card-extra">
+              Sigue acumulando para más recompensas
+            </span>
+          </section>
 
-      <main className="dashboard-grid">
-        <section className="card points-card">
-          <p>Mis puntos</p>
-          <h2>1,250 pts</h2>
-          <span>
-            Sigue acumulando para más recompensas
-          </span>
-        </section>
+          <section className="dashboard-card">
+            <h2 className="section-title">
+              Promociones destacadas
+            </h2>
 
-        <section className="card">
-          <h2>Promociones destacadas</h2>
+            <div className="promo-list">
+              <div className="promo-card">
+                <h3>20% de descuento</h3>
+                <p>Restaurante Demo</p>
+              </div>
 
-          <div className="promo-grid">
-            <div className="promo-card">
-              <h3>20% de descuento</h3>
-              <p>Restaurante Demo</p>
+              <div className="promo-card">
+                <h3>Bebida gratis</h3>
+                <p>Con compras mayores a $300</p>
+              </div>
             </div>
+          </section>
 
-            <div className="promo-card">
-              <h3>Bebida gratis</h3>
-              <p>Con compras mayores a $300</p>
+          <section className="dashboard-card">
+            <h2 className="section-title">
+              Canjear ticket
+            </h2>
+
+            <div className="action-buttons">
+              <button className="primary-btn">
+                Escanear QR
+              </button>
+
+              <button className="secondary-btn">
+                Ingresar código
+              </button>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="card">
-          <h2>Canjear ticket</h2>
+          <section className="dashboard-card">
+            <h2 className="section-title">
+              Actividad reciente
+            </h2>
 
-          <div className="button-group">
-            <button className="primary-btn">
-              Escanear QR
-            </button>
+            <div className="activity-list">
+              <div className="activity-item">
+                +100 puntos por compra
+              </div>
 
-            <button className="secondary-btn">
-              Ingresar código
-            </button>
-          </div>
-        </section>
-
-        <section className="card">
-          <h2>Actividad reciente</h2>
-
-          <div className="activity-list">
-            <p>+100 puntos por compra</p>
-            <p>-500 puntos por canje</p>
-          </div>
-        </section>
-      </main>
+              <div className="activity-item">
+                -500 puntos por canje
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
