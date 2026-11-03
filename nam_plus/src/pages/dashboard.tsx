@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import logo from "../assets/logo.jpeg";
 import "../styles/dashboard.css";
 
@@ -6,14 +7,29 @@ export default function Dashboard() {
     localStorage.getItem("user") || "{}"
   );
 
+  const [theme, setTheme] = useState<"dark" | "light">(
+    (localStorage.getItem("theme") as "dark" | "light") || "dark"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     window.location.href = "/login";
   }
 
+  function toggleTheme() {
+    setTheme((currentTheme) =>
+      currentTheme === "dark" ? "light" : "dark"
+    );
+  }
+
   return (
-    <div className="dashboard-page">
+    <div className={`dashboard-page ${theme}`}>
       <div className="dashboard-bg dashboard-bg-left"></div>
       <div className="dashboard-bg dashboard-bg-right"></div>
 
@@ -27,7 +43,9 @@ export default function Dashboard() {
             />
 
             <div>
-              <h1 className="dashboard-logo">Ñam+</h1>
+              <h1 className="dashboard-logo">
+                Ñam+
+              </h1>
 
               <p className="dashboard-subtitle">
                 Bienvenido de nuevo, disfruta tus recompensas
@@ -39,6 +57,18 @@ export default function Dashboard() {
             <span className="dashboard-user">
               Hola, {user.name || "Usuario"}
             </span>
+
+            <button
+              className="theme-btn"
+              onClick={toggleTheme}
+              title={
+                theme === "dark"
+                  ? "Cambiar a tema claro"
+                  : "Cambiar a tema oscuro"
+              }
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
 
             <button
               className="logout-btn"
@@ -75,7 +105,9 @@ export default function Dashboard() {
 
               <div className="promo-card">
                 <h3>Bebida gratis</h3>
-                <p>Con compras mayores a $300</p>
+                <p>
+                  Con compras mayores a $300
+                </p>
               </div>
             </div>
           </section>
