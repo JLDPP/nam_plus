@@ -1,0 +1,126 @@
+.settings-page {
+  --page-bg: #050b12;
+  --container-bg: rgba(9, 17, 28, 0.9);
+  --card-bg: rgba(12, 22, 35, 0.95);
+  --text-primary: #ffffff;
+  --text-secondary: #aab6c5;
+  --border: rgba(255, 255, 255, 0.08);
+  --primary: #17c8ff;
+
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  padding: 40px 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.settings-page.light {
+  --page-bg: #eef4f8;
+  --container-bg: rgba(255, 255, 255, 0.96);
+  --card-bg: #ffffff;
+  --text-primary: #102030;
+  --text-secondary: #607080;
+  --border: rgba(20, 60, 90, 0.13);
+  --primary: #0bb7ee;
+}
+
+.settings-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--container-bg);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.settings-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.settings-header p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
+
+.back-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.settings-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.settings-card h2 {
+  margin: 0 0 8px;
+}
+
+.settings-card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.settings-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.option-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.option-btn:hover {
+  transform: translateY(-2px);
+}
+
+.option-btn.active {
+  background: var(--primary);
+  color: #031018;
+  border-color: var(--primary);
+}
+
+@media (max-width: 700px) {
+  .settings-header,
+  .settings-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-options {
+    width: 100%;
+  }
+
+  .option-btn {
+    flex: 1;
+  }
+}

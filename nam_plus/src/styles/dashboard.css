@@ -549,4 +549,20 @@
     justify-content:
       space-between;
   }
+
+  .settings-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.settings-btn:hover {
+  background: rgba(23, 200, 255, 0.08);
+}
+
+
 }

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import logo from "../assets/logo.jpeg";
 import "../styles/dashboard.css";
 
@@ -7,13 +6,8 @@ export default function Dashboard() {
     localStorage.getItem("user") || "{}"
   );
 
-  const [theme, setTheme] = useState<"dark" | "light">(
-    (localStorage.getItem("theme") as "dark" | "light") || "dark"
-  );
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  const theme =
+    (localStorage.getItem("theme") as "dark" | "light") || "dark";
 
   function logout() {
     localStorage.removeItem("token");
@@ -22,10 +16,8 @@ export default function Dashboard() {
     window.location.href = "/login";
   }
 
-  function toggleTheme() {
-    setTheme((currentTheme) =>
-      currentTheme === "dark" ? "light" : "dark"
-    );
+  function goToSettings() {
+    window.location.href = "/configuracion";
   }
 
   return (
@@ -59,15 +51,10 @@ export default function Dashboard() {
             </span>
 
             <button
-              className="theme-btn"
-              onClick={toggleTheme}
-              title={
-                theme === "dark"
-                  ? "Cambiar a tema claro"
-                  : "Cambiar a tema oscuro"
-              }
+              className="settings-btn"
+              onClick={goToSettings}
             >
-              {theme === "dark" ? "☀️" : "🌙"}
+              ⚙ Configuración
             </button>
 
             <button
