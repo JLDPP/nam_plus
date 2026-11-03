@@ -14,6 +14,7 @@ import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
 import ProtectedRoute from "./routes/protected.route";
 import Codigo from "./pages/codigo";
+import Qr from "./pages/qr";
 import "./index.css";
 
 
@@ -61,7 +62,16 @@ ReactDOM.createRoot(
             />
           }
         />
-        
+
+        <Route
+  path="/qr"
+  element={
+    <ProtectedRoute>
+      <Qr />
+    </ProtectedRoute>
+  }
+/>
+
         <Route
   path="/codigo"
   element={
@@ -69,6 +79,7 @@ ReactDOM.createRoot(
       <Codigo />
     </ProtectedRoute>
   }
+
 />
 
       </Routes>

@@ -61,6 +61,7 @@ export default function Dashboard() {
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     window.location.href = "/login";
   }
 
@@ -70,6 +71,10 @@ export default function Dashboard() {
 
   function goToCode() {
     window.location.href = "/codigo";
+  }
+
+  function goToQr() {
+    window.location.href = "/qr";
   }
 
   return (
@@ -155,7 +160,10 @@ export default function Dashboard() {
             </h2>
 
             <div className="action-buttons">
-              <button className="primary-btn">
+              <button
+                className="primary-btn"
+                onClick={goToQr}
+              >
                 {t.scanQR}
               </button>
 
