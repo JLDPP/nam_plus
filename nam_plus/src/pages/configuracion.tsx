@@ -20,7 +20,7 @@ export default function Configuracion() {
 
   const translations = {
     es: {
-      title: "Configuración",
+      title: "Preferencias",
       subtitle: "Personaliza tu experiencia en Ñam+",
       back: "Volver",
 

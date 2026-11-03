@@ -31,6 +31,7 @@ export default function Dashboard() {
       activity: "Actividad reciente",
       purchasePoints: "+100 puntos por compra",
       redeemPoints: "-500 puntos por canje",
+      userFallback: "Usuario",
     },
 
     en: {
@@ -51,6 +52,7 @@ export default function Dashboard() {
       activity: "Recent activity",
       purchasePoints: "+100 points for purchase",
       redeemPoints: "-500 points for redemption",
+      userFallback: "User",
     },
   };
 
@@ -59,12 +61,15 @@ export default function Dashboard() {
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     window.location.href = "/login";
   }
 
   function goToSettings() {
     window.location.href = "/configuracion";
+  }
+
+  function goToCode() {
+    window.location.href = "/codigo";
   }
 
   return (
@@ -94,7 +99,7 @@ export default function Dashboard() {
 
           <div className="dashboard-user-box">
             <span className="dashboard-user">
-              {t.hello}, {user.name || "Usuario"}
+              {t.hello}, {user.name || t.userFallback}
             </span>
 
             <button
@@ -154,7 +159,10 @@ export default function Dashboard() {
                 {t.scanQR}
               </button>
 
-              <button className="secondary-btn">
+              <button
+                className="secondary-btn"
+                onClick={goToCode}
+              >
                 {t.enterCode}
               </button>
             </div>

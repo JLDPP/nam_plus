@@ -13,8 +13,9 @@ import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
 import ProtectedRoute from "./routes/protected.route";
-
+import Codigo from "./pages/codigo";
 import "./index.css";
+
 
 ReactDOM.createRoot(
   document.getElementById("root")!
@@ -60,6 +61,15 @@ ReactDOM.createRoot(
             />
           }
         />
+        
+        <Route
+  path="/codigo"
+  element={
+    <ProtectedRoute>
+      <Codigo />
+    </ProtectedRoute>
+  }
+/>
 
       </Routes>
     </BrowserRouter>
