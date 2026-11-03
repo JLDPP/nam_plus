@@ -9,6 +9,53 @@ export default function Dashboard() {
   const theme =
     (localStorage.getItem("theme") as "dark" | "light") || "dark";
 
+  const language =
+    (localStorage.getItem("language") as "es" | "en") || "es";
+
+  const translations = {
+    es: {
+      welcome: "Bienvenido de nuevo, disfruta tus recompensas",
+      hello: "Hola",
+      settings: "Configuración",
+      logout: "Cerrar sesión",
+      points: "Mis puntos",
+      keepEarning: "Sigue acumulando para más recompensas",
+      promotions: "Promociones destacadas",
+      discount: "20% de descuento",
+      restaurant: "Restaurante Demo",
+      freeDrink: "Bebida gratis",
+      purchaseOver: "Con compras mayores a $300",
+      redeem: "Canjear ticket",
+      scanQR: "Escanear QR",
+      enterCode: "Ingresar código",
+      activity: "Actividad reciente",
+      purchasePoints: "+100 puntos por compra",
+      redeemPoints: "-500 puntos por canje",
+    },
+
+    en: {
+      welcome: "Welcome back, enjoy your rewards",
+      hello: "Hello",
+      settings: "Settings",
+      logout: "Log out",
+      points: "My points",
+      keepEarning: "Keep earning points for more rewards",
+      promotions: "Featured promotions",
+      discount: "20% discount",
+      restaurant: "Demo Restaurant",
+      freeDrink: "Free drink",
+      purchaseOver: "With purchases over $300",
+      redeem: "Redeem ticket",
+      scanQR: "Scan QR",
+      enterCode: "Enter code",
+      activity: "Recent activity",
+      purchasePoints: "+100 points for purchase",
+      redeemPoints: "-500 points for redemption",
+    },
+  };
+
+  const t = translations[language];
+
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -40,28 +87,28 @@ export default function Dashboard() {
               </h1>
 
               <p className="dashboard-subtitle">
-                Bienvenido de nuevo, disfruta tus recompensas
+                {t.welcome}
               </p>
             </div>
           </div>
 
           <div className="dashboard-user-box">
             <span className="dashboard-user">
-              Hola, {user.name || "Usuario"}
+              {t.hello}, {user.name || "Usuario"}
             </span>
 
             <button
               className="settings-btn"
               onClick={goToSettings}
             >
-              ⚙ Configuración
+              ⚙ {t.settings}
             </button>
 
             <button
               className="logout-btn"
               onClick={logout}
             >
-              Cerrar sesión
+              {t.logout}
             </button>
           </div>
         </header>
@@ -69,64 +116,62 @@ export default function Dashboard() {
         <main className="dashboard-grid">
           <section className="dashboard-card points-card">
             <p className="card-label">
-              Mis puntos
+              {t.points}
             </p>
 
             <h2>1,250 pts</h2>
 
             <span className="card-extra">
-              Sigue acumulando para más recompensas
+              {t.keepEarning}
             </span>
           </section>
 
           <section className="dashboard-card">
             <h2 className="section-title">
-              Promociones destacadas
+              {t.promotions}
             </h2>
 
             <div className="promo-list">
               <div className="promo-card">
-                <h3>20% de descuento</h3>
-                <p>Restaurante Demo</p>
+                <h3>{t.discount}</h3>
+                <p>{t.restaurant}</p>
               </div>
 
               <div className="promo-card">
-                <h3>Bebida gratis</h3>
-                <p>
-                  Con compras mayores a $300
-                </p>
+                <h3>{t.freeDrink}</h3>
+                <p>{t.purchaseOver}</p>
               </div>
             </div>
           </section>
 
           <section className="dashboard-card">
             <h2 className="section-title">
-              Canjear ticket
+              {t.redeem}
             </h2>
 
             <div className="action-buttons">
               <button className="primary-btn">
-                Escanear QR
+                {t.scanQR}
               </button>
 
               <button className="secondary-btn">
-                Ingresar código
+                {t.enterCode}
               </button>
             </div>
           </section>
 
           <section className="dashboard-card">
             <h2 className="section-title">
-              Actividad reciente
+              {t.activity}
             </h2>
 
             <div className="activity-list">
               <div className="activity-item">
-                +100 puntos por compra
+                {t.purchasePoints}
               </div>
 
               <div className="activity-item">
-                -500 puntos por canje
+                {t.redeemPoints}
               </div>
             </div>
           </section>
