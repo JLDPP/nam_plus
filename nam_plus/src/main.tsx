@@ -7,10 +7,13 @@
   MODIFICACIONES REALIZADAS:
   - Se agregó la ruta /codigo.
   - Se agregó la ruta /qr.
-  - Ambas rutas están protegidas con ProtectedRoute.
+  - Se agregó la ruta /promociones.
+  - Se agregó la ruta /promociones/:id para ver el detalle de una promoción.
+  - Las rutas protegidas utilizan ProtectedRoute.
   - Solo los usuarios con sesión iniciada pueden acceder.
   - Si no existe token, ProtectedRoute redirige al login.
 */
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -25,11 +28,14 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
-import ProtectedRoute from "./routes/protected.route";
 import Codigo from "./pages/codigo";
 import Qr from "./pages/qr";
-import "./index.css";
+import Promociones from "./pages/promociones";
+import PromocionDetalle from "./pages/promocionDetalle";
 
+import ProtectedRoute from "./routes/protected.route";
+
+import "./index.css";
 
 ReactDOM.createRoot(
   document.getElementById("root")!
@@ -67,6 +73,42 @@ ReactDOM.createRoot(
         />
 
         <Route
+          path="/qr"
+          element={
+            <ProtectedRoute>
+              <Qr />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/codigo"
+          element={
+            <ProtectedRoute>
+              <Codigo />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/promociones"
+          element={
+            <ProtectedRoute>
+              <Promociones />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/promociones/:id"
+          element={
+            <ProtectedRoute>
+              <PromocionDetalle />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="*"
           element={
             <Navigate
@@ -75,25 +117,6 @@ ReactDOM.createRoot(
             />
           }
         />
-
-        <Route
-  path="/qr"
-  element={
-    <ProtectedRoute>
-      <Qr />
-    </ProtectedRoute>
-  }
-/>
-
-        <Route
-  path="/codigo"
-  element={
-    <ProtectedRoute>
-      <Codigo />
-    </ProtectedRoute>
-  }
-
-/>
 
       </Routes>
     </BrowserRouter>

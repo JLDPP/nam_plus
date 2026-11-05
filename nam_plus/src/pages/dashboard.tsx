@@ -14,8 +14,24 @@
   - El botón "Escanear QR" dirige a /qr.
   - El botón "Ingresar código" dirige a /codigo.
   - El dashboard solo dirige al usuario; la validación se realiza en redeemCode().
+  - Se agregaron promociones reales desde MongoDB.
+  - Se muestran hasta 2 promociones destacadas.
+  - Se muestra la imagen de la promoción si existe.
+  - Se agregó navegación al detalle de la promoción al hacer clic.
 */
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import logo from "../assets/logo.jpeg";
+
+import {
+  getPromotions,
+  type Promotion,
+} from "../services/promotion.service";
+
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
@@ -28,6 +44,32 @@ export default function Dashboard() {
 
   const language =
     (localStorage.getItem("language") as "es" | "en") || "es";
+
+  const [promotions, setPromotions] =
+    useState<Promotion[]>([]);
+
+  useEffect(() => {
+    async function loadPromotions() {
+      try {
+        const data =
+          await getPromotions();
+
+        setPromotions(
+          data.filter(
+            (promotion) =>
+              promotion.active
+          )
+        );
+      } catch (error) {
+        console.error(
+          "Error cargando promociones en dashboard:",
+          error
+        );
+      }
+    }
+
+    loadPromotions();
+  }, []);
 
   const translations = {
     es: {
@@ -49,6 +91,7 @@ export default function Dashboard() {
       purchasePoints: "+100 puntos por compra",
       redeemPoints: "-500 puntos por canje",
       userFallback: "Usuario",
+      noPromotions: "No hay promociones disponibles",
     },
 
     en: {
@@ -70,6 +113,7 @@ export default function Dashboard() {
       purchasePoints: "+100 points for purchase",
       redeemPoints: "-500 points for redemption",
       userFallback: "User",
+      noPromotions: "No promotions available",
     },
   };
 
@@ -159,15 +203,40 @@ export default function Dashboard() {
             </h2>
 
             <div className="promo-list">
-              <div className="promo-card">
-                <h3>{t.discount}</h3>
-                <p>{t.restaurant}</p>
-              </div>
+              {promotions.length === 0 ? (
+                <div className="promo-card">
+                  <h3>{t.noPromotions}</h3>
+                </div>
+              ) : (
+                promotions
+                  .slice(0, 2)
+                  .map((promotion) => (
+                    <div
+                      className="promo-card"
+                      key={promotion._id}
+                      onClick={() => {
+                        window.location.href =
+                          `/promociones/${promotion._id}`;
+                      }}
+                    >
+                      {promotion.imageUrl && (
+                        <img
+                          src={promotion.imageUrl}
+                          alt={promotion.title}
+                          className="dashboard-promo-image"
+                        />
+                      )}
 
-              <div className="promo-card">
-                <h3>{t.freeDrink}</h3>
-                <p>{t.purchaseOver}</p>
-              </div>
+                      <h3>
+                        {promotion.title}
+                      </h3>
+
+                      <p>
+                        {promotion.restaurantName}
+                      </p>
+                    </div>
+                  ))
+              )}
             </div>
           </section>
 
