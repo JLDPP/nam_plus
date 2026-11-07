@@ -1,17 +1,17 @@
+
 /*
   ARCHIVO: main.tsx
 
   FUNCIÓN:
   Define las rutas principales de la aplicación.
 
-  MODIFICACIONES REALIZADAS:
-  - Se agregó la ruta /codigo.
-  - Se agregó la ruta /qr.
-  - Se agregó la ruta /promociones.
-  - Se agregó la ruta /promociones/:id para ver el detalle de una promoción.
-  - Las rutas protegidas utilizan ProtectedRoute.
-  - Solo los usuarios con sesión iniciada pueden acceder.
-  - Si no existe token, ProtectedRoute redirige al login.
+  MODIFICACIONES:
+  - Se conservan todas las rutas existentes.
+  - Se mantienen las rutas protegidas.
+  - Se agregan las rutas de Canjes-Puntos:
+      /puntos
+      /canjes
+      /historial-canjes
 */
 
 import React from "react";
@@ -33,6 +33,11 @@ import Qr from "./pages/qr";
 import Promociones from "./pages/promociones";
 import PromocionDetalle from "./pages/promocionDetalle";
 
+// Nuevas pantallas de Canjes-Puntos
+import Puntos from "./pages/puntos";
+import Canjes from "./pages/canjes";
+import { HistorialCanjes } from "./pages/historialCanjes";
+
 import ProtectedRoute from "./routes/protected.route";
 
 import "./index.css";
@@ -44,6 +49,8 @@ ReactDOM.createRoot(
     <BrowserRouter>
       <Routes>
 
+        {/* Rutas públicas */}
+
         <Route
           path="/login"
           element={<Login />}
@@ -54,6 +61,8 @@ ReactDOM.createRoot(
           element={<Register />}
         />
 
+        {/* Dashboard */}
+
         <Route
           path="/dashboard"
           element={
@@ -62,6 +71,8 @@ ReactDOM.createRoot(
             </ProtectedRoute>
           }
         />
+
+        {/* Configuración */}
 
         <Route
           path="/configuracion"
@@ -72,6 +83,8 @@ ReactDOM.createRoot(
           }
         />
 
+        {/* Escaneo QR */}
+
         <Route
           path="/qr"
           element={
@@ -81,6 +94,8 @@ ReactDOM.createRoot(
           }
         />
 
+        {/* Ingreso manual de código */}
+
         <Route
           path="/codigo"
           element={
@@ -89,6 +104,8 @@ ReactDOM.createRoot(
             </ProtectedRoute>
           }
         />
+
+        {/* Promociones */}
 
         <Route
           path="/promociones"
@@ -107,6 +124,41 @@ ReactDOM.createRoot(
             </ProtectedRoute>
           }
         />
+
+        {/* Sistema de puntos */}
+
+        <Route
+          path="/puntos"
+          element={
+            <ProtectedRoute>
+              <Puntos />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catálogo de recompensas y canjes */}
+
+        <Route
+          path="/canjes"
+          element={
+            <ProtectedRoute>
+              <Canjes />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Historial de canjes */}
+
+        <Route
+          path="/historial-canjes"
+          element={
+            <ProtectedRoute>
+              <HistorialCanjes />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta predeterminada */}
 
         <Route
           path="*"
