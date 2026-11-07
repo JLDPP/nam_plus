@@ -1,3 +1,4 @@
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
@@ -30,6 +31,9 @@ export async function register(req, res) {
       });
     }
 
+    // Se conserva la validación de roles.
+    // Los registros públicos se crean como clientes para evitar
+    // que alguien se asigne permisos de administrador o restaurante.
     const allowedRoles = ["cliente", "restaurante", "admin"];
 
     const safeRole = allowedRoles.includes(role)
@@ -42,7 +46,12 @@ export async function register(req, res) {
       name: name.trim(),
       email: emailNormalized,
       password: hashedPassword,
-      role: safeRole,
+
+      // Seguridad: el registro público siempre crea clientes.
+      role: "cliente",
+
+      // Nuevo: saldo inicial de puntos.
+      pointsBalance: 0,
     });
 
     const token = jwt.sign(
@@ -66,6 +75,9 @@ export async function register(req, res) {
         name: user.name,
         email: user.email,
         role: user.role,
+
+        // Nuevo: saldo de puntos del usuario.
+        pointsBalance: user.pointsBalance || 0,
       },
     });
   } catch (error) {
@@ -127,6 +139,9 @@ export async function login(req, res) {
         name: user.name,
         email: user.email,
         role: user.role,
+
+        // Nuevo: devuelve los puntos al iniciar sesión.
+        pointsBalance: user.pointsBalance || 0,
       },
     });
   } catch (error) {

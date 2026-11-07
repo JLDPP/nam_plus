@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -25,6 +26,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["cliente", "restaurante", "admin"],
       default: "cliente",
+    },
+
+    // Puntos acumulados del usuario
+    pointsBalance: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
   },
   {

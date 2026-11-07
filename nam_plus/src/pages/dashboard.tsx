@@ -1,23 +1,27 @@
+
 /*
   ARCHIVO: dashboard.tsx
 
   FUNCIÓN:
-  Es la pantalla principal del usuario después de iniciar sesión.
+  Pantalla principal del usuario después de iniciar sesión.
 
-  MODIFICACIONES REALIZADAS:
-  - Se agregó navegación hacia la pantalla de escaneo QR.
-  - Se agregó navegación hacia la pantalla de ingreso manual de código.
-  - Se mantiene el sistema de idioma Español / English.
-  - Se mantiene el tema claro / oscuro.
-  - Se mantiene el acceso a Preferencias.
-  - Se mantiene el cierre de sesión.
-  - El botón "Escanear QR" dirige a /qr.
-  - El botón "Ingresar código" dirige a /codigo.
-  - El dashboard solo dirige al usuario; la validación se realiza en redeemCode().
-  - Se agregaron promociones reales desde MongoDB.
-  - Se muestran hasta 2 promociones destacadas.
-  - Se muestra la imagen de la promoción si existe.
-  - Se agregó navegación al detalle de la promoción al hacer clic.
+  FUNCIONES CONSERVADAS:
+  - Navegación hacia escaneo QR.
+  - Navegación hacia ingreso manual de código.
+  - Sistema de idioma Español / English.
+  - Tema claro / oscuro.
+  - Acceso a Configuración.
+  - Cierre de sesión.
+  - Promociones reales desde MongoDB.
+  - Imágenes de promociones.
+  - Navegación al detalle de promociones.
+
+  NUEVAS FUNCIONES:
+  - Consulta del saldo real de puntos desde MongoDB.
+  - Consulta de movimientos reales de puntos.
+  - Acceso al catálogo de recompensas.
+  - Acceso a la pantalla de mis puntos.
+  - Acceso al historial de canjes.
 */
 
 import {
@@ -31,6 +35,12 @@ import {
   getPromotions,
   type Promotion,
 } from "../services/promotion.service";
+
+import {
+  getPointsBalance,
+  getPointsHistory,
+  type PointsTransaction,
+} from "../services/points.service";
 
 import "../styles/dashboard.css";
 
@@ -48,16 +58,29 @@ export default function Dashboard() {
   const [promotions, setPromotions] =
     useState<Promotion[]>([]);
 
+  const [points, setPoints] = useState(0);
+
+  const [pointsLoading, setPointsLoading] =
+    useState(true);
+
+  const [pointsError, setPointsError] =
+    useState(false);
+
+  const [transactions, setTransactions] =
+    useState<PointsTransaction[]>([]);
+
+  const [activityLoading, setActivityLoading] =
+    useState(true);
+
+  // Cargar promociones
   useEffect(() => {
     async function loadPromotions() {
       try {
-        const data =
-          await getPromotions();
+        const data = await getPromotions();
 
         setPromotions(
           data.filter(
-            (promotion) =>
-              promotion.active
+            (promotion) => promotion.active
           )
         );
       } catch (error) {
@@ -71,6 +94,53 @@ export default function Dashboard() {
     loadPromotions();
   }, []);
 
+  // Cargar saldo real de puntos
+  useEffect(() => {
+    async function loadPoints() {
+      try {
+        setPointsLoading(true);
+        setPointsError(false);
+
+        const balance = await getPointsBalance();
+
+        setPoints(balance);
+      } catch (error) {
+        console.error(
+          "Error consultando saldo de puntos:",
+          error
+        );
+
+        setPointsError(true);
+      } finally {
+        setPointsLoading(false);
+      }
+    }
+
+    loadPoints();
+  }, []);
+
+  // Cargar actividad real de puntos
+  useEffect(() => {
+    async function loadActivity() {
+      try {
+        setActivityLoading(true);
+
+        const data = await getPointsHistory();
+
+        setTransactions(data.slice(0, 5));
+      } catch (error) {
+        console.error(
+          "Error cargando actividad de puntos:",
+          error
+        );
+      } finally {
+        setActivityLoading(false);
+      }
+    }
+
+    loadActivity();
+  }, []);
+
   const translations = {
     es: {
       welcome: "Bienvenido de nuevo, disfruta tus recompensas",
@@ -80,18 +150,23 @@ export default function Dashboard() {
       points: "Mis puntos",
       keepEarning: "Sigue acumulando para más recompensas",
       promotions: "Promociones destacadas",
-      discount: "20% de descuento",
-      restaurant: "Restaurante Demo",
-      freeDrink: "Bebida gratis",
-      purchaseOver: "Con compras mayores a $300",
       redeem: "Canjear ticket",
       scanQR: "Escanear QR",
       enterCode: "Ingresar código",
       activity: "Actividad reciente",
-      purchasePoints: "+100 puntos por compra",
-      redeemPoints: "-500 puntos por canje",
       userFallback: "Usuario",
       noPromotions: "No hay promociones disponibles",
+      viewPoints: "Ver mis puntos",
+      viewRewards: "Ver recompensas",
+      viewHistory: "Historial de canjes",
+      loadingPoints: "Cargando puntos...",
+      pointsError: "No fue posible cargar tus puntos",
+      noActivity: "Todavía no tienes movimientos de puntos",
+      loadingActivity: "Cargando actividad...",
+      pointsUnit: "puntos",
+      earn: "Puntos ganados",
+      redeemActivity: "Puntos utilizados",
+      adjustment: "Ajuste de puntos",
     },
 
     en: {
@@ -102,18 +177,23 @@ export default function Dashboard() {
       points: "My points",
       keepEarning: "Keep earning points for more rewards",
       promotions: "Featured promotions",
-      discount: "20% discount",
-      restaurant: "Demo Restaurant",
-      freeDrink: "Free drink",
-      purchaseOver: "With purchases over $300",
       redeem: "Redeem ticket",
       scanQR: "Scan QR",
       enterCode: "Enter code",
       activity: "Recent activity",
-      purchasePoints: "+100 points for purchase",
-      redeemPoints: "-500 points for redemption",
       userFallback: "User",
       noPromotions: "No promotions available",
+      viewPoints: "View my points",
+      viewRewards: "View rewards",
+      viewHistory: "Redemption history",
+      loadingPoints: "Loading points...",
+      pointsError: "Unable to load your points",
+      noActivity: "You don't have any points activity yet",
+      loadingActivity: "Loading activity...",
+      pointsUnit: "points",
+      earn: "Points earned",
+      redeemActivity: "Points used",
+      adjustment: "Points adjustment",
     },
   };
 
@@ -136,6 +216,65 @@ export default function Dashboard() {
 
   function goToQr() {
     window.location.href = "/qr";
+  }
+
+  function goToPoints() {
+    window.location.href = "/puntos";
+  }
+
+  function goToRewards() {
+    window.location.href = "/canjes";
+  }
+
+  function goToHistory() {
+    window.location.href = "/historial-canjes";
+  }
+
+  function formatTransactionDate(date: string) {
+    return new Date(date).toLocaleDateString(
+      language === "es" ? "es-MX" : "en-US",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  }
+
+  function getTransactionLabel(
+    transaction: PointsTransaction
+  ) {
+    if (transaction.description) {
+      return transaction.description;
+    }
+
+    if (transaction.type === "earn") {
+      return t.earn;
+    }
+
+    if (transaction.type === "redeem") {
+      return t.redeemActivity;
+    }
+
+    return t.adjustment;
+  }
+
+  function getTransactionPoints(
+    transaction: PointsTransaction
+  ) {
+    const amount = Math.abs(transaction.points);
+
+    if (transaction.type === "redeem") {
+      return `-${amount}`;
+    }
+
+    if (transaction.type === "earn") {
+      return `+${amount}`;
+    }
+
+    return transaction.points > 0
+      ? `+${amount}`
+      : `-${amount}`;
   }
 
   return (
@@ -185,18 +324,47 @@ export default function Dashboard() {
         </header>
 
         <main className="dashboard-grid">
+
+          {/* PUNTOS REALES */}
           <section className="dashboard-card points-card">
             <p className="card-label">
               {t.points}
             </p>
 
-            <h2>1,250 pts</h2>
+            {pointsLoading ? (
+              <h2>{t.loadingPoints}</h2>
+            ) : pointsError ? (
+              <h2>{t.pointsError}</h2>
+            ) : (
+              <h2>
+                {points.toLocaleString(
+                  language === "es" ? "es-MX" : "en-US"
+                )} pts
+              </h2>
+            )}
 
             <span className="card-extra">
               {t.keepEarning}
             </span>
+
+            <div className="action-buttons">
+              <button
+                className="primary-btn"
+                onClick={goToPoints}
+              >
+                {t.viewPoints}
+              </button>
+
+              <button
+                className="secondary-btn"
+                onClick={goToRewards}
+              >
+                {t.viewRewards}
+              </button>
+            </div>
           </section>
 
+          {/* PROMOCIONES */}
           <section className="dashboard-card">
             <h2 className="section-title">
               {t.promotions}
@@ -240,6 +408,7 @@ export default function Dashboard() {
             </div>
           </section>
 
+          {/* CANJEAR TICKET */}
           <section className="dashboard-card">
             <h2 className="section-title">
               {t.redeem}
@@ -262,21 +431,61 @@ export default function Dashboard() {
             </div>
           </section>
 
+          {/* ACTIVIDAD REAL */}
           <section className="dashboard-card">
             <h2 className="section-title">
               {t.activity}
             </h2>
 
             <div className="activity-list">
-              <div className="activity-item">
-                {t.purchasePoints}
-              </div>
+              {activityLoading ? (
+                <div className="activity-item">
+                  {t.loadingActivity}
+                </div>
+              ) : transactions.length === 0 ? (
+                <div className="activity-item">
+                  {t.noActivity}
+                </div>
+              ) : (
+                transactions.map((transaction) => (
+                  <div
+                    className="activity-item"
+                    key={transaction._id}
+                  >
+                    <div>
+                      <strong>
+                        {getTransactionLabel(transaction)}
+                      </strong>
 
-              <div className="activity-item">
-                {t.redeemPoints}
-              </div>
+                      <small
+                        style={{
+                          display: "block",
+                          opacity: 0.7,
+                          marginTop: "5px",
+                        }}
+                      >
+                        {formatTransactionDate(
+                          transaction.createdAt
+                        )}
+                      </small>
+                    </div>
+
+                    <strong>
+                      {getTransactionPoints(transaction)} pts
+                    </strong>
+                  </div>
+                ))
+              )}
             </div>
+
+            <button
+              className="secondary-btn"
+              onClick={goToHistory}
+            >
+              {t.viewHistory}
+            </button>
           </section>
+
         </main>
       </div>
     </div>

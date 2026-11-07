@@ -1,0 +1,265 @@
+
+* {
+  box-sizing: border-box;
+}
+
+.history-page {
+  min-height: 100vh;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #101827, #172b3d);
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+.history-header {
+  max-width: 1100px;
+  margin: 0 auto 35px;
+  text-align: center;
+  position: relative;
+}
+
+.history-header h1 {
+  margin: 15px 0 10px;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.history-header p {
+  margin: 0;
+  color: #aab9c8;
+}
+
+.history-back-btn {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  padding: 10px 18px;
+  border: 1px solid #ffffff30;
+  border-radius: 10px;
+  background: #ffffff10;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.history-back-btn:hover {
+  background: #ffffff25;
+}
+
+.history-container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+.history-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.history-actions button {
+  padding: 12px 18px;
+  border: 1px solid #ffffff25;
+  border-radius: 10px;
+  background: #ffffff10;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.history-actions button:hover {
+  background: #ffffff25;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.history-card {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 20px;
+  border: 1px solid #ffffff15;
+  border-radius: 17px;
+  background: #ffffff0d;
+  box-shadow: 0 8px 20px #00000025;
+  transition: transform 0.2s;
+}
+
+.history-card:hover {
+  transform: translateY(-3px);
+}
+
+.history-image,
+.history-image-placeholder {
+  width: 115px;
+  height: 105px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  object-fit: cover;
+}
+
+.history-image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff12;
+  font-size: 40px;
+}
+
+.history-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-details h2 {
+  margin: 0 0 7px;
+  font-size: 20px;
+}
+
+.history-restaurant {
+  margin: 0 0 8px;
+  color: #12b886;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.history-date {
+  margin: 0 0 10px;
+  color: #aab9c8;
+  font-size: 13px;
+}
+
+.history-status {
+  display: inline-block;
+  padding: 6px 11px;
+  border-radius: 20px;
+  background: #12b88625;
+  color: #8ff5ce;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.history-points {
+  min-width: 100px;
+  text-align: center;
+}
+
+.history-points span {
+  display: block;
+  color: #ff7777;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.history-points small {
+  color: #aab9c8;
+  font-size: 12px;
+}
+
+.history-empty {
+  padding: 65px 20px;
+  border: 1px solid #ffffff15;
+  border-radius: 18px;
+  background: #ffffff0d;
+  text-align: center;
+  color: #aab9c8;
+}
+
+.history-empty > span {
+  font-size: 55px;
+}
+
+.history-empty h2 {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.history-empty p {
+  line-height: 1.5;
+}
+
+.history-empty button,
+.history-error button {
+  margin-top: 15px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #12b886;
+  color: #06251e;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.history-empty button:hover,
+.history-error button:hover {
+  background: #0da878;
+}
+
+.history-error {
+  padding: 25px;
+  border: 1px solid #ff4d4d70;
+  border-radius: 15px;
+  background: #ff4d4d20;
+  color: #ffaaaa;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .history-page {
+    padding: 20px 15px;
+  }
+
+  .history-header {
+    padding-top: 55px;
+  }
+
+  .history-header h1 {
+    font-size: 25px;
+  }
+
+  .history-back-btn {
+    top: 0;
+  }
+
+  .history-actions {
+    flex-direction: column;
+  }
+
+  .history-actions button {
+    width: 100%;
+  }
+
+  .history-card {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .history-image,
+  .history-image-placeholder {
+    width: 85px;
+    height: 85px;
+  }
+
+  .history-details {
+    flex: 1 1 calc(100% - 105px);
+  }
+
+  .history-points {
+    width: 100%;
+    text-align: right;
+    border-top: 1px solid #ffffff15;
+    padding-top: 12px;
+  }
+
+  .history-points span {
+    display: inline;
+    margin-right: 5px;
+  }
+}

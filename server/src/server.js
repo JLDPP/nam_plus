@@ -1,3 +1,4 @@
+
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -6,6 +7,10 @@ import morgan from "morgan";
 
 import authRoutes from "./routes/auth.routes.js";
 import promotionRoutes from "./routes/promotion.routes.js";
+
+import pointsRoutes from "./routes/points.routes.js";
+import rewardRoutes from "./routes/reward.routes.js";
+import redemptionRoutes from "./routes/redemption.routes.js";
 
 const app = express();
 
@@ -24,6 +29,15 @@ app.use("/api/auth", authRoutes);
 
 // Promociones
 app.use("/api/promotions", promotionRoutes);
+
+// Puntos
+app.use("/api/points", pointsRoutes);
+
+// Recompensas
+app.use("/api/rewards", rewardRoutes);
+
+// Canjes
+app.use("/api/redemptions", redemptionRoutes);
 
 const PORT = process.env.PORT || 4000;
 const MONGODB_URI = process.env.MONGODB_URI;

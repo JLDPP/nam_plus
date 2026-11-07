@@ -1,0 +1,252 @@
+
+* {
+  box-sizing: border-box;
+}
+
+.redeem-page {
+  min-height: 100vh;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #101827, #172b3d);
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+.redeem-header {
+  max-width: 1100px;
+  margin: 0 auto 35px;
+  text-align: center;
+  position: relative;
+}
+
+.redeem-header h1 {
+  margin: 15px 0 10px;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.redeem-header p {
+  color: #aab9c8;
+  margin: 0;
+}
+
+.redeem-back-btn {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  padding: 10px 18px;
+  border: 1px solid #ffffff30;
+  border-radius: 10px;
+  background: #ffffff10;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.redeem-back-btn:hover {
+  background: #ffffff25;
+}
+
+.redeem-container {
+  max-width: 1150px;
+  margin: auto;
+}
+
+.redeem-top-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.redeem-top-actions button {
+  padding: 12px 18px;
+  border: 1px solid #ffffff25;
+  border-radius: 10px;
+  background: #ffffff10;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.redeem-top-actions button:hover {
+  background: #ffffff25;
+}
+
+.reward-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+}
+
+.reward-card {
+  overflow: hidden;
+  border: 1px solid #ffffff15;
+  border-radius: 18px;
+  background: #ffffff0d;
+  box-shadow: 0 10px 25px #00000030;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.reward-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px #00000045;
+}
+
+.reward-image {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  display: block;
+}
+
+.reward-image-placeholder {
+  width: 100%;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff12;
+  font-size: 65px;
+}
+
+.reward-content {
+  padding: 22px;
+}
+
+.reward-restaurant {
+  color: #12b886;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.reward-content h2 {
+  margin: 10px 0;
+  font-size: 21px;
+}
+
+.reward-description {
+  min-height: 45px;
+  color: #aab9c8;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.reward-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.reward-cost {
+  color: #12d6a0;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.reward-stock {
+  color: #aab9c8;
+  font-size: 12px;
+}
+
+.reward-redeem-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #12b886;
+  color: #06251e;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.reward-redeem-btn:hover:not(:disabled) {
+  background: #0da878;
+}
+
+.reward-redeem-btn:disabled {
+  background: #52616d;
+  color: #c5ced5;
+  cursor: not-allowed;
+}
+
+.redeem-empty {
+  padding: 60px 20px;
+  border: 1px solid #ffffff15;
+  border-radius: 18px;
+  background: #ffffff0d;
+  text-align: center;
+  color: #aab9c8;
+}
+
+.redeem-empty span {
+  font-size: 55px;
+}
+
+.redeem-empty h2 {
+  color: white;
+}
+
+.redeem-success,
+.redeem-error {
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.redeem-success {
+  background: #12b88625;
+  border: 1px solid #12b88670;
+  color: #8ff5ce;
+}
+
+.redeem-error {
+  background: #ff4d4d20;
+  border: 1px solid #ff4d4d70;
+  color: #ffaaaa;
+}
+
+@media (max-width: 900px) {
+  .reward-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .redeem-page {
+    padding: 20px 15px;
+  }
+
+  .redeem-header {
+    padding-top: 55px;
+  }
+
+  .redeem-header h1 {
+    font-size: 25px;
+  }
+
+  .redeem-back-btn {
+    top: 0;
+  }
+
+  .reward-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .redeem-top-actions {
+    flex-direction: column;
+  }
+
+  .redeem-top-actions button {
+    width: 100%;
+  }
+}

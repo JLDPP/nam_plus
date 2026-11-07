@@ -22,7 +22,13 @@ export function auth(req, res, next) {
 
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Se conserva el identificador del usuario.
         req.userId = payload.id;
+
+        // Nuevo: permite identificar el rol del usuario.
+        req.userRole = payload.role;
+
         next();
     } catch (error) {
         return res.status(401).json({
