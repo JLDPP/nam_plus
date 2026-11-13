@@ -10,9 +10,10 @@
   - Se mantienen las rutas protegidas.
   - Se conserva el sistema de puntos y canjes.
   - Se conserva la administración de canjes.
-  - Se agrega la administración de recompensas.
-  - Se restringen las pantallas administrativas
-    a usuarios restaurante y admin.
+  - Se conserva la administración de recompensas.
+  - Se agrega la ruta para generar tickets QR.
+  - Las pantallas administrativas solo permiten
+    usuarios restaurante y admin.
 */
 
 import React from "react";
@@ -40,7 +41,7 @@ import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
 
 // ==========================================
-// QR Y CÓDIGOS
+// QR Y CÓDIGOS DEL CLIENTE
 // ==========================================
 
 import Codigo from "./pages/codigo";
@@ -74,6 +75,12 @@ import CanjesRestaurante from "./pages/canjesRestaurante";
 import AdminRecompensas from "./pages/adminRecompensas";
 
 // ==========================================
+// GENERACIÓN DE TICKETS QR
+// ==========================================
+
+import GenerarTicket from "./pages/generarTicket";
+
+// ==========================================
 // PROTECCIÓN DE RUTAS
 // ==========================================
 
@@ -105,7 +112,7 @@ function RestauranteRoute({
   }
 
   // Solo restaurante y admin pueden entrar.
-  // El backend debe validar los permisos reales.
+  // El backend valida los permisos reales.
   if (!["restaurante", "admin"].includes(role)) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -165,7 +172,7 @@ ReactDOM.createRoot(
         />
 
         {/* ================================= */}
-        {/* QR Y CÓDIGOS */}
+        {/* ESCANEO QR DEL CLIENTE */}
         {/* ================================= */}
 
         <Route
@@ -176,6 +183,10 @@ ReactDOM.createRoot(
             </ProtectedRoute>
           }
         />
+
+        {/* ================================= */}
+        {/* INGRESO MANUAL DE CÓDIGOS */}
+        {/* ================================= */}
 
         <Route
           path="/codigo"
@@ -222,7 +233,7 @@ ReactDOM.createRoot(
         />
 
         {/* ================================= */}
-        {/* CATÁLOGO DE RECOMPENSAS Y CANJES */}
+        {/* CATÁLOGO DE RECOMPENSAS */}
         {/* ================================= */}
 
         <Route
@@ -274,6 +285,22 @@ ReactDOM.createRoot(
             <ProtectedRoute>
               <RestauranteRoute>
                 <AdminRecompensas />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* GENERAR TICKETS QR */}
+        {/* SOLO RESTAURANTE Y ADMIN */}
+        {/* ================================= */}
+
+        <Route
+          path="/generar-ticket"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute>
+                <GenerarTicket />
               </RestauranteRoute>
             </ProtectedRoute>
           }
