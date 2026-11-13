@@ -1,3 +1,4 @@
+
 /*
   ARCHIVO: promotion.service.ts
 
@@ -34,6 +35,9 @@ export type CreatePromotionData = {
   endDate?: string | null;
 };
 
+// ==========================================
+// CONSULTAR TODAS LAS PROMOCIONES
+// ==========================================
 
 export async function getPromotions(): Promise<Promotion[]> {
   const response = await api.get<Promotion[]>(
@@ -43,44 +47,59 @@ export async function getPromotions(): Promise<Promotion[]> {
   return response.data;
 }
 
+// ==========================================
+// CONSULTAR UNA PROMOCIÓN POR ID
+// ==========================================
 
 export async function getPromotionById(
   id: string
 ): Promise<Promotion> {
   const response = await api.get<Promotion>(
-    `/promotions/${id}`
+    `/api/promotions/${id}`
   );
 
   return response.data;
 }
+
+// ==========================================
+// CREAR PROMOCIÓN (SOLO ADMIN)
+// ==========================================
 
 export async function createPromotion(
   data: CreatePromotionData
 ): Promise<Promotion> {
   const response = await api.post<Promotion>(
-    "/promotions",
+    "/api/promotions",
     data
   );
 
   return response.data;
 }
+
+// ==========================================
+// ACTUALIZAR PROMOCIÓN (SOLO ADMIN)
+// ==========================================
 
 export async function updatePromotion(
   id: string,
   data: CreatePromotionData
 ): Promise<Promotion> {
   const response = await api.put<Promotion>(
-    `/promotions/${id}`,
+    `/api/promotions/${id}`,
     data
   );
 
   return response.data;
 }
 
+// ==========================================
+// ELIMINAR PROMOCIÓN (SOLO ADMIN)
+// ==========================================
+
 export async function deletePromotion(
   id: string
 ): Promise<void> {
   await api.delete(
-    `/promotions/${id}`
+    `/api/promotions/${id}`
   );
 }
