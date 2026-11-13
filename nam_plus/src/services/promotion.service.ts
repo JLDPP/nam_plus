@@ -34,13 +34,15 @@ export type CreatePromotionData = {
   endDate?: string | null;
 };
 
+
 export async function getPromotions(): Promise<Promotion[]> {
   const response = await api.get<Promotion[]>(
-    "/promotions"
+    "/api/promotions"
   );
 
   return response.data;
 }
+
 
 export async function getPromotionById(
   id: string

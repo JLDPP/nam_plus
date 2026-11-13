@@ -21,20 +21,27 @@ const rewardSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Restaurante al que pertenece la recompensa
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
+      index: true,
+    },
+
     imageUrl: {
       type: String,
       default: "",
       trim: true,
     },
 
-    // Puntos necesarios para canjear la recompensa.
+    // Puntos necesarios para canjear la recompensa
     pointsCost: {
       type: Number,
       required: true,
       min: 1,
     },
 
-    // Cantidad disponible para canjes.
+    // Cantidad disponible para canjes
     stock: {
       type: Number,
       required: true,
@@ -42,7 +49,7 @@ const rewardSchema = new mongoose.Schema(
       min: 0,
     },
 
-    // Permite activar o desactivar una recompensa.
+    // Permite activar o desactivar una recompensa
     active: {
       type: Boolean,
       default: true,
