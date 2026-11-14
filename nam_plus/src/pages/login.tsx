@@ -19,10 +19,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const { data } = await api.post("/auth/login", {
-        email: email.trim(),
-        password,
-      });
+  const { data } = await api.post("/api/auth/login", {
+    email: email.trim(),
+    password,
+  });
 
       localStorage.setItem("token", data.token);
 

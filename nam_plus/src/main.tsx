@@ -3,15 +3,19 @@
   ARCHIVO: main.tsx
 
   FUNCIÓN:
-  Define las rutas principales de la aplicación.
+  Define las rutas principales de la aplicación Ñam+.
 
-  MODIFICACIONES:
-  - Se conservan todas las rutas existentes.
-  - Se mantienen las rutas protegidas.
-  - Se agregan las rutas de Canjes-Puntos:
-      /puntos
-      /canjes
-      /historial-canjes
+  FUNCIONES CONSERVADAS:
+  - Todas las rutas existentes.
+  - Autenticación y rutas protegidas.
+  - Sistema de puntos y canjes.
+  - Administración de canjes.
+  - Administración de recompensas.
+  - Generación de tickets QR.
+  - Validación de roles restaurante y admin.
+
+  NUEVA INTEGRACIÓN:
+  - Inicialización del sistema global de idiomas.
 */
 
 import React from "react";
@@ -24,23 +28,109 @@ import {
   Navigate,
 } from "react-router-dom";
 
+// ==========================================
+// SISTEMA GLOBAL DE IDIOMAS
+// ==========================================
+
+import "./i18n";
+
+// ==========================================
+// AUTENTICACIÓN
+// ==========================================
+
 import Login from "./pages/login";
 import Register from "./pages/register";
+
+// ==========================================
+// PANTALLAS PRINCIPALES
+// ==========================================
+
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
+
+// ==========================================
+// QR Y CÓDIGOS DEL CLIENTE
+// ==========================================
+
 import Codigo from "./pages/codigo";
 import Qr from "./pages/qr";
+
+// ==========================================
+// PROMOCIONES
+// ==========================================
+
 import Promociones from "./pages/promociones";
 import PromocionDetalle from "./pages/promocionDetalle";
 
-// Nuevas pantallas de Canjes-Puntos
+// ==========================================
+// PUNTOS Y CANJES
+// ==========================================
+
 import Puntos from "./pages/puntos";
 import Canjes from "./pages/canjes";
 import { HistorialCanjes } from "./pages/historialCanjes";
 
+// ==========================================
+// ADMINISTRACIÓN DE CANJES
+// ==========================================
+
+import CanjesRestaurante from "./pages/canjesRestaurante";
+
+// ==========================================
+// ADMINISTRACIÓN DE RECOMPENSAS
+// ==========================================
+
+import AdminRecompensas from "./pages/adminRecompensas";
+
+// ==========================================
+// GENERACIÓN DE TICKETS QR
+// ==========================================
+
+import GenerarTicket from "./pages/generarTicket";
+
+// ==========================================
+// PROTECCIÓN DE RUTAS
+// ==========================================
+
 import ProtectedRoute from "./routes/protected.route";
 
 import "./index.css";
+
+// ==========================================
+// VALIDACIÓN DE ROLES
+// ==========================================
+
+function RestauranteRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const storedUser = localStorage.getItem("user");
+
+  let role = "";
+
+  try {
+    const user = storedUser
+      ? JSON.parse(storedUser)
+      : null;
+
+    role = user?.role || "";
+  } catch {
+    role = "";
+  }
+
+  // Solo restaurante y admin pueden entrar.
+  // El backend valida los permisos reales.
+  if (!["restaurante", "admin"].includes(role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// ==========================================
+// RUTAS PRINCIPALES
+// ==========================================
 
 ReactDOM.createRoot(
   document.getElementById("root")!
@@ -49,7 +139,9 @@ ReactDOM.createRoot(
     <BrowserRouter>
       <Routes>
 
-        {/* Rutas públicas */}
+        {/* ================================= */}
+        {/* RUTAS PÚBLICAS */}
+        {/* ================================= */}
 
         <Route
           path="/login"
@@ -61,7 +153,9 @@ ReactDOM.createRoot(
           element={<Register />}
         />
 
-        {/* Dashboard */}
+        {/* ================================= */}
+        {/* DASHBOARD */}
+        {/* ================================= */}
 
         <Route
           path="/dashboard"
@@ -72,7 +166,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Configuración */}
+        {/* ================================= */}
+        {/* CONFIGURACIÓN */}
+        {/* ================================= */}
 
         <Route
           path="/configuracion"
@@ -83,7 +179,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Escaneo QR */}
+        {/* ================================= */}
+        {/* ESCANEO QR DEL CLIENTE */}
+        {/* ================================= */}
 
         <Route
           path="/qr"
@@ -94,7 +192,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Ingreso manual de código */}
+        {/* ================================= */}
+        {/* INGRESO MANUAL DE CÓDIGOS */}
+        {/* ================================= */}
 
         <Route
           path="/codigo"
@@ -105,7 +205,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Promociones */}
+        {/* ================================= */}
+        {/* PROMOCIONES */}
+        {/* ================================= */}
 
         <Route
           path="/promociones"
@@ -125,7 +227,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Sistema de puntos */}
+        {/* ================================= */}
+        {/* SISTEMA DE PUNTOS */}
+        {/* ================================= */}
 
         <Route
           path="/puntos"
@@ -136,7 +240,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Catálogo de recompensas y canjes */}
+        {/* ================================= */}
+        {/* CATÁLOGO DE RECOMPENSAS */}
+        {/* ================================= */}
 
         <Route
           path="/canjes"
@@ -147,7 +253,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Historial de canjes */}
+        {/* ================================= */}
+        {/* HISTORIAL DE CANJES DEL CLIENTE */}
+        {/* ================================= */}
 
         <Route
           path="/historial-canjes"
@@ -158,7 +266,57 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* Ruta predeterminada */}
+        {/* ================================= */}
+        {/* ADMINISTRACIÓN DE CANJES */}
+        {/* SOLO RESTAURANTE Y ADMIN */}
+        {/* ================================= */}
+
+        <Route
+          path="/canjes-restaurante"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute>
+                <CanjesRestaurante />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* ADMINISTRACIÓN DE RECOMPENSAS */}
+        {/* SOLO RESTAURANTE Y ADMIN */}
+        {/* ================================= */}
+
+        <Route
+          path="/admin-recompensas"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute>
+                <AdminRecompensas />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* GENERAR TICKETS QR */}
+        {/* SOLO RESTAURANTE Y ADMIN */}
+        {/* ================================= */}
+
+        <Route
+          path="/generar-ticket"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute>
+                <GenerarTicket />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* RUTA PREDETERMINADA */}
+        {/* ================================= */}
 
         <Route
           path="*"

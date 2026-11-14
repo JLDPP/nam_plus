@@ -1,116 +1,120 @@
 
-* {
+.history-page {
+  min-height: 100vh;
+  background: #142234;
+  color: #ffffff;
+  padding: 40px 24px;
   box-sizing: border-box;
 }
 
-.history-page {
-  min-height: 100vh;
-  padding: 30px 20px;
-  background: linear-gradient(135deg, #101827, #172b3d);
-  color: #ffffff;
-  font-family: Arial, sans-serif;
-}
-
 .history-header {
+  text-align: center;
   max-width: 1100px;
   margin: 0 auto 35px;
-  text-align: center;
   position: relative;
 }
 
 .history-header h1 {
-  margin: 15px 0 10px;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 800;
+  margin: 10px 0;
 }
 
 .history-header p {
-  margin: 0;
-  color: #aab9c8;
+  color: #a9bed6;
 }
 
 .history-back-btn {
   position: absolute;
   left: 0;
-  top: 10px;
+  top: 0;
   padding: 10px 18px;
-  border: 1px solid #ffffff30;
-  border-radius: 10px;
-  background: #ffffff10;
+  background: #253447;
+  border: 1px solid #475569;
   color: white;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
-}
-
-.history-back-btn:hover {
-  background: #ffffff25;
 }
 
 .history-container {
-  max-width: 1000px;
-  margin: auto;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.history-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(120deg, #087f78, #10b981);
+  padding: 30px;
+  border-radius: 18px;
+  margin-bottom: 24px;
+}
+
+.history-summary span {
+  color: #def7ef;
+  font-size: 15px;
+}
+
+.history-summary h2 {
+  font-size: 30px;
+  margin: 10px 0 0;
 }
 
 .history-actions {
   display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 25px;
+  justify-content: flex-end;
+  margin-bottom: 24px;
 }
 
-.history-actions button {
-  padding: 12px 18px;
-  border: 1px solid #ffffff25;
+.history-actions button,
+.history-retry-btn {
+  background: #10b981;
+  color: #062c29;
+  border: none;
+  padding: 12px 20px;
   border-radius: 10px;
-  background: #ffffff10;
-  color: white;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.history-actions button:hover {
-  background: #ffffff25;
+.history-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .history-card {
+  background: #223144;
+  border: 1px solid #37475d;
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 20px;
-  border: 1px solid #ffffff15;
-  border-radius: 17px;
-  background: #ffffff0d;
-  box-shadow: 0 8px 20px #00000025;
-  transition: transform 0.2s;
-}
-
-.history-card:hover {
-  transform: translateY(-3px);
+  gap: 20px;
 }
 
 .history-image,
 .history-image-placeholder {
-  width: 115px;
-  height: 105px;
-  flex-shrink: 0;
-  border-radius: 13px;
+  width: 85px;
+  height: 85px;
+  border-radius: 12px;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .history-image-placeholder {
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: #ffffff12;
-  font-size: 40px;
+  justify-content: center;
+  background: #334155;
+  font-size: 35px;
 }
 
 .history-details {
@@ -118,148 +122,115 @@
   min-width: 0;
 }
 
-.history-details h2 {
-  margin: 0 0 7px;
-  font-size: 20px;
-}
-
-.history-restaurant {
+.history-details h3 {
+  font-size: 19px;
   margin: 0 0 8px;
-  color: #12b886;
-  font-weight: bold;
-  font-size: 13px;
 }
 
-.history-date {
-  margin: 0 0 10px;
-  color: #aab9c8;
-  font-size: 13px;
+.history-details p {
+  color: #b8c8db;
+  margin: 0 0 8px;
+}
+
+.history-details small {
+  color: #94a3b8;
+}
+
+.history-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.history-meta strong {
+  color: #34d399;
+  font-size: 20px;
 }
 
 .history-status {
   display: inline-block;
-  padding: 6px 11px;
+  padding: 6px 12px;
   border-radius: 20px;
-  background: #12b88625;
-  color: #8ff5ce;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-.history-points {
-  min-width: 100px;
+.status-completed {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+.status-pending {
+  background: #78350f;
+  color: #fde68a;
+}
+
+.status-cancelled {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+.history-state {
+  background: #223144;
+  border: 1px solid #37475d;
   text-align: center;
-}
-
-.history-points span {
-  display: block;
-  color: #ff7777;
-  font-size: 25px;
-  font-weight: 900;
-}
-
-.history-points small {
-  color: #aab9c8;
-  font-size: 12px;
-}
-
-.history-empty {
-  padding: 65px 20px;
-  border: 1px solid #ffffff15;
   border-radius: 18px;
-  background: #ffffff0d;
-  text-align: center;
-  color: #aab9c8;
+  padding: 65px 24px;
 }
 
-.history-empty > span {
-  font-size: 55px;
+.history-state-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
 }
 
-.history-empty h2 {
-  color: white;
-  margin-bottom: 10px;
+.history-state h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
 }
 
-.history-empty p {
-  line-height: 1.5;
+.history-state p {
+  color: #a9bed6;
+  margin-bottom: 25px;
 }
 
-.history-empty button,
-.history-error button {
-  margin-top: 15px;
-  padding: 13px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #12b886;
-  color: #06251e;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.history-empty button:hover,
-.history-error button:hover {
-  background: #0da878;
-}
-
-.history-error {
-  padding: 25px;
-  border: 1px solid #ff4d4d70;
-  border-radius: 15px;
-  background: #ff4d4d20;
-  color: #ffaaaa;
-  text-align: center;
-}
-
-@media (max-width: 650px) {
+@media (max-width: 600px) {
   .history-page {
-    padding: 20px 15px;
+    padding: 24px 14px;
   }
 
   .history-header {
-    padding-top: 55px;
+    padding-top: 45px;
   }
 
   .history-header h1 {
-    font-size: 25px;
+    font-size: 26px;
   }
 
-  .history-back-btn {
-    top: 0;
+  .history-summary {
+    padding: 20px;
   }
 
-  .history-actions {
-    flex-direction: column;
-  }
-
-  .history-actions button {
-    width: 100%;
+  .history-summary h2 {
+    font-size: 22px;
   }
 
   .history-card {
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 12px;
   }
 
   .history-image,
   .history-image-placeholder {
-    width: 85px;
-    height: 85px;
+    width: 65px;
+    height: 65px;
   }
 
-  .history-details {
-    flex: 1 1 calc(100% - 105px);
-  }
-
-  .history-points {
+  .history-meta {
     width: 100%;
-    text-align: right;
-    border-top: 1px solid #ffffff15;
-    padding-top: 12px;
-  }
-
-  .history-points span {
-    display: inline;
-    margin-right: 5px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 }

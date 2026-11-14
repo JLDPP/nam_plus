@@ -1,30 +1,41 @@
+
 /*
   ARCHIVO: codigo.tsx
 
   FUNCIÓN:
-  Esta pantalla permite que el usuario ingrese manualmente
-  el código de un ticket para validarlo.
+  Permite ingresar manualmente un código
+  de ticket para obtener puntos en Ñam+.
 
-  MODIFICACIONES REALIZADAS:
-  - Se agregó un campo para ingresar el código del ticket.
-  - Se valida que el código no esté vacío.
-  - Se valida que el código tenga una longitud mínima.
-  - Se agregó un estado de carga mientras se procesa el código.
-  - Se bloquea temporalmente el input y el botón durante la validación.
-  - Se muestran mensajes de resultado al usuario.
-  - Se conectó esta pantalla con redeemCode().
-  - El código manual y el QR utilizan la misma lógica.
-  - Más adelante redeemCode() enviará el código al backend.
+  FUNCIONES CONSERVADAS:
+  - Validación de código vacío.
+  - Validación de longitud mínima.
+  - Validación con redeemCode().
+  - Bloqueo del formulario durante la consulta.
+  - Mensajes de resultado.
+  - Navegación al dashboard.
+  - Estilos actuales.
+
+  MEJORA:
+  - Traducción global español/inglés.
 */
 
 import { useState } from "react";
-import "../styles/codigo.css";
+import { useTranslation } from "react-i18next";
+
 import { redeemCode } from "../services/redeem.service";
+import "../styles/codigo.css";
 
 export default function Codigo() {
+  const { t } = useTranslation();
+
   const [code, setCode] = useState("");
-  const [message, setMessage] = useState("");
+  const [messageKey, setMessageKey] = useState("");
+  const [serverMessage, setServerMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // ==========================================
+  // VALIDAR CÓDIGO MANUAL
+  // ==========================================
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -34,22 +45,27 @@ export default function Codigo() {
     const cleanCode = code.trim();
 
     if (!cleanCode) {
-      setMessage("Ingresa un código válido.");
+      setServerMessage("");
+      setMessageKey("code.invalid");
       return;
     }
 
     if (cleanCode.length < 4) {
-      setMessage("El código es demasiado corto.");
+      setServerMessage("");
+      setMessageKey("code.tooShort");
       return;
     }
 
     setLoading(true);
-    setMessage("");
+    setMessageKey("");
+    setServerMessage("");
 
     try {
+      // Conservamos la función original.
       const result = await redeemCode(cleanCode);
 
-      setMessage(result.message);
+      // Conservamos el mensaje real del backend.
+      setServerMessage(result.message);
 
       console.log(
         "Resultado del código:",
@@ -61,25 +77,25 @@ export default function Codigo() {
         error
       );
 
-      setMessage(
-        "No se pudo procesar el código."
-      );
+      setMessageKey("code.processingError");
     } finally {
       setLoading(false);
     }
   }
 
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
+
   return (
     <div className="code-page">
       <div className="code-container">
+
         <div className="code-header">
           <div>
-            <h1>Ingresar código</h1>
+            <h1>{t("code.title")}</h1>
 
-            <p>
-              Escribe el código de tu ticket para
-              obtener tus puntos.
-            </p>
+            <p>{t("code.subtitle")}</p>
           </div>
 
           <button
@@ -89,7 +105,7 @@ export default function Codigo() {
               window.location.href = "/dashboard";
             }}
           >
-            Volver
+            {t("common.back")}
           </button>
         </div>
 
@@ -98,7 +114,7 @@ export default function Codigo() {
           onSubmit={handleSubmit}
         >
           <label htmlFor="ticket-code">
-            Código del ticket
+            {t("code.label")}
           </label>
 
           <input
@@ -108,7 +124,7 @@ export default function Codigo() {
             onChange={(event) =>
               setCode(event.target.value)
             }
-            placeholder="Ej. NAM-4F7K92"
+            placeholder={t("code.placeholder")}
             autoComplete="off"
             disabled={loading}
           />
@@ -119,16 +135,19 @@ export default function Codigo() {
             disabled={loading}
           >
             {loading
-              ? "Validando..."
-              : "Validar código"}
+              ? t("code.validating")
+              : t("code.submit")}
           </button>
 
-          {message && (
+          {(messageKey || serverMessage) && (
             <p className="code-message">
-              {message}
+              {messageKey
+                ? t(messageKey)
+                : serverMessage}
             </p>
           )}
         </form>
+
       </div>
     </div>
   );

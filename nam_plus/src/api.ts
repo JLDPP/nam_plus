@@ -1,12 +1,23 @@
 
 import axios from "axios";
 
+// ==========================================
+// CONFIGURACIÓN DE API
+// ==========================================
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  // Usa la URL configurada o el mismo origen.
+  // El proxy de Vite enviará /api al backend.
+  baseURL: import.meta.env.VITE_API_URL || "/",
+
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+// ==========================================
+// CONFIGURAR TOKEN JWT
+// ==========================================
 
 export function setAuth(token: string | null) {
   if (token) {
@@ -20,10 +31,16 @@ export function setAuth(token: string | null) {
   }
 }
 
-// Recuperar la sesión guardada
+// ==========================================
+// RECUPERAR SESIÓN GUARDADA
+// ==========================================
+
 setAuth(localStorage.getItem("token"));
 
-// Interceptor de respuestas
+// ==========================================
+// INTERCEPTOR DE RESPUESTAS
+// ==========================================
+
 api.interceptors.response.use(
   (response) => response,
 

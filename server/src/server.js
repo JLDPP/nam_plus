@@ -11,6 +11,8 @@ import promotionRoutes from "./routes/promotion.routes.js";
 import pointsRoutes from "./routes/points.routes.js";
 import rewardRoutes from "./routes/reward.routes.js";
 import redemptionRoutes from "./routes/redemption.routes.js";
+import ticketRoutes from "./routes/ticket.routes.js";
+
 
 const app = express();
 
@@ -38,6 +40,9 @@ app.use("/api/rewards", rewardRoutes);
 
 // Canjes
 app.use("/api/redemptions", redemptionRoutes);
+
+// Tickets
+app.use("/api/tickets", ticketRoutes);
 
 const PORT = process.env.PORT || 4000;
 const MONGODB_URI = process.env.MONGODB_URI;

@@ -249,4 +249,63 @@
   .redeem-top-actions button {
     width: 100%;
   }
+
+
+
+
+
+
+/* Saldo disponible del usuario */
+.redeem-balance-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.redeem-balance-card h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.redeem-balance-total {
+  font-size: 36px;
+  font-weight: 800;
+  color: #16a34a;
+  margin-bottom: 10px;
+}
+
+.redeem-balance-card p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Información de puntos */
+.redeem-insufficient {
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+.redeem-available {
+  color: #16a34a;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+/* Recompensas que no se pueden canjear */
+.reward-redeem-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+
 }
