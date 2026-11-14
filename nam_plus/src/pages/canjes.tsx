@@ -1,6 +1,29 @@
 
+/*
+  ARCHIVO: canjes.tsx
+
+  FUNCIÓN:
+  Catálogo de recompensas de Ñam+.
+
+  FUNCIONES CONSERVADAS:
+  - Consulta de recompensas reales.
+  - Consulta del saldo de puntos.
+  - Validación de inventario.
+  - Validación de puntos suficientes.
+  - Prevención de canjes duplicados.
+  - Confirmación antes del canje.
+  - Actualización de puntos e inventario.
+  - Manejo de errores.
+  - Navegación.
+  - Diseño original.
+
+  MEJORA:
+  - Traducción español/inglés con i18next.
+*/
+
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 
 import {
@@ -20,6 +43,7 @@ import "../styles/canjes.css";
 
 export default function Canjes() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [points, setPoints] = useState<number | null>(null);
@@ -28,10 +52,24 @@ export default function Canjes() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const [redeemingId, setRedeemingId] = useState<string | null>(null);
+  const [redeemingId, setRedeemingId] =
+    useState<string | null>(null);
 
-  // Bloquea solicitudes repetidas mientras se realiza un canje.
+  // Impide solicitudes repetidas durante un canje.
   const redeemingRef = useRef(false);
+
+  // ==========================================
+  // IDIOMA PARA FORMATO DE NÚMEROS
+  // ==========================================
+
+  const locale =
+    i18n.resolvedLanguage?.startsWith("en")
+      ? "en-US"
+      : "es-MX";
+
+  // ==========================================
+  // CARGAR RECOMPENSAS Y PUNTOS
+  // ==========================================
 
   useEffect(() => {
     let active = true;
@@ -48,13 +86,19 @@ export default function Canjes() {
 
         if (!active) return;
 
-        setRewards(rewardsData.filter((reward) => reward.active));
+        setRewards(
+          rewardsData.filter((reward) => reward.active)
+        );
+
         setPoints(balance);
       } catch (err) {
-        console.error("Error cargando catálogo:", err);
+        console.error(
+          "Error cargando catálogo:",
+          err
+        );
 
         if (active) {
-          setError("No fue posible cargar las recompensas o tus puntos.");
+          setError("rewards.loadError");
         }
       } finally {
         if (active) {
@@ -63,27 +107,35 @@ export default function Canjes() {
       }
     }
 
-    loadInitialData();
+    void loadInitialData();
 
     return () => {
       active = false;
     };
   }, []);
 
+  // ==========================================
+  // ACTUALIZAR RECOMPENSAS Y SALDO
+  // ==========================================
+
   async function refreshData() {
-    const [rewardsResult, pointsResult] = await Promise.allSettled([
-      getRewards(),
-      getPointsBalance(),
-    ]);
+    const [rewardsResult, pointsResult] =
+      await Promise.allSettled([
+        getRewards(),
+        getPointsBalance(),
+      ]);
 
     let refreshed = true;
 
     if (rewardsResult.status === "fulfilled") {
       setRewards(
-        rewardsResult.value.filter((reward) => reward.active)
+        rewardsResult.value.filter(
+          (reward) => reward.active
+        )
       );
     } else {
       refreshed = false;
+
       console.error(
         "Error actualizando recompensas:",
         rewardsResult.reason
@@ -95,6 +147,7 @@ export default function Canjes() {
     } else {
       refreshed = false;
       setPoints(null);
+
       console.error(
         "Error actualizando puntos:",
         pointsResult.reason
@@ -104,26 +157,33 @@ export default function Canjes() {
     return refreshed;
   }
 
+  // ==========================================
+  // CANJEAR RECOMPENSA
+  // ==========================================
+
   async function handleRedeem(reward: Reward) {
     if (redeemingRef.current || loading) return;
 
     if (points === null) {
-      setError("No se pudo verificar tu saldo de puntos.");
+      setError("rewards.balanceError");
       return;
     }
 
     if (reward.stock <= 0) {
-      setError("Esta recompensa está agotada.");
+      setError("rewards.outOfStockError");
       return;
     }
 
     if (points < reward.pointsCost) {
-      setError("No tienes suficientes puntos para este canje.");
+      setError("rewards.insufficientError");
       return;
     }
 
     const confirmed = window.confirm(
-      `¿Deseas canjear "${reward.name}" por ${reward.pointsCost} puntos?`
+      t("rewards.confirmRedeem", {
+        name: reward.name,
+        points: reward.pointsCost.toLocaleString(locale),
+      })
     );
 
     if (!confirmed) return;
@@ -137,35 +197,54 @@ export default function Canjes() {
       await redeemReward(reward._id);
 
       setMessage(
-        `¡Canje registrado correctamente! Has solicitado: ${reward.name}. Puedes consultar su estado en tu historial.`
+        t("rewards.redeemSuccess", {
+          name: reward.name,
+        })
       );
 
       const refreshed = await refreshData();
 
       if (!refreshed) {
-        setError(
-          "El canje se registró, pero no se pudo actualizar toda la información. Recarga la página para consultar tu saldo."
-        );
+        setError("rewards.refreshError");
       }
     } catch (err: unknown) {
       console.error("Error realizando canje:", err);
 
       if (axios.isAxiosError(err)) {
+        const serverMessage =
+          typeof err.response?.data?.message === "string"
+            ? err.response.data.message
+            : null;
+
+        // Conserva los errores específicos del backend.
         setError(
-          err.response?.data?.message ||
-          "No fue posible realizar el canje."
+          serverMessage || "rewards.redeemError"
         );
       } else {
-        setError("Ocurrió un error inesperado al realizar el canje.");
+        setError("rewards.unexpectedError");
       }
 
-      // Recuperar datos por si el saldo o el inventario cambió.
+      // Recuperar el saldo y el inventario.
       await refreshData();
     } finally {
       redeemingRef.current = false;
       setRedeemingId(null);
     }
   }
+
+  // ==========================================
+  // MOSTRAR ERRORES TRADUCIDOS
+  // ==========================================
+
+  function displayError(value: string) {
+    return value.startsWith("rewards.")
+      ? t(value)
+      : value;
+  }
+
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
 
   return (
     <div className="redeem-page">
@@ -174,72 +253,80 @@ export default function Canjes() {
           className="redeem-back-btn"
           onClick={() => navigate("/dashboard")}
         >
-          ← Volver
+          ← {t("common.back")}
         </button>
 
-        <h1>Catálogo de recompensas</h1>
+        <h1>{t("rewards.title")}</h1>
 
-        <p>
-          Utiliza tus puntos y disfruta de tus alimentos favoritos.
-        </p>
+        <p>{t("rewards.subtitle")}</p>
       </header>
 
       <main className="redeem-container">
         <div className="redeem-top-actions">
           <button onClick={() => navigate("/puntos")}>
-            ⭐ Mis puntos
+            ⭐ {t("rewards.myPoints")}
           </button>
 
-          <button onClick={() => navigate("/historial-canjes")}>
-            📋 Historial de canjes
+          <button
+            onClick={() => navigate("/historial-canjes")}
+          >
+            📋 {t("rewards.history")}
           </button>
         </div>
 
-        {/* Saldo disponible */}
+        {/* SALDO DISPONIBLE */}
         <section className="redeem-balance-card">
-          <h2>⭐ Tus puntos disponibles</h2>
+          <h2>
+            ⭐ {t("rewards.availablePoints")}
+          </h2>
 
           <div className="redeem-balance-total">
             {loading || points === null
-              ? "No disponible"
-              : `${points.toLocaleString("es-MX")} pts`}
+              ? t("rewards.unavailable")
+              : `${points.toLocaleString(locale)} pts`}
           </div>
 
-          <p>
-            Selecciona una recompensa que puedas obtener
-            con tus puntos acumulados.
-          </p>
+          <p>{t("rewards.instructions")}</p>
         </section>
 
+        {/* MENSAJES */}
         {message && (
-          <div className="redeem-success" role="status">
+          <div
+            className="redeem-success"
+            role="status"
+          >
             {message}
           </div>
         )}
 
         {error && (
-          <div className="redeem-error" role="alert">
-            {error}
+          <div
+            className="redeem-error"
+            role="alert"
+          >
+            {displayError(error)}
           </div>
         )}
 
+        {/* CATÁLOGO */}
         {loading ? (
           <div className="redeem-empty">
-            Cargando recompensas...
+            {t("rewards.loading")}
           </div>
         ) : rewards.length === 0 ? (
           <div className="redeem-empty">
             <span>🍽️</span>
-            <h2>No hay recompensas disponibles</h2>
-            <p>
-              Pronto encontrarás nuevos alimentos para canjear.
-            </p>
+
+            <h2>{t("rewards.emptyTitle")}</h2>
+
+            <p>{t("rewards.emptyDescription")}</p>
           </div>
         ) : (
           <section className="reward-grid">
             {rewards.map((reward) => {
               const insufficientPoints =
-                points === null || points < reward.pointsCost;
+                points === null ||
+                points < reward.pointsCost;
 
               const outOfStock = reward.stock <= 0;
 
@@ -269,19 +356,24 @@ export default function Canjes() {
 
                     <p className="reward-description">
                       {reward.description ||
-                        "Disfruta esta recompensa."}
+                        t("rewards.defaultDescription")}
                     </p>
 
                     <div className="reward-footer">
                       <span className="reward-cost">
                         ⭐{" "}
-                        {reward.pointsCost.toLocaleString("es-MX")} pts
+                        {reward.pointsCost.toLocaleString(
+                          locale
+                        )}{" "}
+                        pts
                       </span>
 
                       <span className="reward-stock">
                         {outOfStock
-                          ? "Agotado"
-                          : `${reward.stock} disponibles`}
+                          ? t("rewards.outOfStock")
+                          : t("rewards.availableStock", {
+                              count: reward.stock,
+                            })}
                       </span>
                     </div>
 
@@ -294,8 +386,8 @@ export default function Canjes() {
                         }
                       >
                         {insufficientPoints
-                          ? "No tienes suficientes puntos"
-                          : "Puntos suficientes para canjear"}
+                          ? t("rewards.insufficientPoints")
+                          : t("rewards.enoughPoints")}
                       </p>
                     )}
 
@@ -309,14 +401,14 @@ export default function Canjes() {
                       onClick={() => handleRedeem(reward)}
                     >
                       {redeemingId === reward._id
-                        ? "Procesando..."
+                        ? t("rewards.processing")
                         : outOfStock
-                        ? "Agotado"
+                        ? t("rewards.outOfStock")
                         : points === null
-                        ? "Saldo no disponible"
+                        ? t("rewards.balanceUnavailable")
                         : insufficientPoints
-                        ? "Puntos insuficientes"
-                        : "Canjear recompensa"}
+                        ? t("rewards.insufficientShort")
+                        : t("rewards.redeemButton")}
                     </button>
                   </div>
                 </article>

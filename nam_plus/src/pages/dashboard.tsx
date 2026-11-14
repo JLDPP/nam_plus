@@ -3,31 +3,25 @@
   ARCHIVO: dashboard.tsx
 
   FUNCIÓN:
-  Pantalla principal del usuario después de iniciar sesión.
+  Pantalla principal de Ñam+.
 
   FUNCIONES CONSERVADAS:
-  - Navegación hacia escaneo QR.
-  - Navegación hacia ingreso manual de código.
-  - Sistema de idioma Español / English.
-  - Tema claro / oscuro.
-  - Acceso a Configuración.
-  - Cierre de sesión.
-  - Promociones reales desde MongoDB.
-  - Imágenes de promociones.
-  - Navegación al detalle de promociones.
+  - Sistema de puntos reales desde MongoDB.
+  - Actividad reciente.
+  - Promociones destacadas.
+  - Escaneo QR e ingreso manual.
+  - Catálogo e historial de recompensas.
+  - Tema claro y oscuro.
+  - Configuración y cierre de sesión.
+  - Navegación a todas las pantallas.
 
-  NUEVAS FUNCIONES:
-  - Consulta del saldo real de puntos desde MongoDB.
-  - Consulta de movimientos reales de puntos.
-  - Acceso al catálogo de recompensas.
-  - Acceso a la pantalla de mis puntos.
-  - Acceso al historial de canjes.
+  MEJORA:
+  - Traducciones centralizadas mediante i18next.
+  - Eliminación de traducciones locales duplicadas.
 */
 
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import logo from "../assets/logo.jpeg";
 
@@ -45,15 +39,32 @@ import {
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+  // ==========================================
+  // IDIOMA GLOBAL
+  // ==========================================
+
+  const { t, i18n } = useTranslation();
+
+  const locale =
+    i18n.resolvedLanguage?.startsWith("en")
+      ? "en-US"
+      : "es-MX";
+
+  // ==========================================
+  // USUARIO Y TEMA
+  // ==========================================
+
   const user = JSON.parse(
     localStorage.getItem("user") || "{}"
   );
 
   const theme =
-    (localStorage.getItem("theme") as "dark" | "light") || "dark";
+    (localStorage.getItem("theme") as "dark" | "light") ||
+    "dark";
 
-  const language =
-    (localStorage.getItem("language") as "es" | "en") || "es";
+  // ==========================================
+  // ESTADOS
+  // ==========================================
 
   const [promotions, setPromotions] =
     useState<Promotion[]>([]);
@@ -72,7 +83,10 @@ export default function Dashboard() {
   const [activityLoading, setActivityLoading] =
     useState(true);
 
-  // Cargar promociones
+  // ==========================================
+  // CARGAR PROMOCIONES
+  // ==========================================
+
   useEffect(() => {
     async function loadPromotions() {
       try {
@@ -91,10 +105,13 @@ export default function Dashboard() {
       }
     }
 
-    loadPromotions();
+    void loadPromotions();
   }, []);
 
-  // Cargar saldo real de puntos
+  // ==========================================
+  // CARGAR SALDO REAL
+  // ==========================================
+
   useEffect(() => {
     async function loadPoints() {
       try {
@@ -116,10 +133,13 @@ export default function Dashboard() {
       }
     }
 
-    loadPoints();
+    void loadPoints();
   }, []);
 
-  // Cargar actividad real de puntos
+  // ==========================================
+  // CARGAR ACTIVIDAD RECIENTE
+  // ==========================================
+
   useEffect(() => {
     async function loadActivity() {
       try {
@@ -138,66 +158,12 @@ export default function Dashboard() {
       }
     }
 
-    loadActivity();
+    void loadActivity();
   }, []);
 
-  const translations = {
-    es: {
-      welcome: "Bienvenido de nuevo, disfruta tus recompensas",
-      hello: "Hola",
-      settings: "Configuración",
-      logout: "Cerrar sesión",
-      points: "Mis puntos",
-      keepEarning: "Sigue acumulando para más recompensas",
-      promotions: "Promociones destacadas",
-      redeem: "Canjear ticket",
-      scanQR: "Escanear QR",
-      enterCode: "Ingresar código",
-      activity: "Actividad reciente",
-      userFallback: "Usuario",
-      noPromotions: "No hay promociones disponibles",
-      viewPoints: "Ver mis puntos",
-      viewRewards: "Ver recompensas",
-      viewHistory: "Historial de canjes",
-      loadingPoints: "Cargando puntos...",
-      pointsError: "No fue posible cargar tus puntos",
-      noActivity: "Todavía no tienes movimientos de puntos",
-      loadingActivity: "Cargando actividad...",
-      pointsUnit: "puntos",
-      earn: "Puntos ganados",
-      redeemActivity: "Puntos utilizados",
-      adjustment: "Ajuste de puntos",
-    },
-
-    en: {
-      welcome: "Welcome back, enjoy your rewards",
-      hello: "Hello",
-      settings: "Settings",
-      logout: "Log out",
-      points: "My points",
-      keepEarning: "Keep earning points for more rewards",
-      promotions: "Featured promotions",
-      redeem: "Redeem ticket",
-      scanQR: "Scan QR",
-      enterCode: "Enter code",
-      activity: "Recent activity",
-      userFallback: "User",
-      noPromotions: "No promotions available",
-      viewPoints: "View my points",
-      viewRewards: "View rewards",
-      viewHistory: "Redemption history",
-      loadingPoints: "Loading points...",
-      pointsError: "Unable to load your points",
-      noActivity: "You don't have any points activity yet",
-      loadingActivity: "Loading activity...",
-      pointsUnit: "points",
-      earn: "Points earned",
-      redeemActivity: "Points used",
-      adjustment: "Points adjustment",
-    },
-  };
-
-  const t = translations[language];
+  // ==========================================
+  // CERRAR SESIÓN
+  // ==========================================
 
   function logout() {
     localStorage.removeItem("token");
@@ -205,6 +171,10 @@ export default function Dashboard() {
 
     window.location.href = "/login";
   }
+
+  // ==========================================
+  // NAVEGACIÓN
+  // ==========================================
 
   function goToSettings() {
     window.location.href = "/configuracion";
@@ -230,34 +200,44 @@ export default function Dashboard() {
     window.location.href = "/historial-canjes";
   }
 
+  // ==========================================
+  // FORMATO DE FECHAS
+  // ==========================================
+
   function formatTransactionDate(date: string) {
-    return new Date(date).toLocaleDateString(
-      language === "es" ? "es-MX" : "en-US",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
+    return new Date(date).toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   }
+
+  // ==========================================
+  // ETIQUETAS DE MOVIMIENTOS
+  // ==========================================
 
   function getTransactionLabel(
     transaction: PointsTransaction
   ) {
+    // Conservar descripciones reales del backend.
     if (transaction.description) {
       return transaction.description;
     }
 
     if (transaction.type === "earn") {
-      return t.earn;
+      return t("dashboard.earn");
     }
 
     if (transaction.type === "redeem") {
-      return t.redeemActivity;
+      return t("dashboard.redeemActivity");
     }
 
-    return t.adjustment;
+    return t("dashboard.adjustment");
   }
+
+  // ==========================================
+  // FORMATO DE PUNTOS
+  // ==========================================
 
   function getTransactionPoints(
     transaction: PointsTransaction
@@ -277,14 +257,21 @@ export default function Dashboard() {
       : `-${amount}`;
   }
 
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
+
   return (
     <div className={`dashboard-page ${theme}`}>
       <div className="dashboard-bg dashboard-bg-left"></div>
       <div className="dashboard-bg dashboard-bg-right"></div>
 
       <div className="dashboard-container">
+
+        {/* ENCABEZADO */}
         <header className="dashboard-header">
           <div className="dashboard-brand">
+
             <img
               src={logo}
               alt="Logo Ñam+"
@@ -297,28 +284,29 @@ export default function Dashboard() {
               </h1>
 
               <p className="dashboard-subtitle">
-                {t.welcome}
+                {t("dashboard.welcome")}
               </p>
             </div>
           </div>
 
           <div className="dashboard-user-box">
             <span className="dashboard-user">
-              {t.hello}, {user.name || t.userFallback}
+              {t("dashboard.hello")},{" "}
+              {user.name || t("dashboard.userFallback")}
             </span>
 
             <button
               className="settings-btn"
               onClick={goToSettings}
             >
-              ⚙ {t.settings}
+              ⚙ {t("dashboard.settings")}
             </button>
 
             <button
               className="logout-btn"
               onClick={logout}
             >
-              {t.logout}
+              {t("dashboard.logout")}
             </button>
           </div>
         </header>
@@ -327,24 +315,23 @@ export default function Dashboard() {
 
           {/* PUNTOS REALES */}
           <section className="dashboard-card points-card">
+
             <p className="card-label">
-              {t.points}
+              {t("dashboard.points")}
             </p>
 
             {pointsLoading ? (
-              <h2>{t.loadingPoints}</h2>
+              <h2>{t("dashboard.loadingPoints")}</h2>
             ) : pointsError ? (
-              <h2>{t.pointsError}</h2>
+              <h2>{t("dashboard.pointsError")}</h2>
             ) : (
               <h2>
-                {points.toLocaleString(
-                  language === "es" ? "es-MX" : "en-US"
-                )} pts
+                {points.toLocaleString(locale)} pts
               </h2>
             )}
 
             <span className="card-extra">
-              {t.keepEarning}
+              {t("dashboard.keepEarning")}
             </span>
 
             <div className="action-buttons">
@@ -352,28 +339,31 @@ export default function Dashboard() {
                 className="primary-btn"
                 onClick={goToPoints}
               >
-                {t.viewPoints}
+                {t("dashboard.viewPoints")}
               </button>
 
               <button
                 className="secondary-btn"
                 onClick={goToRewards}
               >
-                {t.viewRewards}
+                {t("dashboard.viewRewards")}
               </button>
             </div>
           </section>
 
           {/* PROMOCIONES */}
           <section className="dashboard-card">
+
             <h2 className="section-title">
-              {t.promotions}
+              {t("dashboard.promotions")}
             </h2>
 
             <div className="promo-list">
               {promotions.length === 0 ? (
                 <div className="promo-card">
-                  <h3>{t.noPromotions}</h3>
+                  <h3>
+                    {t("dashboard.noPromotions")}
+                  </h3>
                 </div>
               ) : (
                 promotions
@@ -410,8 +400,9 @@ export default function Dashboard() {
 
           {/* CANJEAR TICKET */}
           <section className="dashboard-card">
+
             <h2 className="section-title">
-              {t.redeem}
+              {t("dashboard.redeem")}
             </h2>
 
             <div className="action-buttons">
@@ -419,33 +410,37 @@ export default function Dashboard() {
                 className="primary-btn"
                 onClick={goToQr}
               >
-                {t.scanQR}
+                {t("dashboard.scanQR")}
               </button>
 
               <button
                 className="secondary-btn"
                 onClick={goToCode}
               >
-                {t.enterCode}
+                {t("dashboard.enterCode")}
               </button>
             </div>
           </section>
 
-          {/* ACTIVIDAD REAL */}
+          {/* ACTIVIDAD RECIENTE */}
           <section className="dashboard-card">
+
             <h2 className="section-title">
-              {t.activity}
+              {t("dashboard.activity")}
             </h2>
 
             <div className="activity-list">
+
               {activityLoading ? (
                 <div className="activity-item">
-                  {t.loadingActivity}
+                  {t("dashboard.loadingActivity")}
                 </div>
+
               ) : transactions.length === 0 ? (
                 <div className="activity-item">
-                  {t.noActivity}
+                  {t("dashboard.noActivity")}
                 </div>
+
               ) : (
                 transactions.map((transaction) => (
                   <div
@@ -471,7 +466,10 @@ export default function Dashboard() {
                     </div>
 
                     <strong>
-                      {getTransactionPoints(transaction)} pts
+                      {getTransactionPoints(
+                        transaction
+                      )}{" "}
+                      pts
                     </strong>
                   </div>
                 ))
@@ -482,8 +480,9 @@ export default function Dashboard() {
               className="secondary-btn"
               onClick={goToHistory}
             >
-              {t.viewHistory}
+              {t("dashboard.viewHistory")}
             </button>
+
           </section>
 
         </main>

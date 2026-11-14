@@ -1,42 +1,83 @@
+
 /*
   ARCHIVO: configuracion.tsx
 
   FUNCIÓN:
-  Permite que el usuario personalice la apariencia
-  y el idioma de la aplicación.
+  Permite personalizar la apariencia y el idioma
+  de la aplicación Ñam+.
 
-  MODIFICACIONES REALIZADAS:
-  - Se agregó la selección de tema oscuro y claro.
-  - Se guarda el tema elegido en localStorage.
-  - Se agregó la selección de idioma Español / English.
-  - Se guarda el idioma elegido en localStorage.
-  - La pantalla cambia sus textos según el idioma seleccionado.
-  - El tema seleccionado también se aplica visualmente en esta pantalla.
-  - Se agregó el botón para volver al dashboard.
-  - Las preferencias quedan guardadas aunque el usuario recargue la página.
-  - El dashboard consulta estas preferencias para mostrar el tema
-    y el idioma correspondientes.
+  FUNCIONES CONSERVADAS:
+  - Selección de tema oscuro y claro.
+  - Guardado del tema en localStorage.
+  - Selección de idioma Español / English.
+  - Guardado del idioma en localStorage.
+  - Traducción de esta pantalla.
+  - Botón para volver al dashboard.
+  - Conservación de las preferencias al recargar.
+
+  NUEVA MEJORA:
+  - Sincronización del idioma con i18next.
+  - Actualización del idioma global de la aplicación.
 */
 
 import { useEffect, useState } from "react";
+import i18n from "../i18n";
 import "../styles/configuracion.css";
 
-export default function Configuracion() {
-  const [theme, setTheme] = useState<"dark" | "light">(
-    (localStorage.getItem("theme") as "dark" | "light") || "dark"
-  );
+type Theme = "dark" | "light";
+type Language = "es" | "en";
 
-  const [language, setLanguage] = useState<"es" | "en">(
-    (localStorage.getItem("language") as "es" | "en") || "es"
-  );
+export default function Configuracion() {
+
+  // ==========================================
+  // CONFIGURACIÓN DEL TEMA
+  // ==========================================
+
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    return savedTheme === "light" ? "light" : "dark";
+  });
+
+  // ==========================================
+  // CONFIGURACIÓN DEL IDIOMA
+  // ==========================================
+
+  const [language, setLanguage] = useState<Language>(() => {
+    const savedLanguage = localStorage.getItem("language");
+
+    return savedLanguage === "en" ? "en" : "es";
+  });
+
+  // ==========================================
+  // GUARDAR TEMA
+  // ==========================================
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  // ==========================================
+  // GUARDAR Y SINCRONIZAR IDIOMA GLOBAL
+  // ==========================================
+
   useEffect(() => {
     localStorage.setItem("language", language);
+
+    // Sincronizar todas las pantallas
+    // que utilizan react-i18next.
+    if (i18n.language !== language) {
+      void i18n.changeLanguage(language);
+    }
+
+    // Actualizar el idioma del documento.
+    document.documentElement.lang = language;
+
   }, [language]);
+
+  // ==========================================
+  // TRADUCCIONES DE CONFIGURACIÓN
+  // ==========================================
 
   const translations = {
     es: {
@@ -82,17 +123,23 @@ export default function Configuracion() {
 
   const t = translations[language];
 
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
+
   return (
     <div className={`settings-page ${theme}`}>
       <div className="settings-container">
+
+        {/* ENCABEZADO */}
         <div className="settings-header">
           <div>
             <h1>{t.title}</h1>
-
             <p>{t.subtitle}</p>
           </div>
 
           <button
+            type="button"
             className="back-btn"
             onClick={() => {
               window.location.href = "/dashboard";
@@ -102,17 +149,16 @@ export default function Configuracion() {
           </button>
         </div>
 
+        {/* APARIENCIA */}
         <section className="settings-card">
           <div>
             <h2>{t.appearance}</h2>
-
-            <p>
-              {t.appearanceDescription}
-            </p>
+            <p>{t.appearanceDescription}</p>
           </div>
 
           <div className="settings-options">
             <button
+              type="button"
               className={
                 theme === "dark"
                   ? "option-btn active"
@@ -124,6 +170,7 @@ export default function Configuracion() {
             </button>
 
             <button
+              type="button"
               className={
                 theme === "light"
                   ? "option-btn active"
@@ -136,17 +183,16 @@ export default function Configuracion() {
           </div>
         </section>
 
+        {/* IDIOMA */}
         <section className="settings-card">
           <div>
             <h2>{t.language}</h2>
-
-            <p>
-              {t.languageDescription}
-            </p>
+            <p>{t.languageDescription}</p>
           </div>
 
           <div className="settings-options">
             <button
+              type="button"
               className={
                 language === "es"
                   ? "option-btn active"
@@ -158,6 +204,7 @@ export default function Configuracion() {
             </button>
 
             <button
+              type="button"
               className={
                 language === "en"
                   ? "option-btn active"
@@ -169,6 +216,7 @@ export default function Configuracion() {
             </button>
           </div>
         </section>
+
       </div>
     </div>
   );

@@ -5,15 +5,17 @@
   FUNCIÓN:
   Define las rutas principales de la aplicación Ñam+.
 
-  MODIFICACIONES:
-  - Se conservan todas las rutas existentes.
-  - Se mantienen las rutas protegidas.
-  - Se conserva el sistema de puntos y canjes.
-  - Se conserva la administración de canjes.
-  - Se conserva la administración de recompensas.
-  - Se agrega la ruta para generar tickets QR.
-  - Las pantallas administrativas solo permiten
-    usuarios restaurante y admin.
+  FUNCIONES CONSERVADAS:
+  - Todas las rutas existentes.
+  - Autenticación y rutas protegidas.
+  - Sistema de puntos y canjes.
+  - Administración de canjes.
+  - Administración de recompensas.
+  - Generación de tickets QR.
+  - Validación de roles restaurante y admin.
+
+  NUEVA INTEGRACIÓN:
+  - Inicialización del sistema global de idiomas.
 */
 
 import React from "react";
@@ -25,6 +27,12 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+
+// ==========================================
+// SISTEMA GLOBAL DE IDIOMAS
+// ==========================================
+
+import "./i18n";
 
 // ==========================================
 // AUTENTICACIÓN

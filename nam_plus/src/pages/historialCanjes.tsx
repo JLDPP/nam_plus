@@ -1,6 +1,32 @@
 
-import { useCallback, useEffect, useState } from "react";
+/*
+  ARCHIVO: historialCanjes.tsx
+
+  FUNCIÓN:
+  Consultar el historial de canjes del usuario.
+
+  FUNCIONES CONSERVADAS:
+  - Consulta al backend.
+  - Botón actualizar.
+  - Resumen de canjes.
+  - Cálculo de puntos utilizados.
+  - Estados completed, pending y cancelled.
+  - Imágenes y datos de recompensas.
+  - Navegación.
+  - Exportaciones existentes.
+
+  MEJORA:
+  - Traducción español/inglés con i18next.
+*/
+
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {
   getMyRedemptions,
@@ -12,13 +38,19 @@ import "../styles/historialCanjes.css";
 // Exportación nombrada compatible con main.tsx
 export function HistorialCanjes() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
-  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+  const [redemptions, setRedemptions] =
+    useState<Redemption[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reload, setReload] = useState(0);
 
-  // Consultar historial desde el backend
+  // ==========================================
+  // CONSULTAR HISTORIAL
+  // ==========================================
+
   const loadHistory = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -28,121 +60,149 @@ export function HistorialCanjes() {
 
       setRedemptions(data);
     } catch (err) {
-      console.error("Error cargando historial:", err);
+      console.error(
+        "Error cargando historial:",
+        err
+      );
 
-      setError("No fue posible cargar el historial de canjes.");
+      setError("history.loadError");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Cargar historial al abrir la pantalla
-  // y cuando el usuario presione actualizar
   useEffect(() => {
     void loadHistory();
   }, [loadHistory, reload]);
 
-  // Resumen de canjes
+  // ==========================================
+  // FORMATO DE IDIOMA
+  // ==========================================
+
+  const locale =
+    i18n.resolvedLanguage?.startsWith("en")
+      ? "en-US"
+      : "es-MX";
+
+  // ==========================================
+  // RESUMEN DE CANJES
+  // ==========================================
+
   const totalRedemptions = redemptions.length;
 
   const totalPoints = redemptions
     .filter((item) => item.status !== "cancelled")
-    .reduce((total, item) => total + item.pointsSpent, 0);
+    .reduce(
+      (total, item) => total + item.pointsSpent,
+      0
+    );
 
-  // Traducir estados
-  const getStatusText = (status: string) => {
+  // ==========================================
+  // TRADUCIR ESTADOS
+  // ==========================================
+
+  function getStatusText(status: string) {
     switch (status) {
       case "completed":
-        return "Completado";
+        return t("history.completed");
 
       case "pending":
-        return "Pendiente";
+        return t("history.pending");
 
       case "cancelled":
-        return "Cancelado";
+        return t("history.cancelled");
 
       default:
-        return "Desconocido";
+        return t("history.unknown");
     }
-  };
+  }
+
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
 
   return (
     <div className="history-page">
-      {/* Encabezado */}
+
+      {/* ENCABEZADO */}
       <header className="history-header">
         <button
           className="history-back-btn"
           onClick={() => navigate("/dashboard")}
         >
-          ← Volver
+          ← {t("common.back")}
         </button>
 
-        <h1>Historial de canjes</h1>
+        <h1>{t("history.title")}</h1>
 
-        <p>
-          Consulta las recompensas que has solicitado.
-        </p>
+        <p>{t("history.subtitle")}</p>
       </header>
 
       <main className="history-container">
-        {/* Resumen */}
+
+        {/* RESUMEN */}
         <section className="history-summary">
           <div>
-            <span>Total de canjes</span>
-
-            <h2>
-              {loading || error ? "—" : totalRedemptions}
-            </h2>
-          </div>
-
-          <div>
-            <span>Puntos utilizados</span>
+            <span>{t("history.totalRedemptions")}</span>
 
             <h2>
               {loading || error
                 ? "—"
-                : `${totalPoints.toLocaleString("es-MX")} pts`}
+                : totalRedemptions}
+            </h2>
+          </div>
+
+          <div>
+            <span>{t("history.pointsSpent")}</span>
+
+            <h2>
+              {loading || error
+                ? "—"
+                : `${totalPoints.toLocaleString(locale)} pts`}
             </h2>
           </div>
         </section>
 
-        {/* Acciones */}
+        {/* ACCIONES */}
         <div className="history-actions">
           <button
             onClick={() => navigate("/canjes")}
           >
-            🎁 Ver recompensas
+            🎁 {t("history.viewRewards")}
           </button>
 
           <button
-            onClick={() => setReload((value) => value + 1)}
+            onClick={() =>
+              setReload((value) => value + 1)
+            }
             disabled={loading}
           >
-            ↻ Actualizar
+            ↻ {t("history.refresh")}
           </button>
         </div>
 
-        {/* Cargando */}
+        {/* CARGANDO */}
         {loading ? (
           <div className="history-state">
             <div className="history-state-icon">
               ⏳
             </div>
 
-            <h2>Cargando historial...</h2>
+            <h2>{t("history.loading")}</h2>
 
-            <p>Estamos consultando tus canjes.</p>
+            <p>{t("history.loadingDescription")}</p>
           </div>
+
         ) : error ? (
-          /* Error */
+          /* ERROR */
           <div className="history-state">
             <div className="history-state-icon">
               ⚠️
             </div>
 
-            <h2>No pudimos cargar tus canjes</h2>
+            <h2>{t("history.errorTitle")}</h2>
 
-            <p>{error}</p>
+            <p>{t(error)}</p>
 
             <button
               className="history-retry-btn"
@@ -150,46 +210,45 @@ export function HistorialCanjes() {
                 setReload((value) => value + 1)
               }
             >
-              Intentar nuevamente
+              {t("history.retry")}
             </button>
           </div>
+
         ) : redemptions.length === 0 ? (
-          /* Sin canjes */
+          /* SIN CANJES */
           <div className="history-state">
             <div className="history-state-icon">
               🎁
             </div>
 
-            <h2>Aún no tienes canjes</h2>
+            <h2>{t("history.emptyTitle")}</h2>
 
-            <p>
-              Explora las recompensas disponibles
-              y utiliza tus puntos para conseguir
-              beneficios.
-            </p>
+            <p>{t("history.emptyDescription")}</p>
 
             <button
               className="history-retry-btn"
               onClick={() => navigate("/canjes")}
             >
-              Explorar recompensas
+              {t("history.exploreRewards")}
             </button>
           </div>
+
         ) : (
-          /* Historial de canjes */
+          /* HISTORIAL DE CANJES */
           <section className="history-list">
             {redemptions.map((redemption) => (
               <article
                 className="history-card"
                 key={redemption._id}
               >
-                {/* Imagen de recompensa */}
+
+                {/* IMAGEN */}
                 {redemption.reward?.imageUrl ? (
                   <img
                     src={redemption.reward.imageUrl}
                     alt={
                       redemption.reward.name ||
-                      "Recompensa"
+                      t("history.reward")
                     }
                     className="history-image"
                   />
@@ -199,32 +258,32 @@ export function HistorialCanjes() {
                   </div>
                 )}
 
-                {/* Información */}
+                {/* INFORMACIÓN */}
                 <div className="history-details">
                   <h3>
                     {redemption.reward?.name ||
-                      "Recompensa no disponible"}
+                      t("history.rewardUnavailable")}
                   </h3>
 
                   <p>
                     {redemption.reward?.restaurantName ||
-                      "Restaurante no disponible"}
+                      t("history.restaurantUnavailable")}
                   </p>
 
                   <small>
-                    Fecha:{" "}
+                    {t("history.date")}:{" "}
                     {new Date(
                       redemption.createdAt
-                    ).toLocaleDateString("es-MX")}
+                    ).toLocaleDateString(locale)}
                   </small>
                 </div>
 
-                {/* Puntos y estado */}
+                {/* PUNTOS Y ESTADO */}
                 <div className="history-meta">
                   <strong>
                     -
                     {redemption.pointsSpent.toLocaleString(
-                      "es-MX"
+                      locale
                     )}{" "}
                     pts
                   </strong>
@@ -235,6 +294,7 @@ export function HistorialCanjes() {
                     {getStatusText(redemption.status)}
                   </span>
                 </div>
+
               </article>
             ))}
           </section>
@@ -244,5 +304,5 @@ export function HistorialCanjes() {
   );
 }
 
-// Exportación por defecto compatible con otros componentes
+// Exportación por defecto compatible
 export default HistorialCanjes;
