@@ -1,5 +1,9 @@
+
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import { api, setAuth } from "../api";
 import logo from "../assets/logo.jpeg";
 
@@ -12,35 +16,78 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(
+    e: FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
 
     setError("");
     setLoading(true);
 
     try {
-  const { data } = await api.post("/api/auth/login", {
-    email: email.trim(),
-    password,
-  });
+      const { data } = await api.post(
+        "/api/auth/login",
+        {
+          email: email.trim(),
+          password,
+        }
+      );
 
-      localStorage.setItem("token", data.token);
-
-      if (data.user) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify(data.user)
+      // Validar respuesta del servidor
+      if (
+        typeof data.token !== "string" ||
+        !data.token ||
+        !data.user ||
+        !["cliente", "restaurante", "admin"].includes(
+          data.user.role
+        )
+      ) {
+        setError(
+          "No se pudo identificar el tipo de usuario"
         );
+
+        return;
       }
+
+      // Guardar sesión
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
 
       setAuth(data.token);
 
-      nav("/dashboard");
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          "Correo o contraseña incorrectos"
-      );
+      // =====================================
+      // REDIRECCIÓN SEGÚN EL ROL
+      // =====================================
+
+      if (data.user.role === "restaurante") {
+        nav("/restaurante", {
+          replace: true,
+        });
+      } else {
+        nav("/dashboard", {
+          replace: true,
+        });
+      }
+
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message ||
+          "No se pudo iniciar sesión"
+        );
+      } else {
+        setError(
+          "Ocurrió un error inesperado"
+        );
+      }
+
     } finally {
       setLoading(false);
     }
@@ -49,6 +96,7 @@ export default function Login() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
+
         <div className="brand">
           <img
             src={logo}
@@ -63,10 +111,11 @@ export default function Login() {
         </div>
 
         <form
-         className="auth-form"
-         onSubmit={onSubmit}
-         autoComplete="off"
-          >
+          className="auth-form"
+          onSubmit={onSubmit}
+          autoComplete="off"
+        >
+
           <div className="input-group">
             <label htmlFor="email">
               Correo electrónico
@@ -82,6 +131,7 @@ export default function Login() {
               }
               autoComplete="off"
               required
+              disabled={loading}
             />
           </div>
 
@@ -101,6 +151,7 @@ export default function Login() {
                 }
                 autoComplete="off"
                 required
+                disabled={loading}
               />
 
               <button
@@ -152,6 +203,7 @@ export default function Login() {
             Crear una cuenta
           </Link>
         </div>
+
       </div>
     </div>
   );

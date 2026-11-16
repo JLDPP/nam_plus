@@ -1,0 +1,677 @@
+
+/* ==========================================
+   ÑAM+ PORTAL DE RESTAURANTES
+========================================== */
+
+.rp-layout {
+  --rp-bg: #090d11;
+  --rp-panel: #111820;
+  --rp-border: #25313d;
+  --rp-muted: #94a3b2;
+  --rp-cyan: #00c3ff;
+  --rp-green: #69dca0;
+  --rp-orange: #ffad57;
+
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+
+  min-height: 100vh;
+  background: var(--rp-bg);
+  color: #f5f7fa;
+}
+
+.rp-layout a {
+  text-decoration: none;
+}
+
+.rp-layout button {
+  font: inherit;
+}
+
+.rp-layout a:focus-visible,
+.rp-layout button:focus-visible {
+  outline: 2px solid var(--rp-cyan);
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   MENÚ LATERAL
+========================================== */
+
+.rp-sidebar {
+  display: flex;
+  flex-direction: column;
+
+  position: sticky;
+  top: 0;
+
+  height: 100vh;
+  overflow-y: auto;
+
+  padding: 26px 16px;
+
+  background: #10161d;
+  border-right: 1px solid var(--rp-border);
+}
+
+.rp-brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 8px;
+  margin-bottom: 35px;
+}
+
+.rp-logo {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--rp-orange);
+}
+
+.rp-brand h2 {
+  margin: 0;
+  font-size: 25px;
+  letter-spacing: -1px;
+}
+
+.rp-brand span {
+  color: var(--rp-muted);
+  font-size: 12px;
+}
+
+.rp-menu-label {
+  margin: 0 10px 14px;
+
+  color: #758595;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.rp-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.rp-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 46px;
+  padding: 12px;
+
+  border-radius: 10px;
+
+  color: #b9c6d1;
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: background 0.2s, color 0.2s;
+}
+
+.rp-nav-link:hover {
+  background: #1c2833;
+  color: #ffffff;
+}
+
+.rp-nav-active {
+  background: rgba(0, 195, 255, 0.12);
+  color: #54d8ff;
+}
+
+.rp-nav-icon {
+  display: grid;
+  place-items: center;
+
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+
+  background: #1e2a35;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ==========================================
+   CUENTA Y CIERRE DE SESIÓN
+========================================== */
+
+.rp-sidebar-footer {
+  margin-top: auto;
+  padding-top: 30px;
+}
+
+.rp-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 15px 5px;
+  border-top: 1px solid var(--rp-border);
+}
+
+.rp-avatar {
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+
+  background: rgba(0, 195, 255, 0.13);
+  color: var(--rp-cyan);
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.rp-account-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.rp-account-info strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.rp-account-info span {
+  color: var(--rp-muted);
+  font-size: 11px;
+}
+
+.rp-logout {
+  width: 100%;
+  padding: 12px;
+
+  background: #1c2530;
+  border: 1px solid #33404d;
+  border-radius: 10px;
+
+  color: #e6edf3;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.rp-logout:hover {
+  background: rgba(255, 100, 100, 0.12);
+  border-color: #a74c4c;
+  color: #ffaaaa;
+}
+
+/* ==========================================
+   CONTENIDO PRINCIPAL
+========================================== */
+
+.rp-main {
+  width: 100%;
+  min-width: 0;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 34px;
+}
+
+.rp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.rp-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  color: #63dfff;
+}
+
+.rp-header h1 {
+  margin: 9px 0;
+  font-size: clamp(25px, 3vw, 34px);
+  letter-spacing: -1px;
+}
+
+.rp-header p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--rp-muted);
+  line-height: 1.6;
+}
+
+.rp-role {
+  padding: 8px 13px;
+
+  background: rgba(105, 220, 160, 0.10);
+  color: var(--rp-green);
+
+  border: 1px solid rgba(105, 220, 160, 0.22);
+  border-radius: 30px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   BIENVENIDA
+========================================== */
+
+.rp-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 30px;
+  margin-bottom: 24px;
+
+  background: linear-gradient(
+    115deg,
+    #102d36,
+    #13222a 60%,
+    #17201e
+  );
+
+  border: 1px solid #26434d;
+  border-radius: 20px;
+}
+
+.rp-welcome h2 {
+  margin: 12px 0;
+  font-size: 28px;
+  overflow-wrap: anywhere;
+}
+
+.rp-welcome p {
+  max-width: 570px;
+  margin: 0;
+  color: #aebfc9;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.rp-welcome-logo {
+  width: 105px;
+  height: 105px;
+  flex-shrink: 0;
+  object-fit: cover;
+
+  border-radius: 50%;
+  border: 3px solid rgba(255, 173, 87, 0.4);
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   TARJETAS DE RESUMEN
+========================================== */
+
+.rp-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 34px;
+}
+
+.rp-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  min-width: 0;
+  padding: 20px;
+
+  border: 1px solid var(--rp-border);
+  border-radius: 15px;
+  background: var(--rp-panel);
+}
+
+.rp-stat > span {
+  font-size: 13px;
+  color: var(--rp-muted);
+}
+
+.rp-stat strong {
+  font-size: 27px;
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+}
+
+.rp-stat small {
+  font-size: 11px;
+  color: var(--rp-muted);
+}
+
+.rp-text-cyan {
+  color: var(--rp-cyan);
+}
+
+.rp-text-green {
+  color: var(--rp-green);
+}
+
+/* ==========================================
+   HERRAMIENTAS DE ADMINISTRACIÓN
+========================================== */
+
+.rp-section-heading {
+  margin-bottom: 20px;
+}
+
+.rp-section-heading h2 {
+  margin: 0 0 7px;
+  font-size: 21px;
+}
+
+.rp-section-heading p {
+  margin: 0;
+  color: var(--rp-muted);
+  font-size: 13px;
+}
+
+.rp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.rp-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  min-width: 0;
+  min-height: 228px;
+  padding: 23px;
+
+  background: var(--rp-panel);
+  border: 1px solid var(--rp-border);
+  border-radius: 17px;
+
+  scroll-margin-top: 24px;
+
+  transition:
+    transform 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.rp-card:hover {
+  transform: translateY(-3px);
+  border-color: #3a6172;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+}
+
+.rp-card:target {
+  border-color: var(--rp-cyan);
+}
+
+.rp-card-icon {
+  display: grid;
+  place-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 13px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.rp-icon-cyan {
+  background: rgba(0, 195, 255, 0.11);
+  color: #57dfff;
+}
+
+.rp-icon-green {
+  background: rgba(105, 220, 160, 0.12);
+  color: #69dca0;
+}
+
+.rp-icon-orange {
+  background: rgba(255, 173, 87, 0.12);
+  color: #ffad57;
+}
+
+.rp-icon-purple {
+  background: rgba(167, 139, 250, 0.12);
+  color: #bdabff;
+}
+
+.rp-card h3 {
+  margin: 18px 0 9px;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.rp-card p {
+  margin: 0 0 23px;
+
+  color: var(--rp-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   BOTONES DE LOS MÓDULOS
+========================================== */
+
+.rp-card-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  width: 100%;
+  margin-top: auto;
+  padding: 12px;
+
+  background: rgba(0, 195, 255, 0.10);
+  border: 1px solid rgba(0, 195, 255, 0.2);
+  border-radius: 9px;
+
+  color: #65dfff;
+  font-size: 13px;
+  font-weight: 700;
+
+  transition: background 0.2s;
+}
+
+.rp-card-button:hover {
+  background: rgba(0, 195, 255, 0.20);
+}
+
+.rp-card-pending {
+  width: 100%;
+  margin-top: auto;
+  padding: 12px;
+
+  background: #1c2630;
+  border: 1px solid #2b3946;
+  border-radius: 9px;
+
+  text-align: center;
+  color: #a0acb7;
+  font-size: 12px;
+}
+
+/* ==========================================
+   SECCIÓN DE RECOMPENSAS
+========================================== */
+
+.rp-extra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-top: 24px;
+  padding: 24px;
+
+  background: var(--rp-panel);
+  border: 1px solid var(--rp-border);
+  border-radius: 17px;
+}
+
+.rp-extra h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.rp-extra p {
+  margin: 0;
+  color: var(--rp-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.rp-extra .rp-card-button {
+  width: auto;
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.rp-footer {
+  margin-top: 35px;
+  padding: 15px;
+  text-align: center;
+  color: #718392;
+  font-size: 12px;
+}
+
+/* ==========================================
+   RESPONSIVE - TABLET
+========================================== */
+
+@media (max-width: 1200px) {
+  .rp-layout {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+
+  .rp-main {
+    padding: 26px;
+  }
+
+  .rp-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .rp-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rp-sidebar {
+    position: relative;
+    height: auto;
+
+    border-right: none;
+    border-bottom: 1px solid var(--rp-border);
+  }
+
+  .rp-brand {
+    margin-bottom: 20px;
+  }
+
+  .rp-navigation {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .rp-nav-link {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .rp-sidebar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-top: 12px;
+  }
+
+  .rp-account {
+    border-top: none;
+    padding: 0;
+  }
+
+  .rp-logout {
+    width: auto;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE - CELULARES
+========================================== */
+
+@media (max-width: 600px) {
+  .rp-main {
+    padding: 22px 16px;
+  }
+
+  .rp-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rp-welcome {
+    padding: 23px;
+  }
+
+  .rp-welcome h2 {
+    font-size: 23px;
+  }
+
+  .rp-welcome-logo {
+    display: none;
+  }
+
+  .rp-summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .rp-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .rp-card {
+    min-height: 215px;
+  }
+
+  .rp-extra {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rp-extra .rp-card-button {
+    width: 100%;
+  }
+
+  .rp-account-info span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rp-card,
+  .rp-nav-link,
+  .rp-card-button {
+    transition: none;
+  }
+
+  .rp-card:hover {
+    transform: none;
+  }
+}

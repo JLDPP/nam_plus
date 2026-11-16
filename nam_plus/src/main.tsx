@@ -1,23 +1,4 @@
 
-/*
-  ARCHIVO: main.tsx
-
-  FUNCIÓN:
-  Define las rutas principales de la aplicación Ñam+.
-
-  FUNCIONES CONSERVADAS:
-  - Todas las rutas existentes.
-  - Autenticación y rutas protegidas.
-  - Sistema de puntos y canjes.
-  - Administración de canjes.
-  - Administración de recompensas.
-  - Generación de tickets QR.
-  - Validación de roles restaurante y admin.
-
-  NUEVA INTEGRACIÓN:
-  - Inicialización del sistema global de idiomas.
-*/
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -28,73 +9,82 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// ==========================================
-// SISTEMA GLOBAL DE IDIOMAS
-// ==========================================
-
+// Sistema global de idiomas
 import "./i18n";
 
-// ==========================================
-// AUTENTICACIÓN
-// ==========================================
-
+// Autenticación
 import Login from "./pages/login";
 import Register from "./pages/register";
 
-// ==========================================
-// PANTALLAS PRINCIPALES
-// ==========================================
-
+// Pantallas principales
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
 
-// ==========================================
-// QR Y CÓDIGOS DEL CLIENTE
-// ==========================================
+// Dashboard del restaurante
+import RestauranteInicio from "./pages/restaurante/RestauranteInicio";
 
+// QR y códigos del cliente
 import Codigo from "./pages/codigo";
 import Qr from "./pages/qr";
 
-// ==========================================
-// PROMOCIONES
-// ==========================================
-
+// Promociones
 import Promociones from "./pages/promociones";
 import PromocionDetalle from "./pages/promocionDetalle";
 
-// ==========================================
-// PUNTOS Y CANJES
-// ==========================================
-
+// Puntos y canjes
 import Puntos from "./pages/puntos";
 import Canjes from "./pages/canjes";
 import { HistorialCanjes } from "./pages/historialCanjes";
 
-// ==========================================
-// ADMINISTRACIÓN DE CANJES
-// ==========================================
-
+// Administración de canjes
 import CanjesRestaurante from "./pages/canjesRestaurante";
 
-// ==========================================
-// ADMINISTRACIÓN DE RECOMPENSAS
-// ==========================================
-
+// Administración de recompensas
 import AdminRecompensas from "./pages/adminRecompensas";
 
-// ==========================================
-// GENERACIÓN DE TICKETS QR
-// ==========================================
-
+// Generación de tickets QR
 import GenerarTicket from "./pages/generarTicket";
 
-// ==========================================
-// PROTECCIÓN DE RUTAS
-// ==========================================
-
+// Protección de rutas
 import ProtectedRoute from "./routes/protected.route";
 
 import "./index.css";
+
+// ==========================================
+// OBTENER ROL DEL USUARIO
+// ==========================================
+
+function getUserRole(): string {
+  try {
+    const storedUser = localStorage.getItem("user");
+
+    const user = storedUser
+      ? JSON.parse(storedUser)
+      : null;
+
+    return user?.role || "";
+  } catch {
+    return "";
+  }
+}
+
+// ==========================================
+// DASHBOARD SEGÚN EL ROL
+// ==========================================
+
+function DashboardPorRol() {
+  const role = getUserRole();
+
+  if (role === "restaurante") {
+    return <Navigate to="/restaurante" replace />;
+  }
+
+  if (role === "cliente" || role === "admin") {
+    return <Dashboard />;
+  }
+
+  return <Navigate to="/login" replace />;
+}
 
 // ==========================================
 // VALIDACIÓN DE ROLES
@@ -102,26 +92,18 @@ import "./index.css";
 
 function RestauranteRoute({
   children,
+  soloRestaurante = false,
 }: {
   children: React.ReactNode;
+  soloRestaurante?: boolean;
 }) {
-  const storedUser = localStorage.getItem("user");
+  const role = getUserRole();
 
-  let role = "";
+  const allowedRoles = soloRestaurante
+    ? ["restaurante"]
+    : ["restaurante", "admin"];
 
-  try {
-    const user = storedUser
-      ? JSON.parse(storedUser)
-      : null;
-
-    role = user?.role || "";
-  } catch {
-    role = "";
-  }
-
-  // Solo restaurante y admin pueden entrar.
-  // El backend valida los permisos reales.
-  if (!["restaurante", "admin"].includes(role)) {
+  if (!allowedRoles.includes(role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -139,9 +121,7 @@ ReactDOM.createRoot(
     <BrowserRouter>
       <Routes>
 
-        {/* ================================= */}
         {/* RUTAS PÚBLICAS */}
-        {/* ================================= */}
 
         <Route
           path="/login"
@@ -153,22 +133,31 @@ ReactDOM.createRoot(
           element={<Register />}
         />
 
-        {/* ================================= */}
-        {/* DASHBOARD */}
-        {/* ================================= */}
+        {/* DASHBOARD SEGÚN ROL */}
 
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <DashboardPorRol />
             </ProtectedRoute>
           }
         />
 
-        {/* ================================= */}
+        {/* DASHBOARD EXCLUSIVO DE RESTAURANTES */}
+
+        <Route
+          path="/restaurante"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute soloRestaurante>
+                <RestauranteInicio />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
         {/* CONFIGURACIÓN */}
-        {/* ================================= */}
 
         <Route
           path="/configuracion"
@@ -179,9 +168,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
-        {/* ESCANEO QR DEL CLIENTE */}
-        {/* ================================= */}
+        {/* ESCANEO QR */}
 
         <Route
           path="/qr"
@@ -192,9 +179,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
-        {/* INGRESO MANUAL DE CÓDIGOS */}
-        {/* ================================= */}
+        {/* INGRESO DE CÓDIGOS */}
 
         <Route
           path="/codigo"
@@ -205,9 +190,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* PROMOCIONES */}
-        {/* ================================= */}
 
         <Route
           path="/promociones"
@@ -227,9 +210,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* SISTEMA DE PUNTOS */}
-        {/* ================================= */}
 
         <Route
           path="/puntos"
@@ -240,9 +221,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* CATÁLOGO DE RECOMPENSAS */}
-        {/* ================================= */}
 
         <Route
           path="/canjes"
@@ -253,9 +232,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* HISTORIAL DE CANJES DEL CLIENTE */}
-        {/* ================================= */}
 
         <Route
           path="/historial-canjes"
@@ -266,10 +243,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* ADMINISTRACIÓN DE CANJES */}
-        {/* SOLO RESTAURANTE Y ADMIN */}
-        {/* ================================= */}
 
         <Route
           path="/canjes-restaurante"
@@ -282,10 +256,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* ADMINISTRACIÓN DE RECOMPENSAS */}
-        {/* SOLO RESTAURANTE Y ADMIN */}
-        {/* ================================= */}
 
         <Route
           path="/admin-recompensas"
@@ -298,10 +269,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
-        {/* GENERAR TICKETS QR */}
-        {/* SOLO RESTAURANTE Y ADMIN */}
-        {/* ================================= */}
+        {/* GENERACIÓN DE TICKETS QR */}
 
         <Route
           path="/generar-ticket"
@@ -314,17 +282,12 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ================================= */}
         {/* RUTA PREDETERMINADA */}
-        {/* ================================= */}
 
         <Route
           path="*"
           element={
-            <Navigate
-              to="/login"
-              replace
-            />
+            <Navigate to="/login" replace />
           }
         />
 
