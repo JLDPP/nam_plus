@@ -1,0 +1,228 @@
+
+/* ==========================================
+   PROMOCIONES DEL RESTAURANTE
+========================================== */
+
+.rp-promotions a {
+  text-decoration: none;
+}
+
+/* NAVEGACIÓN */
+
+.rp-promo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.rp-promo-tab {
+  padding: 12px 18px;
+  border: 1px solid #283b4b;
+  border-radius: 12px;
+
+  background: #0c1623;
+  color: #aab6c5;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  transition: 0.2s ease;
+}
+
+.rp-promo-tab:hover,
+.rp-promo-tab.selected {
+  background: rgba(23, 200, 255, 0.10);
+  color: #17c8ff;
+  border-color: #17c8ff;
+}
+
+/* RESTAURANTE SELECCIONADO */
+
+.rp-promo-restaurant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  padding: 22px;
+  margin-bottom: 24px;
+
+  border: 1px solid #28424e;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    120deg,
+    #102b35,
+    #0c1623
+  );
+}
+
+.rp-promo-restaurant span {
+  color: #aab6c5;
+  font-size: 13px;
+}
+
+.rp-promo-restaurant h2 {
+  margin: 8px 0 0;
+  color: #17c8ff;
+  font-size: 22px;
+}
+
+/* SELECTORES */
+
+.rp-promotions select {
+  max-width: 100%;
+  padding: 12px 14px;
+
+  background: #111e2c;
+  color: #ffffff;
+
+  border: 1px solid #344454;
+  border-radius: 10px;
+  outline: none;
+
+  font: inherit;
+  cursor: pointer;
+}
+
+.rp-promotions select:focus {
+  border-color: #17c8ff;
+}
+
+.rp-promotions input[readonly] {
+  color: #17c8ff;
+  opacity: 0.8;
+}
+
+.rp-promotions input[type="date"] {
+  color-scheme: dark;
+}
+
+/* ESTADÍSTICAS */
+
+.rp-promo-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.rp-promo-stats article {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  padding: 22px;
+  background: #0c1623;
+
+  border: 1px solid #263544;
+  border-radius: 16px;
+}
+
+.rp-promo-stats span {
+  font-size: 13px;
+  color: #aab6c5;
+}
+
+.rp-promo-stats strong {
+  font-size: 30px;
+  color: #17c8ff;
+}
+
+.rp-promo-stats article:nth-child(2) strong {
+  color: #2ee6a6;
+}
+
+.rp-promo-stats article:nth-child(3) strong {
+  color: #ff8c8c;
+}
+
+.rp-promo-stats article:nth-child(4) strong {
+  color: #ffb446;
+}
+
+/* FILTROS */
+
+.rp-promo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.rp-promo-toolbar h2 {
+  margin: 0 auto 0 0;
+}
+
+/* ESTADOS */
+
+.rp-promo-status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rp-promo-status.status-activa {
+  background: rgba(46, 230, 166, 0.12);
+  color: #2ee6a6;
+}
+
+.rp-promo-status.status-programada {
+  background: rgba(23, 200, 255, 0.12);
+  color: #17c8ff;
+}
+
+.rp-promo-status.status-vencida {
+  background: rgba(255, 80, 80, 0.12);
+  color: #ff8c8c;
+}
+
+.rp-promo-status.status-inactiva {
+  background: rgba(255, 180, 70, 0.12);
+  color: #ffb446;
+}
+
+.rp-promotions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .rp-promo-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .rp-promo-stats {
+    gap: 10px;
+  }
+
+  .rp-promo-stats article {
+    padding: 15px;
+  }
+
+  .rp-promo-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rp-promo-toolbar h2 {
+    margin-bottom: 8px;
+  }
+
+  .rp-promo-tabs {
+    flex-direction: column;
+  }
+
+  .rp-promo-tab {
+    text-align: center;
+  }
+}

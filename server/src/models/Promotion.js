@@ -1,9 +1,3 @@
-/*
-  ARCHIVO: Promotion.js
-
-  FUNCIÓN:
-  Define la estructura de una promoción en MongoDB.
-*/
 
 import mongoose from "mongoose";
 
@@ -21,6 +15,15 @@ const promotionSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Referencia al restaurante propietario.
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
+      default: null,
+      index: true,
+    },
+
+    // Se conserva por compatibilidad con el frontend.
     restaurantName: {
       type: String,
       required: true,
@@ -62,8 +65,14 @@ const promotionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
   }
 );
+
+promotionSchema.index({
+  restaurant: 1,
+  createdAt: -1,
+});
 
 export default mongoose.model(
   "Promotion",

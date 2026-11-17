@@ -1,13 +1,3 @@
-/*
-  ARCHIVO: promotion.routes.js
-
-  FUNCIÓN:
-  Define las rutas del módulo de promociones.
-
-  PERMISOS:
-  - Cualquier usuario puede consultar promociones.
-  - Solo admin puede crear, modificar o eliminar.
-*/
 
 import { Router } from "express";
 
@@ -17,22 +7,59 @@ import {
   createPromotion,
   updatePromotion,
   deletePromotion,
+  getMyPromotions,
+  createRestaurantPromotion,
+  updateRestaurantPromotion,
 } from "../controllers/promotion.controller.js";
 
 import { auth } from "../middleware/auth.js";
 import adminOnly from "../middleware/admin.js";
+import { requireRole } from "../middleware/requireRole.js";
 
 const router = Router();
 
-// Consultar promociones
-router.get("/", getPromotions);
+// ==========================================
+// RUTAS EXCLUSIVAS PARA RESTAURANTES
+// ==========================================
 
+// Consultar promociones propias
 router.get(
-  "/:id",
-  getPromotionById
+  "/mine",
+  auth,
+  requireRole("restaurante"),
+  getMyPromotions
 );
 
-// Solo ADMIN puede crear
+// Publicar promoción
+router.post(
+  "/mine/:restaurantId",
+  auth,
+  requireRole("restaurante"),
+  createRestaurantPromotion
+);
+
+// Editar o desactivar promoción
+router.patch(
+  "/mine/:restaurantId/:id",
+  auth,
+  requireRole("restaurante"),
+  updateRestaurantPromotion
+);
+
+// ==========================================
+// RUTAS GENERALES
+// ==========================================
+
+// Consultar todas las promociones
+router.get("/", getPromotions);
+
+// Consultar promoción por ID
+router.get("/:id", getPromotionById);
+
+// ==========================================
+// RUTAS EXCLUSIVAS PARA ADMINISTRADORES
+// ==========================================
+
 router.post(
   "/",
   auth,
@@ -40,7 +67,6 @@ router.post(
   createPromotion
 );
 
-// Solo ADMIN puede modificar
 router.put(
   "/:id",
   auth,
@@ -48,7 +74,6 @@ router.put(
   updatePromotion
 );
 
-// Solo ADMIN puede eliminar
 router.delete(
   "/:id",
   auth,

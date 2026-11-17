@@ -42,6 +42,8 @@ const modulos: Modulo[] = [
     description:
       "Crea ofertas y beneficios exclusivos para tus clientes.",
     color: "orange",
+    path: "/restaurante/promociones",
+    action: "Publicar promoción",
   },
   {
     id: "puntos",
@@ -68,6 +70,8 @@ const modulos: Modulo[] = [
     description:
       "Consulta tus promociones activas, vencidas y pausadas.",
     color: "orange",
+    path: "/restaurante/promociones/historial",
+    action: "Consultar historial",
   },
   {
     id: "perfil",

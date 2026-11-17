@@ -1,18 +1,21 @@
 
-/*
-  ARCHIVO: promotion.service.ts
-
-  FUNCIÓN:
-  Centraliza las peticiones del frontend
-  hacia la API de promociones.
-*/
-
 import { api } from "../api";
+
+// ==========================================
+// TIPOS
+// ==========================================
+
+export type PromotionStatus =
+  | "Programada"
+  | "Activa"
+  | "Vencida"
+  | "Inactiva";
 
 export type Promotion = {
   _id: string;
   title: string;
   description?: string;
+  restaurant?: string | null;
   restaurantName: string;
   imageUrl?: string;
   minAmount: number;
@@ -20,7 +23,9 @@ export type Promotion = {
   active: boolean;
   startDate?: string;
   endDate?: string | null;
-  status?: "Programada" | "Activa" | "Vencida" | "Inactiva";
+  status?: PromotionStatus;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type CreatePromotionData = {
@@ -35,66 +40,65 @@ export type CreatePromotionData = {
   endDate?: string | null;
 };
 
+export type RestaurantPromotionData = Omit<
+  CreatePromotionData,
+  "restaurantName"
+>;
+
+export type OwnedRestaurant = {
+  _id: string;
+  name: string;
+};
+
+export type MyPromotionsResponse = {
+  restaurants: OwnedRestaurant[];
+  promotions: Promotion[];
+};
+
 // ==========================================
-// CONSULTAR TODAS LAS PROMOCIONES
+// FUNCIONES EXISTENTES
 // ==========================================
 
 export async function getPromotions(): Promise<Promotion[]> {
-  const response = await api.get<Promotion[]>(
+  const { data } = await api.get<Promotion[]>(
     "/api/promotions"
   );
 
-  return response.data;
+  return data;
 }
-
-// ==========================================
-// CONSULTAR UNA PROMOCIÓN POR ID
-// ==========================================
 
 export async function getPromotionById(
   id: string
 ): Promise<Promotion> {
-  const response = await api.get<Promotion>(
+  const { data } = await api.get<Promotion>(
     `/api/promotions/${id}`
   );
 
-  return response.data;
+  return data;
 }
-
-// ==========================================
-// CREAR PROMOCIÓN (SOLO ADMIN)
-// ==========================================
 
 export async function createPromotion(
-  data: CreatePromotionData
+  payload: CreatePromotionData
 ): Promise<Promotion> {
-  const response = await api.post<Promotion>(
+  const { data } = await api.post<Promotion>(
     "/api/promotions",
-    data
+    payload
   );
 
-  return response.data;
+  return data;
 }
-
-// ==========================================
-// ACTUALIZAR PROMOCIÓN (SOLO ADMIN)
-// ==========================================
 
 export async function updatePromotion(
   id: string,
-  data: CreatePromotionData
+  payload: CreatePromotionData
 ): Promise<Promotion> {
-  const response = await api.put<Promotion>(
+  const { data } = await api.put<Promotion>(
     `/api/promotions/${id}`,
-    data
+    payload
   );
 
-  return response.data;
+  return data;
 }
-
-// ==========================================
-// ELIMINAR PROMOCIÓN (SOLO ADMIN)
-// ==========================================
 
 export async function deletePromotion(
   id: string
@@ -102,4 +106,53 @@ export async function deletePromotion(
   await api.delete(
     `/api/promotions/${id}`
   );
+}
+
+// ==========================================
+// CONSULTAR PROMOCIONES DEL RESTAURANTE
+// ==========================================
+
+export async function getMyPromotions(
+  signal?: AbortSignal
+): Promise<MyPromotionsResponse> {
+  const { data } =
+    await api.get<MyPromotionsResponse>(
+      "/api/promotions/mine",
+      { signal }
+    );
+
+  return data;
+}
+
+// ==========================================
+// PUBLICAR PROMOCIÓN
+// ==========================================
+
+export async function createRestaurantPromotion(
+  restaurantId: string,
+  payload: RestaurantPromotionData
+): Promise<Promotion> {
+  const { data } = await api.post<Promotion>(
+    `/api/promotions/mine/${restaurantId}`,
+    payload
+  );
+
+  return data;
+}
+
+// ==========================================
+// ACTUALIZAR PROMOCIÓN DEL RESTAURANTE
+// ==========================================
+
+export async function updateRestaurantPromotion(
+  restaurantId: string,
+  promotionId: string,
+  payload: Partial<RestaurantPromotionData>
+): Promise<Promotion> {
+  const { data } = await api.patch<Promotion>(
+    `/api/promotions/mine/${restaurantId}/${promotionId}`,
+    payload
+  );
+
+  return data;
 }

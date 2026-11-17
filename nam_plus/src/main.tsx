@@ -9,58 +9,44 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Sistema global de idiomas
 import "./i18n";
+import "./index.css";
 
-// Autenticación
+// AUTENTICACIÓN
 import Login from "./pages/login";
 import Register from "./pages/register";
 
-// Pantallas principales
+// CLIENTES
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
-
-// Dashboard del restaurante
-import RestauranteInicio from "./pages/restaurante/RestauranteInicio";
-
-// QR y códigos del cliente
 import Codigo from "./pages/codigo";
 import Qr from "./pages/qr";
-
-// Promociones
 import Promociones from "./pages/promociones";
 import PromocionDetalle from "./pages/promocionDetalle";
-
-// Puntos y canjes
 import Puntos from "./pages/puntos";
 import Canjes from "./pages/canjes";
 import { HistorialCanjes } from "./pages/historialCanjes";
 
-// Administración de canjes
+// RESTAURANTES
+import RestauranteInicio from "./pages/restaurante/RestauranteInicio";
+import RestaurantePromociones from "./pages/restaurante/RestaurantePromociones";
+
 import CanjesRestaurante from "./pages/canjesRestaurante";
-
-// Administración de recompensas
 import AdminRecompensas from "./pages/adminRecompensas";
-
-// Generación de tickets QR
 import GenerarTicket from "./pages/generarTicket";
 
-// Protección de rutas
+// PROTECCIÓN
 import ProtectedRoute from "./routes/protected.route";
 
-import "./index.css";
-
 // ==========================================
-// OBTENER ROL DEL USUARIO
+// CONSULTAR ROL
 // ==========================================
 
 function getUserRole(): string {
   try {
-    const storedUser = localStorage.getItem("user");
-
-    const user = storedUser
-      ? JSON.parse(storedUser)
-      : null;
+    const user = JSON.parse(
+      localStorage.getItem("user") || "null"
+    );
 
     return user?.role || "";
   } catch {
@@ -87,7 +73,7 @@ function DashboardPorRol() {
 }
 
 // ==========================================
-// VALIDACIÓN DE ROLES
+// RUTAS DE RESTAURANTES
 // ==========================================
 
 function RestauranteRoute({
@@ -111,7 +97,7 @@ function RestauranteRoute({
 }
 
 // ==========================================
-// RUTAS PRINCIPALES
+// APLICACIÓN
 // ==========================================
 
 ReactDOM.createRoot(
@@ -123,17 +109,10 @@ ReactDOM.createRoot(
 
         {/* RUTAS PÚBLICAS */}
 
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-        {/* DASHBOARD SEGÚN ROL */}
+        {/* DASHBOARD GENERAL */}
 
         <Route
           path="/dashboard"
@@ -144,7 +123,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* DASHBOARD EXCLUSIVO DE RESTAURANTES */}
+        {/* DASHBOARD RESTAURANTE */}
 
         <Route
           path="/restaurante"
@@ -152,6 +131,32 @@ ReactDOM.createRoot(
             <ProtectedRoute>
               <RestauranteRoute soloRestaurante>
                 <RestauranteInicio />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* PUBLICAR PROMOCIONES */}
+
+        <Route
+          path="/restaurante/promociones"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute soloRestaurante>
+                <RestaurantePromociones mode="publicar" />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* HISTORIAL DE PROMOCIONES */}
+
+        <Route
+          path="/restaurante/promociones/historial"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute soloRestaurante>
+                <RestaurantePromociones mode="historial" />
               </RestauranteRoute>
             </ProtectedRoute>
           }
@@ -168,7 +173,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ESCANEO QR */}
+        {/* ESCANEAR QR */}
 
         <Route
           path="/qr"
@@ -179,7 +184,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* INGRESO DE CÓDIGOS */}
+        {/* CÓDIGO MANUAL */}
 
         <Route
           path="/codigo"
@@ -190,7 +195,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* PROMOCIONES */}
+        {/* CATÁLOGO DE PROMOCIONES */}
 
         <Route
           path="/promociones"
@@ -210,7 +215,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* SISTEMA DE PUNTOS */}
+        {/* PUNTOS */}
 
         <Route
           path="/puntos"
@@ -221,7 +226,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* CATÁLOGO DE RECOMPENSAS */}
+        {/* CANJES CLIENTES */}
 
         <Route
           path="/canjes"
@@ -232,8 +237,6 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* HISTORIAL DE CANJES DEL CLIENTE */}
-
         <Route
           path="/historial-canjes"
           element={
@@ -243,7 +246,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* ADMINISTRACIÓN DE CANJES */}
+        {/* CANJES RESTAURANTE */}
 
         <Route
           path="/canjes-restaurante"
@@ -269,7 +272,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* GENERACIÓN DE TICKETS QR */}
+        {/* GENERACIÓN DE TICKETS */}
 
         <Route
           path="/generar-ticket"
