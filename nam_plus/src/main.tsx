@@ -1,4 +1,3 @@
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -13,10 +12,12 @@ import "./i18n";
 import "./index.css";
 
 // AUTENTICACIÓN
+
 import Login from "./pages/login";
 import Register from "./pages/register";
 
 // CLIENTES
+
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
 import Codigo from "./pages/codigo";
@@ -28,19 +29,20 @@ import Canjes from "./pages/canjes";
 import { HistorialCanjes } from "./pages/historialCanjes";
 
 // RESTAURANTES
+
 import RestauranteInicio from "./pages/restaurante/RestauranteInicio";
 import RestaurantePromociones from "./pages/restaurante/RestaurantePromociones";
+import RestauranteTransferirPuntos from "./pages/restaurante/RestauranteTransferirPuntos";
 
 import CanjesRestaurante from "./pages/canjesRestaurante";
 import AdminRecompensas from "./pages/adminRecompensas";
 import GenerarTicket from "./pages/generarTicket";
 
 // PROTECCIÓN
+
 import ProtectedRoute from "./routes/protected.route";
 
-// ==========================================
 // CONSULTAR ROL
-// ==========================================
 
 function getUserRole(): string {
   try {
@@ -54,9 +56,7 @@ function getUserRole(): string {
   }
 }
 
-// ==========================================
 // DASHBOARD SEGÚN EL ROL
-// ==========================================
 
 function DashboardPorRol() {
   const role = getUserRole();
@@ -72,9 +72,7 @@ function DashboardPorRol() {
   return <Navigate to="/login" replace />;
 }
 
-// ==========================================
-// RUTAS DE RESTAURANTES
-// ==========================================
+// PROTECCIÓN DE RESTAURANTES
 
 function RestauranteRoute({
   children,
@@ -96,9 +94,7 @@ function RestauranteRoute({
   return <>{children}</>;
 }
 
-// ==========================================
 // APLICACIÓN
-// ==========================================
 
 ReactDOM.createRoot(
   document.getElementById("root")!
@@ -131,6 +127,19 @@ ReactDOM.createRoot(
             <ProtectedRoute>
               <RestauranteRoute soloRestaurante>
                 <RestauranteInicio />
+              </RestauranteRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* TRANSFERIR PUNTOS */}
+
+        <Route
+          path="/restaurante/transferir-puntos"
+          element={
+            <ProtectedRoute>
+              <RestauranteRoute soloRestaurante>
+                <RestauranteTransferirPuntos />
               </RestauranteRoute>
             </ProtectedRoute>
           }
@@ -195,7 +204,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* CATÁLOGO DE PROMOCIONES */}
+        {/* PROMOCIONES */}
 
         <Route
           path="/promociones"
@@ -289,9 +298,7 @@ ReactDOM.createRoot(
 
         <Route
           path="*"
-          element={
-            <Navigate to="/login" replace />
-          }
+          element={<Navigate to="/login" replace />}
         />
 
       </Routes>

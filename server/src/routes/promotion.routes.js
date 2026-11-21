@@ -1,5 +1,4 @@
-
-import { Router } from "express";
+import express, { Router } from "express";
 
 import {
   getPromotions,
@@ -16,7 +15,18 @@ import { auth } from "../middleware/auth.js";
 import adminOnly from "../middleware/admin.js";
 import { requireRole } from "../middleware/requireRole.js";
 
+import {
+  imageDirectory,
+  readPromotionUpload,
+} from "../middleware/promotionImage.js";
+
 const router = Router();
+
+// Mostrar imágenes guardadas en server/uploads/promociones
+router.use(
+  "/images",
+  express.static(imageDirectory, { index: false })
+);
 
 // ==========================================
 // RUTAS EXCLUSIVAS PARA RESTAURANTES
@@ -35,6 +45,7 @@ router.post(
   "/mine/:restaurantId",
   auth,
   requireRole("restaurante"),
+  readPromotionUpload,
   createRestaurantPromotion
 );
 
@@ -43,6 +54,7 @@ router.patch(
   "/mine/:restaurantId/:id",
   auth,
   requireRole("restaurante"),
+  readPromotionUpload,
   updateRestaurantPromotion
 );
 

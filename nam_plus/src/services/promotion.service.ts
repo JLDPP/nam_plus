@@ -1,32 +1,10 @@
-
 import { api } from "../api";
-
-// ==========================================
-// TIPOS
-// ==========================================
 
 export type PromotionStatus =
   | "Programada"
   | "Activa"
   | "Vencida"
   | "Inactiva";
-
-export type Promotion = {
-  _id: string;
-  title: string;
-  description?: string;
-  restaurant?: string | null;
-  restaurantName: string;
-  imageUrl?: string;
-  minAmount: number;
-  points: number;
-  active: boolean;
-  startDate?: string;
-  endDate?: string | null;
-  status?: PromotionStatus;
-  createdAt?: string;
-  updatedAt?: string;
-};
 
 export type CreatePromotionData = {
   title: string;
@@ -35,15 +13,27 @@ export type CreatePromotionData = {
   imageUrl?: string;
   minAmount: number;
   points: number;
+  pointsCost?: number;
   active: boolean;
   startDate?: string;
   endDate?: string | null;
 };
 
+export type Promotion = CreatePromotionData & {
+  _id: string;
+  stock?: number;
+  restaurant?: string | null;
+  status?: PromotionStatus;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type RestaurantPromotionData = Omit<
   CreatePromotionData,
   "restaurantName"
->;
+> & {
+  restaurantName?: string;
+};
 
 export type OwnedRestaurant = {
   _id: string;
@@ -55,104 +45,114 @@ export type MyPromotionsResponse = {
   promotions: Promotion[];
 };
 
-// ==========================================
-// FUNCIONES EXISTENTES
-// ==========================================
+function withImage(promotion: Promotion): Promotion {
+  if (!promotion.imageUrl?.startsWith("/api/promotions/images/")) {
+    return promotion;
+  }
 
-export async function getPromotions(): Promise<Promotion[]> {
-  const { data } = await api.get<Promotion[]>(
-    "/api/promotions"
+  const apiBase = new URL(
+    api.defaults.baseURL || "/",
+    window.location.origin
   );
 
-  return data;
+  return {
+    ...promotion,
+    imageUrl: new URL(promotion.imageUrl, apiBase).href,
+  };
 }
 
-export async function getPromotionById(
-  id: string
-): Promise<Promotion> {
-  const { data } = await api.get<Promotion>(
-    `/api/promotions/${id}`
-  );
+export async function getPromotions(): Promise<Promotion[]> {
+  const { data } = await api.get<Promotion[]>("/api/promotions");
+  return data.map(withImage);
+}
 
-  return data;
+export async function getPromotionById(id: string): Promise<Promotion> {
+  const { data } = await api.get<Promotion>(`/api/promotions/${id}`);
+  return withImage(data);
 }
 
 export async function createPromotion(
   payload: CreatePromotionData
 ): Promise<Promotion> {
-  const { data } = await api.post<Promotion>(
-    "/api/promotions",
-    payload
-  );
-
-  return data;
+  const { data } = await api.post<Promotion>("/api/promotions", payload);
+  return withImage(data);
 }
 
 export async function updatePromotion(
   id: string,
   payload: CreatePromotionData
 ): Promise<Promotion> {
-  const { data } = await api.put<Promotion>(
-    `/api/promotions/${id}`,
-    payload
-  );
-
-  return data;
+  const { data } = await api.put<Promotion>(`/api/promotions/${id}`, payload);
+  return withImage(data);
 }
 
-export async function deletePromotion(
-  id: string
-): Promise<void> {
-  await api.delete(
-    `/api/promotions/${id}`
-  );
+export async function deletePromotion(id: string): Promise<void> {
+  await api.delete(`/api/promotions/${id}`);
 }
-
-// ==========================================
-// CONSULTAR PROMOCIONES DEL RESTAURANTE
-// ==========================================
 
 export async function getMyPromotions(
   signal?: AbortSignal
 ): Promise<MyPromotionsResponse> {
-  const { data } =
-    await api.get<MyPromotionsResponse>(
-      "/api/promotions/mine",
-      { signal }
-    );
+  const { data } = await api.get<MyPromotionsResponse>(
+    "/api/promotions/mine",
+    { signal }
+  );
 
-  return data;
+  return {
+    ...data,
+    promotions: data.promotions.map(withImage),
+  };
 }
 
-// ==========================================
-// PUBLICAR PROMOCIÓN
-// ==========================================
+function buildPromotionRequest(
+  payload: Partial<RestaurantPromotionData>,
+  image?: File | null
+) {
+  if (!image) {
+    return { body: payload, config: undefined };
+  }
+
+  const body = new FormData();
+  body.append("promotion", JSON.stringify(payload));
+  body.append("image", image);
+
+  return {
+    body,
+    config: {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  };
+}
 
 export async function createRestaurantPromotion(
   restaurantId: string,
-  payload: RestaurantPromotionData
+  payload: RestaurantPromotionData,
+  image?: File | null
 ): Promise<Promotion> {
+  const { body, config } = buildPromotionRequest(payload, image);
+
   const { data } = await api.post<Promotion>(
     `/api/promotions/mine/${restaurantId}`,
-    payload
+    body,
+    config
   );
 
-  return data;
+  return withImage(data);
 }
-
-// ==========================================
-// ACTUALIZAR PROMOCIÓN DEL RESTAURANTE
-// ==========================================
 
 export async function updateRestaurantPromotion(
   restaurantId: string,
   promotionId: string,
-  payload: Partial<RestaurantPromotionData>
+  payload: Partial<RestaurantPromotionData>,
+  image?: File | null
 ): Promise<Promotion> {
+  const { body, config } = buildPromotionRequest(payload, image);
+
   const { data } = await api.patch<Promotion>(
     `/api/promotions/mine/${restaurantId}/${promotionId}`,
-    payload
+    body,
+    config
   );
 
-  return data;
+  return withImage(data);
 }

@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const promotionSchema = new mongoose.Schema(
@@ -8,43 +7,49 @@ const promotionSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
     description: {
       type: String,
       default: "",
       trim: true,
     },
-
-    // Referencia al restaurante propietario.
     restaurant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Restaurant",
       default: null,
       index: true,
     },
-
-    // Se conserva por compatibilidad con el frontend.
     restaurantName: {
       type: String,
       required: true,
       trim: true,
     },
-
     imageUrl: {
       type: String,
       default: "",
       trim: true,
     },
-
     minAmount: {
       type: Number,
       default: 0,
       min: 0,
     },
 
+    // Puntos que el cliente gana por comprar.
     points: {
       type: Number,
       default: 0,
+      min: 0,
+    },
+
+    // Puntos que se descuentan por canjear.
+    pointsCost: {
+      type: Number,
+      default: 300,
+      min: 1,
+    },
+    stock: {
+      type: Number,
+      default: 10,
       min: 0,
     },
 
@@ -52,12 +57,10 @@ const promotionSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-
     startDate: {
       type: Date,
       default: Date.now,
     },
-
     endDate: {
       type: Date,
       default: null,
@@ -69,12 +72,7 @@ const promotionSchema = new mongoose.Schema(
   }
 );
 
-promotionSchema.index({
-  restaurant: 1,
-  createdAt: -1,
-});
+promotionSchema.index({ restaurant: 1, createdAt: -1 });
 
-export default mongoose.model(
-  "Promotion",
-  promotionSchema
-);
+export default mongoose.models.Promotion ||
+  mongoose.model("Promotion", promotionSchema);
