@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const redemptionSchema = new mongoose.Schema(
@@ -10,13 +9,20 @@ const redemptionSchema = new mongoose.Schema(
       index: true,
     },
 
+    rewardModel: {
+      type: String,
+      enum: ["Reward", "Promotion"],
+      default: "Reward",
+    },
+
     reward: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Reward",
+      ref: function () {
+        return this.rewardModel || "Reward";
+      },
       required: true,
     },
 
-    // Cantidad de puntos utilizados en el canje.
     pointsSpent: {
       type: Number,
       required: true,
@@ -29,15 +35,10 @@ const redemptionSchema = new mongoose.Schema(
       default: "pending",
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-redemptionSchema.index({
-  user: 1,
-  createdAt: -1,
-});
+redemptionSchema.index({ user: 1, createdAt: -1 });
 
 export default mongoose.models.Redemption ||
   mongoose.model("Redemption", redemptionSchema);

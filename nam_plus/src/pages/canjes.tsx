@@ -1,43 +1,13 @@
-
-/*
-  ARCHIVO: canjes.tsx
-
-  FUNCIÓN:
-  Catálogo de recompensas de Ñam+.
-
-  FUNCIONES CONSERVADAS:
-  - Consulta de recompensas reales.
-  - Consulta del saldo de puntos.
-  - Validación de inventario.
-  - Validación de puntos suficientes.
-  - Prevención de canjes duplicados.
-  - Confirmación antes del canje.
-  - Actualización de puntos e inventario.
-  - Manejo de errores.
-  - Navegación.
-  - Diseño original.
-
-  MEJORA:
-  - Traducción español/inglés con i18next.
-*/
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 
 import {
-  getRewards,
-  type Reward,
-} from "../services/reward.service";
+  getPromotions,
+  type Promotion,
+} from "../services/promotion.service";
 
-import {
-  redeemReward,
-} from "../services/redemption.service";
-
-import {
-  getPointsBalance,
-} from "../services/points.service";
+import { getPointsBalance } from "../services/points.service";
 
 import "../styles/canjes.css";
 
@@ -45,375 +15,173 @@ export default function Canjes() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
-  const [rewards, setRewards] = useState<Reward[]>([]);
+  const english = i18n.resolvedLanguage?.startsWith("en") ?? false;
+  const locale = english ? "en-US" : "es-MX";
+
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [points, setPoints] = useState<number | null>(null);
-
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-
-  const [redeemingId, setRedeemingId] =
-    useState<string | null>(null);
-
-  // Impide solicitudes repetidas durante un canje.
-  const redeemingRef = useRef(false);
-
-  // ==========================================
-  // IDIOMA PARA FORMATO DE NÚMEROS
-  // ==========================================
-
-  const locale =
-    i18n.resolvedLanguage?.startsWith("en")
-      ? "en-US"
-      : "es-MX";
-
-  // ==========================================
-  // CARGAR RECOMPENSAS Y PUNTOS
-  // ==========================================
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    let mounted = true;
 
-    async function loadInitialData() {
+    async function loadPromotions() {
       try {
-        setLoading(true);
-        setError("");
+        const data = await getPromotions();
 
-        const [rewardsData, balance] = await Promise.all([
-          getRewards(),
-          getPointsBalance(),
-        ]);
+        if (mounted) {
+          setPromotions(data.filter((promotion) => promotion.active));
+        }
+      } catch (error) {
+        console.error("Error cargando promociones:", error);
 
-        if (!active) return;
-
-        setRewards(
-          rewardsData.filter((reward) => reward.active)
-        );
-
-        setPoints(balance);
-      } catch (err) {
-        console.error(
-          "Error cargando catálogo:",
-          err
-        );
-
-        if (active) {
-          setError("rewards.loadError");
+        if (mounted) {
+          setLoadError(true);
         }
       } finally {
-        if (active) {
+        if (mounted) {
           setLoading(false);
         }
       }
     }
 
-    void loadInitialData();
+    async function loadBalance() {
+      try {
+        const balance = await getPointsBalance();
+
+        if (mounted) {
+          setPoints(balance);
+        }
+      } catch (error) {
+        console.error("Error cargando el saldo:", error);
+      }
+    }
+
+    void loadPromotions();
+    void loadBalance();
 
     return () => {
-      active = false;
+      mounted = false;
     };
   }, []);
-
-  // ==========================================
-  // ACTUALIZAR RECOMPENSAS Y SALDO
-  // ==========================================
-
-  async function refreshData() {
-    const [rewardsResult, pointsResult] =
-      await Promise.allSettled([
-        getRewards(),
-        getPointsBalance(),
-      ]);
-
-    let refreshed = true;
-
-    if (rewardsResult.status === "fulfilled") {
-      setRewards(
-        rewardsResult.value.filter(
-          (reward) => reward.active
-        )
-      );
-    } else {
-      refreshed = false;
-
-      console.error(
-        "Error actualizando recompensas:",
-        rewardsResult.reason
-      );
-    }
-
-    if (pointsResult.status === "fulfilled") {
-      setPoints(pointsResult.value);
-    } else {
-      refreshed = false;
-      setPoints(null);
-
-      console.error(
-        "Error actualizando puntos:",
-        pointsResult.reason
-      );
-    }
-
-    return refreshed;
-  }
-
-  // ==========================================
-  // CANJEAR RECOMPENSA
-  // ==========================================
-
-  async function handleRedeem(reward: Reward) {
-    if (redeemingRef.current || loading) return;
-
-    if (points === null) {
-      setError("rewards.balanceError");
-      return;
-    }
-
-    if (reward.stock <= 0) {
-      setError("rewards.outOfStockError");
-      return;
-    }
-
-    if (points < reward.pointsCost) {
-      setError("rewards.insufficientError");
-      return;
-    }
-
-    const confirmed = window.confirm(
-      t("rewards.confirmRedeem", {
-        name: reward.name,
-        points: reward.pointsCost.toLocaleString(locale),
-      })
-    );
-
-    if (!confirmed) return;
-
-    redeemingRef.current = true;
-    setRedeemingId(reward._id);
-    setError("");
-    setMessage("");
-
-    try {
-      await redeemReward(reward._id);
-
-      setMessage(
-        t("rewards.redeemSuccess", {
-          name: reward.name,
-        })
-      );
-
-      const refreshed = await refreshData();
-
-      if (!refreshed) {
-        setError("rewards.refreshError");
-      }
-    } catch (err: unknown) {
-      console.error("Error realizando canje:", err);
-
-      if (axios.isAxiosError(err)) {
-        const serverMessage =
-          typeof err.response?.data?.message === "string"
-            ? err.response.data.message
-            : null;
-
-        // Conserva los errores específicos del backend.
-        setError(
-          serverMessage || "rewards.redeemError"
-        );
-      } else {
-        setError("rewards.unexpectedError");
-      }
-
-      // Recuperar el saldo y el inventario.
-      await refreshData();
-    } finally {
-      redeemingRef.current = false;
-      setRedeemingId(null);
-    }
-  }
-
-  // ==========================================
-  // MOSTRAR ERRORES TRADUCIDOS
-  // ==========================================
-
-  function displayError(value: string) {
-    return value.startsWith("rewards.")
-      ? t(value)
-      : value;
-  }
-
-  // ==========================================
-  // INTERFAZ
-  // ==========================================
 
   return (
     <div className="redeem-page">
       <header className="redeem-header">
         <button
+          type="button"
           className="redeem-back-btn"
           onClick={() => navigate("/dashboard")}
         >
           ← {t("common.back")}
         </button>
 
-        <h1>{t("rewards.title")}</h1>
+        <h1>
+          {english ? "Promotion catalog" : "Catálogo de promociones"}
+        </h1>
 
-        <p>{t("rewards.subtitle")}</p>
+        <p>
+          {english
+            ? "Explore promotions from participating restaurants."
+            : "Explora las promociones de los restaurantes participantes."}
+        </p>
       </header>
 
       <main className="redeem-container">
         <div className="redeem-top-actions">
-          <button onClick={() => navigate("/puntos")}>
+          <button type="button" onClick={() => navigate("/puntos")}>
             ⭐ {t("rewards.myPoints")}
           </button>
 
           <button
+            type="button"
             onClick={() => navigate("/historial-canjes")}
           >
             📋 {t("rewards.history")}
           </button>
         </div>
 
-        {/* SALDO DISPONIBLE */}
         <section className="redeem-balance-card">
-          <h2>
-            ⭐ {t("rewards.availablePoints")}
-          </h2>
+          <h2>⭐ {t("rewards.availablePoints")}</h2>
 
           <div className="redeem-balance-total">
-            {loading || points === null
+            {points === null
               ? t("rewards.unavailable")
               : `${points.toLocaleString(locale)} pts`}
           </div>
-
-          <p>{t("rewards.instructions")}</p>
         </section>
 
-        {/* MENSAJES */}
-        {message && (
-          <div
-            className="redeem-success"
-            role="status"
-          >
-            {message}
-          </div>
-        )}
-
-        {error && (
-          <div
-            className="redeem-error"
-            role="alert"
-          >
-            {displayError(error)}
-          </div>
-        )}
-
-        {/* CATÁLOGO */}
         {loading ? (
-          <div className="redeem-empty">
-            {t("rewards.loading")}
+          <div className="redeem-empty" role="status">
+            {english ? "Loading promotions..." : "Cargando promociones..."}
           </div>
-        ) : rewards.length === 0 ? (
+        ) : loadError ? (
+          <p className="redeem-error" role="alert">
+            {english
+              ? "Could not load promotions."
+              : "No se pudieron cargar las promociones."}
+          </p>
+        ) : promotions.length === 0 ? (
           <div className="redeem-empty">
-            <span>🍽️</span>
-
-            <h2>{t("rewards.emptyTitle")}</h2>
-
-            <p>{t("rewards.emptyDescription")}</p>
+            <h2>
+              {english ? "No active promotions" : "No hay promociones activas"}
+            </h2>
           </div>
         ) : (
           <section className="reward-grid">
-            {rewards.map((reward) => {
-              const insufficientPoints =
-                points === null ||
-                points < reward.pointsCost;
+            {promotions.map((promotion) => (
+              <article className="reward-card" key={promotion._id}>
+                {promotion.imageUrl ? (
+                  <img
+                    className="reward-image"
+                    src={promotion.imageUrl}
+                    alt={promotion.title}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="reward-image-placeholder" aria-hidden="true">
+                    🍽️
+                  </div>
+                )}
 
-              const outOfStock = reward.stock <= 0;
+                <div className="reward-content">
+                  <span className="reward-restaurant">
+                    {promotion.restaurantName}
+                  </span>
 
-              return (
-                <article
-                  className="reward-card"
-                  key={reward._id}
-                >
-                  {reward.imageUrl ? (
-                    <img
-                      src={reward.imageUrl}
-                      alt={reward.name}
-                      className="reward-image"
-                    />
-                  ) : (
-                    <div className="reward-image-placeholder">
-                      🍔
-                    </div>
+                  <h2>{promotion.title}</h2>
+
+                  {promotion.description && (
+                    <p className="reward-description">
+                      {promotion.description}
+                    </p>
                   )}
 
-                  <div className="reward-content">
-                    <span className="reward-restaurant">
-                      {reward.restaurantName}
+                  <div className="reward-footer">
+                    <span className="reward-cost">
+                      ⭐ +{promotion.points.toLocaleString(locale)} pts
                     </span>
 
-                    <h2>{reward.name}</h2>
-
-                    <p className="reward-description">
-                      {reward.description ||
-                        t("rewards.defaultDescription")}
-                    </p>
-
-                    <div className="reward-footer">
-                      <span className="reward-cost">
-                        ⭐{" "}
-                        {reward.pointsCost.toLocaleString(
-                          locale
-                        )}{" "}
-                        pts
-                      </span>
-
-                      <span className="reward-stock">
-                        {outOfStock
-                          ? t("rewards.outOfStock")
-                          : t("rewards.availableStock", {
-                              count: reward.stock,
-                            })}
-                      </span>
-                    </div>
-
-                    {!outOfStock && points !== null && (
-                      <p
-                        className={
-                          insufficientPoints
-                            ? "redeem-insufficient"
-                            : "redeem-available"
-                        }
-                      >
-                        {insufficientPoints
-                          ? t("rewards.insufficientPoints")
-                          : t("rewards.enoughPoints")}
-                      </p>
-                    )}
-
-                    <button
-                      className="reward-redeem-btn"
-                      disabled={
-                        outOfStock ||
-                        insufficientPoints ||
-                        redeemingId !== null
-                      }
-                      onClick={() => handleRedeem(reward)}
-                    >
-                      {redeemingId === reward._id
-                        ? t("rewards.processing")
-                        : outOfStock
-                        ? t("rewards.outOfStock")
-                        : points === null
-                        ? t("rewards.balanceUnavailable")
-                        : insufficientPoints
-                        ? t("rewards.insufficientShort")
-                        : t("rewards.redeemButton")}
-                    </button>
+                    <span className="reward-stock">
+                      {english ? "Minimum purchase" : "Compra mínima"} ·{" "}
+                      {promotion.minAmount.toLocaleString(locale, {
+                        style: "currency",
+                        currency: "MXN",
+                      })}
+                    </span>
                   </div>
-                </article>
-              );
-            })}
+
+                  <button
+                    type="button"
+                    className="reward-redeem-btn"
+                    onClick={() => navigate(`/promociones/${promotion._id}`)}
+                  >
+                    {english ? "View promotion" : "Ver promoción"}
+                  </button>
+                </div>
+              </article>
+            ))}
           </section>
         )}
       </main>

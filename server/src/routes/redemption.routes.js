@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 
 import { auth } from "../middleware/auth.js";
@@ -10,65 +9,52 @@ import {
   getRestaurantRedemptions,
   completeRedemption,
   cancelRedemption,
+  getPromotionCustomers,
 } from "../controllers/redemption.controller.js";
 
 const router = Router();
 
-// ==========================================
-// AUTENTICACIÓN JWT
-// ==========================================
-
-// Todas las rutas requieren autenticación
 router.use(auth);
 
-// ==========================================
-// 1. REALIZAR CANJE CON PUNTOS
-// ==========================================
-
-// Solo clientes pueden canjear recompensas
+// 1. Realizar un canje con puntos
 router.post(
   "/",
   requireRole("cliente"),
   createRedemption
 );
 
-// ==========================================
-// 2. HISTORIAL PERSONAL DEL CLIENTE
-// ==========================================
-
+// 2. Historial personal del cliente
 router.get(
   "/history",
   getMyRedemptions
 );
 
-// ==========================================
-// 3. CONSULTAR CANJES DEL RESTAURANTE
-// ==========================================
-
+// 3. Historial de canjes del restaurante
 router.get(
   "/restaurant",
   requireRole("restaurante", "admin"),
   getRestaurantRedemptions
 );
 
-// ==========================================
-// 4. CONFIRMAR ENTREGA DE RECOMPENSA
-// ==========================================
-
+// 4. Confirmar entrega
 router.patch(
   "/:id/complete",
   requireRole("restaurante", "admin"),
   completeRedemption
 );
 
-// ==========================================
-// 5. CANCELAR CANJE Y DEVOLVER PUNTOS
-// ==========================================
-
+// 5. Cancelar canje
 router.patch(
   "/:id/cancel",
   requireRole("restaurante", "admin"),
   cancelRedemption
+);
+
+// 6. Ver clientes que canjearon una promoción propia
+router.get(
+  "/promotions/:promotionId/customers",
+  requireRole("restaurante"),
+  getPromotionCustomers
 );
 
 export default router;

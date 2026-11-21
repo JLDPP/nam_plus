@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from "react-router-dom";
 
 import { setAuth } from "../../api";
@@ -6,9 +5,7 @@ import logo from "../../assets/logo.jpeg";
 
 import "./restaurante.css";
 
-// ==========================================
 // TIPOS
-// ==========================================
 
 type Modulo = {
   id: string;
@@ -20,9 +17,7 @@ type Modulo = {
   action?: string;
 };
 
-// ==========================================
 // MÓDULOS DEL RESTAURANTE
-// ==========================================
 
 const modulos: Modulo[] = [
   {
@@ -52,6 +47,8 @@ const modulos: Modulo[] = [
     description:
       "Entrega puntos a tus clientes por las compras realizadas.",
     color: "green",
+    path: "/restaurante/transferir-puntos",
+    action: "Transferir puntos",
   },
   {
     id: "canjes",
@@ -83,10 +80,6 @@ const modulos: Modulo[] = [
   },
 ];
 
-// ==========================================
-// COMPONENTE PRINCIPAL
-// ==========================================
-
 export default function RestauranteInicio() {
   const nav = useNavigate();
 
@@ -109,9 +102,7 @@ export default function RestauranteInicio() {
     userName = "Restaurante";
   }
 
-  // ==========================================
   // CERRAR SESIÓN
-  // ==========================================
 
   function logout() {
     localStorage.removeItem("token");
@@ -124,17 +115,12 @@ export default function RestauranteInicio() {
     });
   }
 
-  // ==========================================
-  // VISTA
-  // ==========================================
-
   return (
     <div className="rp-layout">
 
       {/* MENÚ LATERAL */}
 
       <aside className="rp-sidebar">
-
         <div className="rp-brand">
           <img
             src={logo}
@@ -156,16 +142,12 @@ export default function RestauranteInicio() {
           className="rp-navigation"
           aria-label="Menú de restaurantes"
         >
-
           <Link
             to="/restaurante"
             className="rp-nav-link rp-nav-active"
             aria-current="page"
           >
-            <span className="rp-nav-icon">
-              ▦
-            </span>
-
+            <span className="rp-nav-icon">▦</span>
             Inicio
           </Link>
 
@@ -201,19 +183,14 @@ export default function RestauranteInicio() {
             to="/admin-recompensas"
             className="rp-nav-link"
           >
-            <span className="rp-nav-icon">
-              ★
-            </span>
-
+            <span className="rp-nav-icon">★</span>
             Recompensas
           </Link>
-
         </nav>
 
-        {/* CUENTA DEL USUARIO */}
+        {/* USUARIO */}
 
         <div className="rp-sidebar-footer">
-
           <div className="rp-account">
             <div className="rp-avatar">
               {userName.charAt(0).toUpperCase()}
@@ -232,25 +209,19 @@ export default function RestauranteInicio() {
           >
             Cerrar sesión
           </button>
-
         </div>
-
       </aside>
 
       {/* CONTENIDO PRINCIPAL */}
 
       <main className="rp-main">
-
         <header className="rp-header">
-
           <div>
             <span className="rp-eyebrow">
               PORTAL DE RESTAURANTES
             </span>
 
-            <h1>
-              Panel de administración
-            </h1>
+            <h1>Panel de administración</h1>
 
             <p>
               Gestiona las operaciones de tu
@@ -261,21 +232,17 @@ export default function RestauranteInicio() {
           <span className="rp-role">
             Restaurante
           </span>
-
         </header>
 
         {/* BIENVENIDA */}
 
         <section className="rp-welcome">
-
           <div>
             <span className="rp-eyebrow">
               ÑAM+ PARA NEGOCIOS
             </span>
 
-            <h2>
-              ¡Bienvenido, {userName}!
-            </h2>
+            <h2>¡Bienvenido, {userName}!</h2>
 
             <p>
               Publica promociones, recompensa la
@@ -289,16 +256,14 @@ export default function RestauranteInicio() {
             alt=""
             className="rp-welcome-logo"
           />
-
         </section>
 
-        {/* RESUMEN DE HERRAMIENTAS */}
+        {/* RESUMEN */}
 
         <section
           className="rp-summary"
           aria-label="Resumen del portal"
         >
-
           <article className="rp-stat">
             <span>Herramientas del portal</span>
             <strong>6</strong>
@@ -307,23 +272,26 @@ export default function RestauranteInicio() {
 
           <article className="rp-stat">
             <span>Acceso a tickets</span>
+
             <strong className="rp-text-cyan">
               QR
             </strong>
+
             <small>Generación de códigos</small>
           </article>
 
           <article className="rp-stat">
             <span>Canjes y recompensas</span>
+
             <strong className="rp-text-green">
               Gestión
             </strong>
+
             <small>Acceso a operaciones existentes</small>
           </article>
-
         </section>
 
-        {/* MÓDULOS PRINCIPALES */}
+        {/* HERRAMIENTAS */}
 
         <div className="rp-section-heading">
           <h2>Herramientas de administración</h2>
@@ -334,14 +302,12 @@ export default function RestauranteInicio() {
         </div>
 
         <section className="rp-grid">
-
           {modulos.map((modulo) => (
             <article
               key={modulo.id}
               id={modulo.id}
               className="rp-card"
             >
-
               <div
                 className={
                   `rp-card-icon rp-icon-${modulo.color}`
@@ -361,6 +327,7 @@ export default function RestauranteInicio() {
                   className="rp-card-button"
                 >
                   {modulo.action}
+
                   <span aria-hidden="true">→</span>
                 </Link>
               ) : (
@@ -368,16 +335,13 @@ export default function RestauranteInicio() {
                   Pendiente de integración
                 </div>
               )}
-
             </article>
           ))}
-
         </section>
 
-        {/* RECOMPENSAS EXISTENTES */}
+        {/* RECOMPENSAS */}
 
         <section className="rp-extra">
-
           <div>
             <h3>Administración de recompensas</h3>
 
@@ -393,15 +357,12 @@ export default function RestauranteInicio() {
           >
             Administrar recompensas
           </Link>
-
         </section>
 
         <footer className="rp-footer">
           Ñam+ · Portal de restaurantes
         </footer>
-
       </main>
-
     </div>
   );
 }

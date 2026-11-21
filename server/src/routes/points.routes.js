@@ -1,22 +1,34 @@
-
 import { Router } from "express";
 
 import { auth } from "../middleware/auth.js";
+import { requireRole } from "../middleware/requireRole.js";
 
 import {
   getBalance,
   getHistory,
+  findCustomer,
+  transferPoints,
 } from "../controllers/points.controller.js";
 
 const router = Router();
 
-// Todas las rutas requieren autenticación
 router.use(auth);
 
-// Consultar saldo de puntos
+// CLIENTES
 router.get("/balance", getBalance);
-
-// Consultar movimientos de puntos
 router.get("/history", getHistory);
+
+// RESTAURANTES
+router.get(
+  "/customer",
+  requireRole("restaurante"),
+  findCustomer
+);
+
+router.post(
+  "/transfer",
+  requireRole("restaurante"),
+  transferPoints
+);
 
 export default router;
