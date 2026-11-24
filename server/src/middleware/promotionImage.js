@@ -55,9 +55,7 @@ export function readImageUpload(field, invalidMessage) {
   };
 }
 
-export async function saveImage(file, directory, publicPath) {
-  if (!file) return null;
-
+export async function encodeImage(file) {
   const image = sharp(file.buffer, {
     limitInputPixels: 25_000_000,
   });
@@ -78,19 +76,22 @@ export async function saveImage(file, directory, publicPath) {
     throw error;
   }
 
-  await mkdir(directory, { recursive: true });
+  return bytes;
+}
+
+export async function savePromotionImage(file) {
+  if (!file) return null;
+
+  const bytes = await encodeImage(file);
+  await mkdir(imageDirectory, { recursive: true });
 
   const filename = `${randomUUID()}.webp`;
-  const destination = path.join(directory, filename);
+  const destination = path.join(imageDirectory, filename);
 
   await writeFile(destination, bytes, { flag: "wx" });
 
   return {
-    url: `${publicPath}/${filename}`,
+    url: `/api/promotions/images/${filename}`,
     discard: () => unlink(destination),
   };
-}
-
-export function savePromotionImage(file) {
-  return saveImage(file, imageDirectory, "/api/promotions/images");
 }
