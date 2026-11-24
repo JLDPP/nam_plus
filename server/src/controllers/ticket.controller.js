@@ -6,6 +6,7 @@ import Ticket from "../models/Ticket.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js";
 import PointsTransaction from "../models/PointsTransaction.js";
+import { sendTicketEmail } from "../services/ticketEmail.service.js";
 
 // ==========================================
 // FUNCIONES AUXILIARES
@@ -63,7 +64,33 @@ export async function createTicket(req, res) {
       );
     }
 
-    const { amountMXN, restaurantId } = req.body || {};
+    // ==========================================
+    // RECIBIR DATOS DE LA COMPRA Y DEL CLIENTE
+    // ==========================================
+
+    const {
+      amountMXN,
+      restaurantId,
+      customerEmail,
+    } = req.body || {};
+
+    // Validar correo electrónico del cliente
+    if (
+      typeof customerEmail !== "string" ||
+      customerEmail.trim().length > 254 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())
+    ) {
+      throw httpError(
+        "Ingresa un correo electrónico válido",
+        400
+      );
+    }
+
+    const recipient = customerEmail.trim();
+
+    // ==========================================
+    // VALIDAR IMPORTE DE COMPRA
+    // ==========================================
 
     if (
       typeof amountMXN !== "number" ||
@@ -107,6 +134,10 @@ export async function createTicket(req, res) {
       );
     }
 
+    // ==========================================
+    // VALIDAR RESTAURANTE
+    // ==========================================
+
     let restaurant;
 
     if (currentUser.role === "admin") {
@@ -142,11 +173,19 @@ export async function createTicket(req, res) {
       );
     }
 
+    // ==========================================
+    // GENERAR CÓDIGO ÚNICO DEL TICKET
+    // ==========================================
+
     const code = generateCode();
 
     const expiresAt = new Date(
       Date.now() + 30 * 24 * 60 * 60 * 1000
     );
+
+    // ==========================================
+    // GUARDAR TICKET EN MONGODB
+    // ==========================================
 
     const ticket = await Ticket.create({
       restaurant: restaurant._id,
@@ -158,10 +197,44 @@ export async function createTicket(req, res) {
       expiresAt,
     });
 
+    // ==========================================
+    // ENVIAR TICKET QR POR CORREO ELECTRÓNICO
+    // ==========================================
+
+    let emailSent = false;
+
+    try {
+      await sendTicketEmail({
+        recipient,
+        code,
+        restaurantName: restaurant.name,
+        amountMXN: amountCents / 100,
+        points: ticket.points,
+        expiresAt: ticket.expiresAt,
+      });
+
+      emailSent = true;
+
+      console.log(
+        "Ticket enviado correctamente por correo"
+      );
+    } catch (emailError) {
+      console.error(
+        "Error al enviar el ticket por correo:",
+        emailError
+      );
+    }
+
+    // ==========================================
+    // RESPUESTA AL FRONTEND
+    // ==========================================
+
     // El código original se devuelve al generarlo.
     // No se almacena en texto plano.
     return res.status(201).json({
-      message: "Ticket generado correctamente",
+      message: emailSent
+        ? "Ticket generado y enviado por correo correctamente"
+        : "Ticket generado, pero no se pudo enviar el correo",
       ticket: {
         id: ticket._id,
         code,
@@ -170,6 +243,10 @@ export async function createTicket(req, res) {
         points: ticket.points,
         status: ticket.status,
         expiresAt: ticket.expiresAt,
+      },
+      email: {
+        sent: emailSent,
+        recipient,
       },
     });
   } catch (error) {
