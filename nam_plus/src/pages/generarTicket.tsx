@@ -20,6 +20,10 @@ interface Ticket {
 interface TicketResponse {
   message: string;
   ticket: Ticket;
+  email: {
+    sent: boolean;
+    recipient: string;
+  };
 }
 
 export default function GenerarTicket() {
@@ -27,6 +31,10 @@ export default function GenerarTicket() {
 
   const [amount, setAmount] = useState("");
   const [restaurantId, setRestaurantId] = useState("");
+
+  // Correo electrónico del cliente
+  const [customerEmail, setCustomerEmail] = useState("");
+
   const [ticket, setTicket] = useState<Ticket | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -46,6 +54,10 @@ export default function GenerarTicket() {
 
   const isAdmin = userRole === "admin";
 
+  // ==========================================
+  // GENERAR TICKET Y ENVIARLO POR CORREO
+  // ==========================================
+
   async function generateTicket(
     event: React.FormEvent<HTMLFormElement>
   ) {
@@ -58,6 +70,7 @@ export default function GenerarTicket() {
 
     const amountMXN = Number(amount);
 
+    // Validar importe de compra
     if (
       !Number.isFinite(amountMXN) ||
       amountMXN < 500 ||
@@ -68,6 +81,20 @@ export default function GenerarTicket() {
     ) {
       setError(
         "Ingresa un importe válido de al menos $500 MXN, con máximo dos decimales."
+      );
+      return;
+    }
+
+    // Validar correo electrónico
+    const email = customerEmail.trim();
+
+    if (
+      !email ||
+      email.length > 254 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      setError(
+        "Ingresa un correo electrónico válido del cliente."
       );
       return;
     }
@@ -94,6 +121,7 @@ export default function GenerarTicket() {
         "/api/tickets",
         {
           amountMXN,
+          customerEmail: email,
           ...(isAdmin
             ? { restaurantId: restaurantId.trim() }
             : {}),
@@ -101,7 +129,19 @@ export default function GenerarTicket() {
       );
 
       setTicket(data.ticket);
-      setMessage(data.message);
+
+      // Confirmar estado del envío
+      if (data.email?.sent) {
+        setMessage(
+          `Ticket generado y enviado correctamente a ${data.email.recipient}.`
+        );
+      } else {
+        setError(
+          "El ticket se generó correctamente, pero no fue posible enviar el correo. " +
+          "Puedes entregar el QR o copiar el código manual que aparece en pantalla. " +
+          "No generes otro ticket para la misma compra."
+        );
+      }
     } catch (err: unknown) {
       console.error("Error generando ticket:", err);
 
@@ -117,6 +157,10 @@ export default function GenerarTicket() {
       setLoading(false);
     }
   }
+
+  // ==========================================
+  // COPIAR CÓDIGO MANUAL
+  // ==========================================
 
   async function copyCode() {
     if (!ticket) return;
@@ -146,8 +190,9 @@ export default function GenerarTicket() {
           <h1>Generar tickets QR</h1>
 
           <p>
-            Registra una compra y genera un código
-            para que el cliente acumule puntos.
+            Registra una compra y envía el código QR
+            y el código manual al correo del cliente
+            para que acumule puntos.
           </p>
         </header>
 
@@ -171,6 +216,26 @@ export default function GenerarTicket() {
                   setAmount(event.target.value)
                 }
                 disabled={loading}
+                required
+              />
+
+              {/* CORREO ELECTRÓNICO DEL CLIENTE */}
+
+              <label htmlFor="ticket-customer-email">
+                Correo electrónico del cliente
+              </label>
+
+              <input
+                id="ticket-customer-email"
+                type="email"
+                placeholder="cliente@gmail.com"
+                value={customerEmail}
+                onChange={(event) =>
+                  setCustomerEmail(event.target.value)
+                }
+                maxLength={254}
+                disabled={loading}
+                autoComplete="email"
                 required
               />
 
@@ -210,8 +275,8 @@ export default function GenerarTicket() {
                 disabled={loading}
               >
                 {loading
-                  ? "Generando..."
-                  : "Generar ticket QR"}
+                  ? "Generando y enviando..."
+                  : "Generar y enviar ticket QR"}
               </button>
             </form>
           </section>
@@ -275,7 +340,8 @@ export default function GenerarTicket() {
               </div>
 
               <p className="ticket-note">
-                Entrega el código o muestra el QR al cliente.
+                El código QR y el código manual
+                corresponden al mismo ticket.
                 Solo podrá utilizarse una vez.
               </p>
             </section>
