@@ -6,9 +6,8 @@
 .redeem-page {
   min-height: 100vh;
   padding: 30px 20px;
-  background: linear-gradient(135deg, #101827, #172b3d);
-  color: #ffffff;
-  font-family: Arial, sans-serif;
+  background: var(--nam-page);
+  color: var(--nam-ink);
 }
 
 .redeem-header {
@@ -25,7 +24,7 @@
 }
 
 .redeem-header p {
-  color: #aab9c8;
+  color: var(--nam-muted);
   margin: 0;
 }
 
@@ -34,16 +33,16 @@
   left: 0;
   top: 10px;
   padding: 10px 18px;
-  border: 1px solid #ffffff30;
+  border: 1px solid var(--nam-border);
   border-radius: 10px;
-  background: #ffffff10;
-  color: white;
+  background: var(--nam-soft);
+  color: var(--nam-ink);
   cursor: pointer;
   transition: 0.2s;
 }
 
 .redeem-back-btn:hover {
-  background: #ffffff25;
+  background: var(--nam-raised);
 }
 
 .redeem-container {
@@ -61,17 +60,17 @@
 
 .redeem-top-actions button {
   padding: 12px 18px;
-  border: 1px solid #ffffff25;
+  border: 1px solid var(--nam-border);
   border-radius: 10px;
-  background: #ffffff10;
-  color: white;
+  background: var(--nam-soft);
+  color: var(--nam-ink);
   font-weight: bold;
   cursor: pointer;
   transition: 0.2s;
 }
 
 .redeem-top-actions button:hover {
-  background: #ffffff25;
+  background: var(--nam-raised);
 }
 
 .reward-grid {
@@ -82,16 +81,16 @@
 
 .reward-card {
   overflow: hidden;
-  border: 1px solid #ffffff15;
+  border: 1px solid var(--nam-border);
   border-radius: 18px;
-  background: #ffffff0d;
-  box-shadow: 0 10px 25px #00000030;
+  background: var(--nam-soft);
+  box-shadow: 0 10px 25px #60301622;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .reward-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 35px #00000045;
+  box-shadow: 0 15px 35px #60301622;
 }
 
 .reward-image {
@@ -107,7 +106,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff12;
+  background: var(--nam-soft);
   font-size: 65px;
 }
 
@@ -116,7 +115,7 @@
 }
 
 .reward-restaurant {
-  color: #12b886;
+  color: var(--nam-green);
   font-size: 13px;
   font-weight: bold;
   text-transform: uppercase;
@@ -130,7 +129,7 @@
 
 .reward-description {
   min-height: 45px;
-  color: #aab9c8;
+  color: var(--nam-muted);
   line-height: 1.5;
   font-size: 14px;
 }
@@ -145,13 +144,13 @@
 }
 
 .reward-cost {
-  color: #12d6a0;
+  color: var(--nam-green);
   font-size: 17px;
   font-weight: 800;
 }
 
 .reward-stock {
-  color: #aab9c8;
+  color: var(--nam-muted);
   font-size: 12px;
 }
 
@@ -160,8 +159,8 @@
   padding: 14px;
   border: none;
   border-radius: 10px;
-  background: #12b886;
-  color: #06251e;
+  background: var(--nam-button);
+  color: var(--nam-on-button);
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
@@ -169,22 +168,22 @@
 }
 
 .reward-redeem-btn:hover:not(:disabled) {
-  background: #0da878;
+  background: var(--nam-button-hover);
 }
 
 .reward-redeem-btn:disabled {
-  background: #52616d;
-  color: #c5ced5;
+  background: var(--nam-raised);
+  color: var(--nam-muted);
   cursor: not-allowed;
 }
 
 .redeem-empty {
   padding: 60px 20px;
-  border: 1px solid #ffffff15;
+  border: 1px solid var(--nam-border);
   border-radius: 18px;
-  background: #ffffff0d;
+  background: var(--nam-soft);
   text-align: center;
-  color: #aab9c8;
+  color: var(--nam-muted);
 }
 
 .redeem-empty span {
@@ -192,7 +191,7 @@
 }
 
 .redeem-empty h2 {
-  color: white;
+  color: var(--nam-ink);
 }
 
 .redeem-success,
@@ -204,15 +203,15 @@
 }
 
 .redeem-success {
-  background: #12b88625;
-  border: 1px solid #12b88670;
-  color: #8ff5ce;
+  background: var(--nam-mint);
+  border: 1px solid var(--nam-line);
+  color: var(--nam-green);
 }
 
 .redeem-error {
-  background: #ff4d4d20;
-  border: 1px solid #ff4d4d70;
-  color: #ffaaaa;
+  background: var(--nam-error-bg);
+  border: 1px solid var(--nam-line);
+  color: var(--nam-error);
 }
 
 @media (max-width: 900px) {
@@ -257,44 +256,44 @@
 
 /* Saldo disponible del usuario */
 .redeem-balance-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   border-radius: 16px;
   padding: 24px;
   margin: 24px 0;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(96, 48, 22, 0.12);
 }
 
 .redeem-balance-card h2 {
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 12px;
-  color: #1f2937;
+  color: var(--nam-ink);
 }
 
 .redeem-balance-total {
   font-size: 36px;
   font-weight: 800;
-  color: #16a34a;
+  color: var(--nam-green);
   margin-bottom: 10px;
 }
 
 .redeem-balance-card p {
-  color: #6b7280;
+  color: var(--nam-muted);
   font-size: 14px;
 }
 
 /* Información de puntos */
 .redeem-insufficient {
-  color: #dc2626;
+  color: var(--nam-error);
   font-size: 13px;
   font-weight: 600;
   margin: 12px 0;
 }
 
 .redeem-available {
-  color: #16a34a;
+  color: var(--nam-green);
   font-size: 13px;
   font-weight: 600;
   margin: 12px 0;

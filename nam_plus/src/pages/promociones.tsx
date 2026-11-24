@@ -1,3 +1,5 @@
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   useEffect,
   useState,
@@ -7,6 +9,7 @@ import {
   createPromotion,
   deletePromotion,
   getPromotions,
+  isPromotionAvailable,
   updatePromotion,
   type Promotion,
 } from "../services/promotion.service";
@@ -74,38 +77,8 @@ export default function Promociones() {
       if (isAdmin) {
         setPromotions(data);
       } else {
-        const today =
-          new Date();
-
-        setPromotions(
-          data.filter(
-            (promotion) => {
-              if (!promotion.active) {
-                return false;
-              }
-
-              if (
-                promotion.startDate &&
-                new Date(
-                  promotion.startDate
-                ) > today
-              ) {
-                return false;
-              }
-
-              if (
-                promotion.endDate &&
-                new Date(
-                  promotion.endDate
-                ) < today
-              ) {
-                return false;
-              }
-
-              return true;
-            }
-          )
-        );
+        const today = new Date();
+        setPromotions(data.filter((promotion) => isPromotionAvailable(promotion, today)));
       }
     } catch (error) {
       console.error(
@@ -750,6 +723,10 @@ export default function Promociones() {
                     )}
                   </div>
                 )}
+
+                <Link className="promotion-detail-link" to={`/promociones/${promotion._id}`}>
+                  Ver promoción <ArrowRight size={17} aria-hidden="true" />
+                </Link>
 
                 {isAdmin && (
                   <div className="promotion-admin-actions">

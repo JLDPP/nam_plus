@@ -1,3 +1,4 @@
+import AuthLayout from "../components/AuthLayout";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, setAuth } from "../api";
@@ -61,123 +62,112 @@ export default function Register() {
   }
 
   return (
-    <div className="auth-wrap">
-      <div className="auth-card">
-        <div className="brand">
-          <div className="nam-logo">
-            Ñ
-          </div>
+    <AuthLayout title="Crear cuenta" description="Únete a Ñam+ y empieza a disfrutar promociones y recompensas.">
+      <form
+        className="auth-form"
+        onSubmit={onSubmit}
+      >
+        <div className="input-group">
+          <label htmlFor="register-name">Nombre</label>
 
-          <h1>Crear cuenta</h1>
-
-          <p className="muted">
-            Únete a Ñam+ y empieza a disfrutar
-            promociones y recompensas.
-          </p>
+          <input
+            id="register-name"
+            type="text"
+            placeholder="Tu nombre"
+            value={name}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
+            required
+          />
         </div>
 
-        <form
-          className="auth-form"
-          onSubmit={onSubmit}
-        >
-          <div className="input-group">
-            <label>Nombre</label>
+        <div className="input-group">
+          <label htmlFor="register-email">Correo electrónico</label>
 
+          <input
+            id="register-email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label htmlFor="register-password">Contraseña</label>
+
+          <div className="pass">
             <input
-              type="text"
-              placeholder="Tu nombre"
-              value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
-              required
-            />
-          </div>
-
-          <div className="input-group">
-            <label>Correo electrónico</label>
-
-            <input
-              type="email"
-              placeholder="correo@ejemplo.com"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-              required
-            />
-          </div>
-
-          <div className="input-group">
-            <label>Contraseña</label>
-
-            <div className="pass">
-              <input
-                type={show ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                required
-              />
-
-              <button
-                type="button"
-                className="ghost"
-                onClick={() =>
-                  setShow((s) => !s)
-                }
-              >
-                {show ? "Ocultar" : "Ver"}
-              </button>
-            </div>
-          </div>
-
-          <div className="input-group">
-            <label>Confirmar contraseña</label>
-
-            <input
+              id="register-password"
               type={show ? "text" : "password"}
               placeholder="••••••••"
-              value={confirmPassword}
+              value={password}
               onChange={(e) =>
-                setConfirmPassword(e.target.value)
+                setPassword(e.target.value)
               }
               required
             />
+
+            <button
+              type="button"
+              className="ghost"
+              onClick={() =>
+                setShow((s) => !s)
+              }
+            >
+              {show ? "Ocultar" : "Ver"}
+            </button>
           </div>
-
-          {error && (
-            <div className="alert">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="btn primary"
-            disabled={loading}
-          >
-            {loading
-              ? "Creando cuenta..."
-              : "Crear cuenta"}
-          </button>
-        </form>
-
-        <div className="footer-links">
-          <span className="muted">
-            ¿Ya tienes cuenta?
-          </span>
-
-          <Link
-            to="/login"
-            className="link"
-          >
-            Iniciar sesión
-          </Link>
         </div>
+
+        <div className="input-group">
+          <label htmlFor="register-confirm">Confirmar contraseña</label>
+
+          <input
+            id="register-confirm"
+            type={show ? "text" : "password"}
+            placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
+            required
+          />
+        </div>
+
+        {error && (
+          <div className="alert" role="alert">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="btn primary"
+          disabled={loading}
+        >
+          {loading
+            ? "Creando cuenta..."
+            : "Crear cuenta"}
+        </button>
+      </form>
+
+      <div className="footer-links">
+        <span className="muted">
+          ¿Ya tienes cuenta?
+        </span>
+
+        <Link
+          to="/login"
+          className="link"
+        >
+          Iniciar sesión
+        </Link>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

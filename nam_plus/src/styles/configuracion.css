@@ -1,37 +1,18 @@
 .settings-page {
-  --page-bg: #050b12;
-  --container-bg: rgba(9, 17, 28, 0.9);
-  --card-bg: rgba(12, 22, 35, 0.95);
-  --text-primary: #ffffff;
-  --text-secondary: #aab6c5;
-  --border: rgba(255, 255, 255, 0.08);
-  --primary: #17c8ff;
-
   min-height: 100vh;
-  background: var(--page-bg);
-  color: var(--text-primary);
+  background: var(--nam-page);
+  color: var(--nam-ink);
   padding: 40px 20px;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.settings-page.light {
-  --page-bg: #eef4f8;
-  --container-bg: rgba(255, 255, 255, 0.96);
-  --card-bg: #ffffff;
-  --text-primary: #102030;
-  --text-secondary: #607080;
-  --border: rgba(20, 60, 90, 0.13);
-  --primary: #0bb7ee;
 }
 
 .settings-container {
   max-width: 900px;
   margin: 0 auto;
-  background: var(--container-bg);
-  border: 1px solid var(--border);
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   border-radius: 28px;
   padding: 30px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 60px rgba(96, 48, 22, 0.12);
 }
 
 .settings-header {
@@ -49,21 +30,21 @@
 
 .settings-header p {
   margin: 8px 0 0;
-  color: var(--text-secondary);
+  color: var(--nam-muted);
 }
 
 .back-btn {
   background: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--primary);
+  color: var(--nam-ink);
+  border: 1px solid var(--nam-accent);
   border-radius: 12px;
   padding: 10px 18px;
   cursor: pointer;
 }
 
 .settings-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: var(--nam-soft);
+  border: 1px solid var(--nam-border);
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 20px;
@@ -80,7 +61,7 @@
 
 .settings-card p {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--nam-muted);
 }
 
 .settings-options {
@@ -90,9 +71,13 @@
 }
 
 .option-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--border);
+  color: var(--nam-ink);
+  border: 1px solid var(--nam-border);
   border-radius: 12px;
   padding: 12px 18px;
   cursor: pointer;
@@ -104,9 +89,9 @@
 }
 
 .option-btn.active {
-  background: var(--primary);
-  color: #031018;
-  border-color: var(--primary);
+  background: var(--nam-button);
+  color: var(--nam-on-button);
+  border-color: var(--nam-accent);
 }
 
 @media (max-width: 700px) {

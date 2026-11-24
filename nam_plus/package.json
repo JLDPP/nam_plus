@@ -5,9 +5,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/nunito": "^5.3.0",
     "axios": "^1.20.0",
     "html5-qrcode": "^2.3.8",
     "i18next": "^27.1.1",
+    "lucide-react": "^1.78.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

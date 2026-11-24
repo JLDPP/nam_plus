@@ -21,6 +21,7 @@
 */
 
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import i18n from "../i18n";
 import "../styles/configuracion.css";
 
@@ -36,7 +37,7 @@ export default function Configuracion() {
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem("theme");
 
-    return savedTheme === "light" ? "light" : "dark";
+    return savedTheme === "dark" ? "dark" : "light";
   });
 
   // ==========================================
@@ -55,6 +56,7 @@ export default function Configuracion() {
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
+    document.documentElement.dataset.theme = theme;
   }, [theme]);
 
   // ==========================================
@@ -128,7 +130,7 @@ export default function Configuracion() {
   // ==========================================
 
   return (
-    <div className={`settings-page ${theme}`}>
+    <div className="settings-page">
       <div className="settings-container">
 
         {/* ENCABEZADO */}
@@ -164,9 +166,10 @@ export default function Configuracion() {
                   ? "option-btn active"
                   : "option-btn"
               }
+              aria-pressed={theme === "dark"}
               onClick={() => setTheme("dark")}
             >
-              🌙 {t.dark}
+              <Moon size={17} aria-hidden="true" /> {t.dark}
             </button>
 
             <button
@@ -176,9 +179,10 @@ export default function Configuracion() {
                   ? "option-btn active"
                   : "option-btn"
               }
+              aria-pressed={theme === "light"}
               onClick={() => setTheme("light")}
             >
-              ☀️ {t.light}
+              <Sun size={17} aria-hidden="true" /> {t.light}
             </button>
           </div>
         </section>
@@ -198,9 +202,10 @@ export default function Configuracion() {
                   ? "option-btn active"
                   : "option-btn"
               }
+              aria-pressed={language === "es"}
               onClick={() => setLanguage("es")}
             >
-              🇲🇽 {t.spanish}
+              {t.spanish}
             </button>
 
             <button
@@ -210,9 +215,10 @@ export default function Configuracion() {
                   ? "option-btn active"
                   : "option-btn"
               }
+              aria-pressed={language === "en"}
               onClick={() => setLanguage("en")}
             >
-              🇺🇸 {t.english}
+              {t.english}
             </button>
           </div>
         </section>

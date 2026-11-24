@@ -1,8 +1,8 @@
 
 .ticket-page {
   min-height: 100vh;
-  background: #142234;
-  color: #ffffff;
+  background: var(--nam-page);
+  color: var(--nam-ink);
   padding: 35px 24px;
   box-sizing: border-box;
 }
@@ -23,15 +23,15 @@
 }
 
 .ticket-header p {
-  color: #a9bed6;
+  color: var(--nam-muted);
 }
 
 .ticket-back-btn {
   display: block;
-  background: #253447;
-  color: #ffffff;
+  background: var(--nam-soft);
+  color: var(--nam-ink);
   padding: 12px 18px;
-  border: 1px solid #475569;
+  border: 1px solid var(--nam-line);
   border-radius: 10px;
   cursor: pointer;
 }
@@ -45,8 +45,8 @@
 
 .ticket-form-card,
 .ticket-result-card {
-  background: #223144;
-  border: 1px solid #37475d;
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   border-radius: 16px;
   padding: 28px;
 }
@@ -67,9 +67,9 @@
 }
 
 .ticket-form-card input {
-  background: #142234;
-  color: #ffffff;
-  border: 1px solid #475569;
+  background: var(--nam-page);
+  color: var(--nam-ink);
+  border: 1px solid var(--nam-line);
   border-radius: 10px;
   padding: 14px;
   font: inherit;
@@ -78,7 +78,7 @@
 
 .ticket-form-card input:focus {
   outline: none;
-  border-color: #10b981;
+  border-color: var(--nam-green);
 }
 
 .ticket-points-preview {
@@ -86,20 +86,20 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  background: #142234;
+  background: var(--nam-page);
   border-radius: 10px;
   padding: 18px;
   margin: 10px 0;
 }
 
 .ticket-points-preview strong {
-  color: #34d399;
+  color: var(--nam-green);
 }
 
 .ticket-generate-btn,
 .ticket-copy-btn {
-  background: #10b981;
-  color: #062c29;
+  background: var(--nam-button);
+  color: var(--nam-on-button);
   border: none;
   border-radius: 10px;
   padding: 14px;
@@ -117,7 +117,7 @@
 }
 
 .ticket-restaurant-name {
-  color: #a9bed6;
+  color: var(--nam-muted);
   margin-bottom: 20px;
 }
 
@@ -136,13 +136,13 @@
 }
 
 .ticket-code-label {
-  color: #a9bed6;
+  color: var(--nam-muted);
   margin-top: 24px;
 }
 
 .ticket-code-value {
-  background: #142234;
-  border: 1px solid #475569;
+  background: var(--nam-page);
+  border: 1px solid var(--nam-line);
   padding: 14px;
   border-radius: 10px;
   font-weight: 700;
@@ -157,7 +157,7 @@
 .ticket-result-info {
   text-align: left;
   margin-top: 24px;
-  border-top: 1px solid #37475d;
+  border-top: 1px solid var(--nam-border);
   padding-top: 14px;
 }
 
@@ -168,12 +168,12 @@
 }
 
 .ticket-result-info strong {
-  color: #34d399;
+  color: var(--nam-green);
 }
 
 .ticket-note {
   font-size: 13px;
-  color: #a9bed6;
+  color: var(--nam-muted);
   margin-top: 20px;
 }
 
@@ -185,13 +185,13 @@
 }
 
 .ticket-success {
-  background: #064e3b;
-  color: #6ee7b7;
+  background: var(--nam-mint);
+  color: var(--nam-green);
 }
 
 .ticket-error {
-  background: #7f1d1d;
-  color: #fca5a5;
+  background: var(--nam-error-bg);
+  color: var(--nam-error);
 }
 
 @media (max-width: 700px) {

@@ -11,6 +11,8 @@ const savedLanguage =
     ? "en"
     : "es";
 
+document.documentElement.lang = savedLanguage;
+
 void i18n.use(initReactI18next).init({
   resources: {
     es: { translation: es },

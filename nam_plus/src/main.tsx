@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import "./i18n";
+import "@fontsource-variable/nunito";
 import "./index.css";
 
 // AUTENTICACIÓN
@@ -95,6 +96,9 @@ function RestauranteRoute({
 }
 
 // APLICACIÓN
+
+document.documentElement.dataset.theme =
+  localStorage.getItem("theme") === "dark" ? "dark" : "light";
 
 ReactDOM.createRoot(
   document.getElementById("root")!

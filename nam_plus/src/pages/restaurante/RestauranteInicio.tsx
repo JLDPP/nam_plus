@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { Coins, Gift, History, House, Receipt, Store, Tag, Ticket, type LucideIcon } from "lucide-react";
 
 import { setAuth } from "../../api";
 import logo from "../../assets/logo.jpeg";
@@ -9,7 +10,7 @@ import "./restaurante.css";
 
 type Modulo = {
   id: string;
-  icon: string;
+  Icon: LucideIcon;
   title: string;
   description: string;
   color: string;
@@ -22,7 +23,7 @@ type Modulo = {
 const modulos: Modulo[] = [
   {
     id: "cupones",
-    icon: "QR",
+    Icon: Ticket,
     title: "Generar cupón",
     description:
       "Genera tickets con códigos de texto y QR para tus clientes.",
@@ -32,7 +33,7 @@ const modulos: Modulo[] = [
   },
   {
     id: "promociones",
-    icon: "%",
+    Icon: Tag,
     title: "Publicar promociones",
     description:
       "Crea ofertas y beneficios exclusivos para tus clientes.",
@@ -42,7 +43,7 @@ const modulos: Modulo[] = [
   },
   {
     id: "puntos",
-    icon: "+P",
+    Icon: Coins,
     title: "Transferir puntos",
     description:
       "Entrega puntos a tus clientes por las compras realizadas.",
@@ -52,7 +53,7 @@ const modulos: Modulo[] = [
   },
   {
     id: "canjes",
-    icon: "✓",
+    Icon: History,
     title: "Historial de canjes",
     description:
       "Consulta y administra los canjes de recompensas.",
@@ -62,7 +63,7 @@ const modulos: Modulo[] = [
   },
   {
     id: "historial-promociones",
-    icon: "H",
+    Icon: Receipt,
     title: "Historial de promociones",
     description:
       "Consulta tus promociones activas, vencidas y pausadas.",
@@ -72,7 +73,7 @@ const modulos: Modulo[] = [
   },
   {
     id: "perfil",
-    icon: "R",
+    Icon: Store,
     title: "Perfil del restaurante",
     description:
       "Actualiza la información y configuración de tu negocio.",
@@ -135,7 +136,7 @@ export default function RestauranteInicio() {
         </div>
 
         <p className="rp-menu-label">
-          MENÚ PRINCIPAL
+          Herramientas
         </p>
 
         <nav
@@ -147,7 +148,7 @@ export default function RestauranteInicio() {
             className="rp-nav-link rp-nav-active"
             aria-current="page"
           >
-            <span className="rp-nav-icon">▦</span>
+            <span className="rp-nav-icon"><House size={17} aria-hidden="true" /></span>
             Inicio
           </Link>
 
@@ -159,7 +160,7 @@ export default function RestauranteInicio() {
                 className="rp-nav-link"
               >
                 <span className="rp-nav-icon">
-                  {modulo.icon}
+                  <modulo.Icon size={19} aria-hidden="true" />
                 </span>
 
                 {modulo.title}
@@ -171,7 +172,7 @@ export default function RestauranteInicio() {
                 className="rp-nav-link"
               >
                 <span className="rp-nav-icon">
-                  {modulo.icon}
+                  <modulo.Icon size={19} aria-hidden="true" />
                 </span>
 
                 {modulo.title}
@@ -183,7 +184,7 @@ export default function RestauranteInicio() {
             to="/admin-recompensas"
             className="rp-nav-link"
           >
-            <span className="rp-nav-icon">★</span>
+            <span className="rp-nav-icon"><Gift size={17} aria-hidden="true" /></span>
             Recompensas
           </Link>
         </nav>
@@ -238,10 +239,6 @@ export default function RestauranteInicio() {
 
         <section className="rp-welcome">
           <div>
-            <span className="rp-eyebrow">
-              ÑAM+ PARA NEGOCIOS
-            </span>
-
             <h2>¡Bienvenido, {userName}!</h2>
 
             <p>
@@ -258,47 +255,10 @@ export default function RestauranteInicio() {
           />
         </section>
 
-        {/* RESUMEN */}
-
-        <section
-          className="rp-summary"
-          aria-label="Resumen del portal"
-        >
-          <article className="rp-stat">
-            <span>Herramientas del portal</span>
-            <strong>6</strong>
-            <small>Funciones principales</small>
-          </article>
-
-          <article className="rp-stat">
-            <span>Acceso a tickets</span>
-
-            <strong className="rp-text-cyan">
-              QR
-            </strong>
-
-            <small>Generación de códigos</small>
-          </article>
-
-          <article className="rp-stat">
-            <span>Canjes y recompensas</span>
-
-            <strong className="rp-text-green">
-              Gestión
-            </strong>
-
-            <small>Acceso a operaciones existentes</small>
-          </article>
-        </section>
-
         {/* HERRAMIENTAS */}
 
         <div className="rp-section-heading">
           <h2>Herramientas de administración</h2>
-
-          <p>
-            Selecciona la operación que deseas realizar.
-          </p>
         </div>
 
         <section className="rp-grid">
@@ -314,7 +274,7 @@ export default function RestauranteInicio() {
                 }
                 aria-hidden="true"
               >
-                {modulo.icon}
+                <modulo.Icon size={19} aria-hidden="true" />
               </div>
 
               <h3>{modulo.title}</h3>

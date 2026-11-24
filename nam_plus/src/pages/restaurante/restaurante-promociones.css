@@ -18,11 +18,11 @@
 
 .rp-promo-tab {
   padding: 12px 18px;
-  border: 1px solid #283b4b;
+  border: 1px solid var(--nam-border);
   border-radius: 12px;
 
-  background: #0c1623;
-  color: #aab6c5;
+  background: var(--nam-surface);
+  color: var(--nam-muted);
 
   font-weight: 600;
   font-size: 14px;
@@ -32,9 +32,9 @@
 
 .rp-promo-tab:hover,
 .rp-promo-tab.selected {
-  background: rgba(23, 200, 255, 0.10);
-  color: #17c8ff;
-  border-color: #17c8ff;
+  background: rgba(var(--nam-accent-rgb), 0.10);
+  color: var(--nam-accent);
+  border-color: var(--nam-accent);
 }
 
 /* RESTAURANTE SELECCIONADO */
@@ -49,24 +49,24 @@
   padding: 22px;
   margin-bottom: 24px;
 
-  border: 1px solid #28424e;
+  border: 1px solid var(--nam-border);
   border-radius: 16px;
 
   background: linear-gradient(
     120deg,
-    #102b35,
-    #0c1623
+    var(--nam-peach),
+    var(--nam-surface)
   );
 }
 
 .rp-promo-restaurant span {
-  color: #aab6c5;
+  color: var(--nam-muted);
   font-size: 13px;
 }
 
 .rp-promo-restaurant h2 {
   margin: 8px 0 0;
-  color: #17c8ff;
+  color: var(--nam-accent);
   font-size: 22px;
 }
 
@@ -76,10 +76,10 @@
   max-width: 100%;
   padding: 12px 14px;
 
-  background: #111e2c;
-  color: #ffffff;
+  background: var(--nam-surface);
+  color: var(--nam-ink);
 
-  border: 1px solid #344454;
+  border: 1px solid var(--nam-line);
   border-radius: 10px;
   outline: none;
 
@@ -88,11 +88,11 @@
 }
 
 .rp-promotions select:focus {
-  border-color: #17c8ff;
+  border-color: var(--nam-accent);
 }
 
 .rp-promotions input[readonly] {
-  color: #17c8ff;
+  color: var(--nam-accent);
   opacity: 0.8;
 }
 
@@ -115,32 +115,32 @@
   gap: 12px;
 
   padding: 22px;
-  background: #0c1623;
+  background: var(--nam-surface);
 
-  border: 1px solid #263544;
+  border: 1px solid var(--nam-border);
   border-radius: 16px;
 }
 
 .rp-promo-stats span {
   font-size: 13px;
-  color: #aab6c5;
+  color: var(--nam-muted);
 }
 
 .rp-promo-stats strong {
   font-size: 30px;
-  color: #17c8ff;
+  color: var(--nam-accent);
 }
 
 .rp-promo-stats article:nth-child(2) strong {
-  color: #2ee6a6;
+  color: var(--nam-green);
 }
 
 .rp-promo-stats article:nth-child(3) strong {
-  color: #ff8c8c;
+  color: var(--nam-error);
 }
 
 .rp-promo-stats article:nth-child(4) strong {
-  color: #ffb446;
+  color: var(--nam-gold);
 }
 
 /* FILTROS */
@@ -168,23 +168,23 @@
 }
 
 .rp-promo-status.status-activa {
-  background: rgba(46, 230, 166, 0.12);
-  color: #2ee6a6;
+  background: rgba(var(--nam-green-rgb), 0.12);
+  color: var(--nam-green);
 }
 
 .rp-promo-status.status-programada {
-  background: rgba(23, 200, 255, 0.12);
-  color: #17c8ff;
+  background: rgba(var(--nam-accent-rgb), 0.12);
+  color: var(--nam-accent);
 }
 
 .rp-promo-status.status-vencida {
-  background: rgba(255, 80, 80, 0.12);
-  color: #ff8c8c;
+  background: rgba(var(--nam-error-rgb), 0.12);
+  color: var(--nam-error);
 }
 
 .rp-promo-status.status-inactiva {
-  background: rgba(255, 180, 70, 0.12);
-  color: #ffb446;
+  background: rgba(var(--nam-gold-rgb), 0.12);
+  color: var(--nam-gold);
 }
 
 .rp-promotions button:disabled {

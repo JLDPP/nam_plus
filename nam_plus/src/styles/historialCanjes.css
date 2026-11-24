@@ -1,8 +1,8 @@
 
 .history-page {
   min-height: 100vh;
-  background: #142234;
-  color: #ffffff;
+  background: var(--nam-page);
+  color: var(--nam-ink);
   padding: 40px 24px;
   box-sizing: border-box;
 }
@@ -21,7 +21,7 @@
 }
 
 .history-header p {
-  color: #a9bed6;
+  color: var(--nam-muted);
 }
 
 .history-back-btn {
@@ -29,9 +29,9 @@
   left: 0;
   top: 0;
   padding: 10px 18px;
-  background: #253447;
-  border: 1px solid #475569;
-  color: white;
+  background: var(--nam-soft);
+  border: 1px solid var(--nam-line);
+  color: var(--nam-ink);
   border-radius: 10px;
   cursor: pointer;
 }
@@ -45,14 +45,15 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  background: linear-gradient(120deg, #087f78, #10b981);
+  background: linear-gradient(120deg, var(--nam-lavender), var(--nam-purple-highlight));
+  color: var(--nam-purple);
   padding: 30px;
   border-radius: 18px;
   margin-bottom: 24px;
 }
 
 .history-summary span {
-  color: #def7ef;
+  color: var(--nam-purple);
   font-size: 15px;
 }
 
@@ -70,8 +71,8 @@
 
 .history-actions button,
 .history-retry-btn {
-  background: #10b981;
-  color: #062c29;
+  background: var(--nam-button);
+  color: var(--nam-on-button);
   border: none;
   padding: 12px 20px;
   border-radius: 10px;
@@ -91,8 +92,8 @@
 }
 
 .history-card {
-  background: #223144;
-  border: 1px solid #37475d;
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   border-radius: 16px;
   padding: 20px;
   display: flex;
@@ -113,7 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #334155;
+  background: var(--nam-soft);
   font-size: 35px;
 }
 
@@ -128,12 +129,12 @@
 }
 
 .history-details p {
-  color: #b8c8db;
+  color: var(--nam-muted);
   margin: 0 0 8px;
 }
 
 .history-details small {
-  color: #94a3b8;
+  color: var(--nam-muted);
 }
 
 .history-meta {
@@ -145,7 +146,7 @@
 }
 
 .history-meta strong {
-  color: #34d399;
+  color: var(--nam-green);
   font-size: 20px;
 }
 
@@ -158,23 +159,23 @@
 }
 
 .status-completed {
-  background: #064e3b;
-  color: #6ee7b7;
+  background: var(--nam-mint);
+  color: var(--nam-green);
 }
 
 .status-pending {
-  background: #78350f;
-  color: #fde68a;
+  background: var(--nam-yellow);
+  color: var(--nam-gold);
 }
 
 .status-cancelled {
-  background: #7f1d1d;
-  color: #fca5a5;
+  background: var(--nam-error-bg);
+  color: var(--nam-error);
 }
 
 .history-state {
-  background: #223144;
-  border: 1px solid #37475d;
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   text-align: center;
   border-radius: 18px;
   padding: 65px 24px;
@@ -191,7 +192,7 @@
 }
 
 .history-state p {
-  color: #a9bed6;
+  color: var(--nam-muted);
   margin-bottom: 25px;
 }
 

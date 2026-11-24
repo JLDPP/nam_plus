@@ -1,3 +1,4 @@
+import AuthLayout from "../components/AuthLayout";
 
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -5,7 +6,6 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { api, setAuth } from "../api";
-import logo from "../assets/logo.jpeg";
 
 export default function Login() {
   const nav = useNavigate();
@@ -94,117 +94,101 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-wrap">
-      <div className="auth-card">
+    <AuthLayout title="Iniciar sesión" description="Descubre promociones, acumula puntos y disfruta tus restaurantes favoritos.">
+      <form
+        className="auth-form"
+        onSubmit={onSubmit}
+        autoComplete="off"
+      >
 
-        <div className="brand">
-          <img
-            src={logo}
-            alt="Logo de Ñam+"
-            className="nam-logo-img"
+        <div className="input-group">
+          <label htmlFor="email">
+            Correo electrónico
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            autoComplete="off"
+            required
+            disabled={loading}
           />
-
-          <p className="muted">
-            Descubre promociones, acumula puntos y disfruta
-            tus restaurantes favoritos.
-          </p>
         </div>
 
-        <form
-          className="auth-form"
-          onSubmit={onSubmit}
-          autoComplete="off"
-        >
+        <div className="input-group">
+          <label htmlFor="password">
+            Contraseña
+          </label>
 
-          <div className="input-group">
-            <label htmlFor="email">
-              Correo electrónico
-            </label>
-
+          <div className="pass">
             <input
-              id="email"
-              type="email"
-              placeholder="correo@ejemplo.com"
-              value={email}
+              id="password"
+              type={show ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
               onChange={(e) =>
-                setEmail(e.target.value)
+                setPassword(e.target.value)
               }
               autoComplete="off"
               required
               disabled={loading}
             />
-          </div>
 
-          <div className="input-group">
-            <label htmlFor="password">
-              Contraseña
-            </label>
-
-            <div className="pass">
-              <input
-                id="password"
-                type={show ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                autoComplete="off"
-                required
-                disabled={loading}
-              />
-
-              <button
-                type="button"
-                className="ghost"
-                onClick={() =>
-                  setShow((current) => !current)
-                }
-                aria-label={
-                  show
-                    ? "Ocultar contraseña"
-                    : "Mostrar contraseña"
-                }
-              >
-                {show ? "Ocultar" : "Ver"}
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div
-              className="alert"
-              role="alert"
+            <button
+              type="button"
+              className="ghost"
+              onClick={() =>
+                setShow((current) => !current)
+              }
+              aria-label={
+                show
+                  ? "Ocultar contraseña"
+                  : "Mostrar contraseña"
+              }
             >
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="btn primary"
-            disabled={loading}
-          >
-            {loading
-              ? "Ingresando..."
-              : "Iniciar sesión"}
-          </button>
-        </form>
-
-        <div className="footer-links">
-          <span className="muted">
-            ¿No tienes cuenta?
-          </span>
-
-          <Link
-            to="/register"
-            className="link"
-          >
-            Crear una cuenta
-          </Link>
+              {show ? "Ocultar" : "Ver"}
+            </button>
+          </div>
         </div>
 
+        {error && (
+          <div
+            className="alert"
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="btn primary"
+          disabled={loading}
+        >
+          {loading
+            ? "Ingresando..."
+            : "Iniciar sesión"}
+        </button>
+      </form>
+
+      <div className="footer-links">
+        <span className="muted">
+          ¿No tienes cuenta?
+        </span>
+
+        <Link
+          to="/register"
+          className="link"
+        >
+          Crear una cuenta
+        </Link>
       </div>
-    </div>
+
+    </AuthLayout>
   );
 }

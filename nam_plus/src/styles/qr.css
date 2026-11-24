@@ -5,8 +5,8 @@
 
 .qr-page {
   min-height: 100vh;
-  background: #0b1422;
-  color: #f8fafc;
+  background: var(--nam-page);
+  color: var(--nam-ink);
   padding: 40px 20px;
   box-sizing: border-box;
 }
@@ -34,7 +34,7 @@
 }
 
 .qr-eyebrow {
-  color: #10b981;
+  color: var(--nam-green);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 2px;
@@ -48,7 +48,7 @@
 
 .qr-header p {
   margin: 0;
-  color: #94a3b8;
+  color: var(--nam-muted);
   font-size: 14px;
   line-height: 1.7;
 }
@@ -56,16 +56,16 @@
 .qr-back-btn {
   flex-shrink: 0;
   padding: 11px 17px;
-  background: #1e293b;
-  color: #fff;
-  border: 1px solid #334155;
+  background: var(--nam-soft);
+  color: var(--nam-ink);
+  border: 1px solid var(--nam-soft);
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .qr-back-btn:hover {
-  background: #334155;
+  background: var(--nam-soft);
 }
 
 /* ==========================================
@@ -74,10 +74,10 @@
 
 .qr-scanner-card {
   padding: 24px;
-  background: #152235;
-  border: 1px solid #2c3e55;
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   border-radius: 22px;
-  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 16px 35px rgba(96, 48, 22, 0.12);
 }
 
 .qr-card-heading {
@@ -93,9 +93,9 @@
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.28);
+  background: rgba(var(--nam-green-rgb), 0.12);
+  color: var(--nam-green);
+  border: 1px solid rgba(var(--nam-green-rgb), 0.28);
   border-radius: 14px;
   font-size: 27px;
 }
@@ -107,7 +107,7 @@
 
 .qr-card-heading p {
   margin: 0;
-  color: #94a3b8;
+  color: var(--nam-muted);
   font-size: 13px;
 }
 
@@ -119,8 +119,8 @@
   width: 100%;
   max-width: 450px;
   margin: 0 auto;
-  background: #050b13;
-  border: 1px solid #334155;
+  background: var(--nam-soft);
+  border: 1px solid var(--nam-soft);
   border-radius: 18px;
   overflow: hidden;
 }
@@ -128,8 +128,8 @@
 #qr-reader {
   width: 100% !important;
   border: none !important;
-  background: #050b13 !important;
-  color: #fff !important;
+  background: var(--nam-soft) !important;
+  color: var(--nam-ink) !important;
 }
 
 #qr-reader video {
@@ -143,7 +143,7 @@
 #qr-reader__scan_region {
   width: 100% !important;
   min-height: 0;
-  background: #050b13 !important;
+  background: var(--nam-soft) !important;
 }
 
 /* Eliminar elementos decorativos del lector */
@@ -162,7 +162,7 @@
   justify-content: center;
   gap: 9px;
   margin-top: 20px;
-  color: #10b981;
+  color: var(--nam-green);
   font-size: 13px;
   font-weight: 700;
 }
@@ -170,9 +170,9 @@
 .qr-instructions-dot {
   width: 9px;
   height: 9px;
-  background: #10b981;
+  background: var(--nam-green);
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+  box-shadow: 0 0 10px rgba(var(--nam-green-rgb), 0.7);
   animation: qr-pulse 1.8s infinite;
 }
 
@@ -190,7 +190,7 @@
 
 .qr-help-text {
   text-align: center;
-  color: #94a3b8;
+  color: var(--nam-muted);
   font-size: 13px;
   line-height: 1.6;
   margin: 12px 0 0;
@@ -203,14 +203,14 @@
 .qr-result {
   margin-top: 20px;
   padding: 20px;
-  background: #152235;
-  border: 1px solid #2c3e55;
+  background: var(--nam-surface);
+  border: 1px solid var(--nam-border);
   border-radius: 16px;
 }
 
 .qr-result-label {
   display: block;
-  color: #94a3b8;
+  color: var(--nam-muted);
   font-size: 12px;
   margin-bottom: 9px;
 }
@@ -219,7 +219,7 @@
   display: block;
   font-size: 14px;
   word-break: break-all;
-  color: #10b981;
+  color: var(--nam-green);
 }
 
 /* ==========================================
@@ -244,23 +244,23 @@
 }
 
 .qr-primary-btn {
-  background: #10b981;
-  color: #062a21;
+  background: var(--nam-button);
+  color: var(--nam-on-button);
   border: none;
 }
 
 .qr-primary-btn:hover {
-  background: #34d399;
+  background: var(--nam-button-hover);
 }
 
 .qr-secondary-btn {
-  background: #1e293b;
-  color: #fff;
-  border: 1px solid #334155;
+  background: var(--nam-soft);
+  color: var(--nam-ink);
+  border: 1px solid var(--nam-soft);
 }
 
 .qr-secondary-btn:hover {
-  background: #334155;
+  background: var(--nam-raised);
 }
 
 .qr-primary-btn:disabled,
@@ -276,10 +276,10 @@
 .qr-message {
   margin-top: 18px;
   padding: 16px;
-  background: #10382f;
-  border: 1px solid #166c55;
+  background: var(--nam-mint);
+  border: 1px solid var(--nam-green);
   border-radius: 12px;
-  color: #a7f3d0;
+  color: var(--nam-green);
   font-size: 14px;
 }
 
@@ -293,7 +293,7 @@
 
 .qr-footer p {
   margin: 0;
-  color: #64748b;
+  color: var(--nam-muted);
   font-size: 12px;
   text-align: center;
   line-height: 1.5;

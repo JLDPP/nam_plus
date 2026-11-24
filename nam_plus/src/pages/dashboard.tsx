@@ -1,354 +1,196 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
-import logo from "../assets/logo.jpeg";
-
+import { Link, useNavigate } from "react-router-dom";
 import {
-  getPromotions,
-  type Promotion,
-} from "../services/promotion.service";
+  ArrowDownLeft, ArrowRight, ArrowUpRight, Coins, Gift, History,
+  House, LogOut, QrCode, Settings, Tag, Ticket, Utensils,
+} from "lucide-react";
 
-import {
-  getPointsBalance,
-  getPointsHistory,
-  type PointsTransaction,
-} from "../services/points.service";
-
+import { setAuth } from "../api";
+import PromotionCarousel from "../components/PromotionCarousel";
+import { getPromotions, isPromotionAvailable, type Promotion } from "../services/promotion.service";
+import { getPointsBalance, getPointsHistory, type PointsTransaction } from "../services/points.service";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
-  // ==========================================
-  // IDIOMA, USUARIO Y TEMA
-  // ==========================================
-
   const { t, i18n } = useTranslation();
-
-  const locale = i18n.resolvedLanguage?.startsWith("en")
-    ? "en-US"
-    : "es-MX";
-
+  const navigate = useNavigate();
+  const locale = i18n.resolvedLanguage?.startsWith("en") ? "en-US" : "es-MX";
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  const theme =
-    (localStorage.getItem("theme") as "dark" | "light") || "dark";
-
-  // ==========================================
-  // ESTADOS
-  // ==========================================
-
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [points, setPoints] = useState(0);
-  const [pointsLoading, setPointsLoading] = useState(true);
+  const [promotionsStatus, setPromotionsStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [promotionsAttempt, setPromotionsAttempt] = useState(0);
+  const [points, setPoints] = useState<number | null>(null);
   const [pointsError, setPointsError] = useState(false);
-
-  const [transactions, setTransactions] = useState<PointsTransaction[]>([]);
-  const [activityLoading, setActivityLoading] = useState(true);
-
-  // ==========================================
-  // CARGAR PROMOCIONES
-  // ==========================================
+  const [transactions, setTransactions] = useState<PointsTransaction[] | null>(null);
+  const [activityError, setActivityError] = useState(false);
 
   useEffect(() => {
-    async function loadPromotions() {
-      try {
-        const data = await getPromotions();
-        setPromotions(data.filter((promotion) => promotion.active));
-      } catch (error) {
-        console.error("Error cargando promociones en dashboard:", error);
-      }
-    }
+    const request = new AbortController();
 
-    void loadPromotions();
-  }, []);
+    getPromotions(request.signal).then((data) => {
+      if (request.signal.aborted) return;
+      const now = new Date();
+      // The API returns newest first.
+      setPromotions(data.filter((item) =>
+        isPromotionAvailable(item, now) && (item.stock == null || item.stock > 0)
+      ).slice(0, 5));
+      setPromotionsStatus("ready");
+    }).catch(() => {
+      if (!request.signal.aborted) setPromotionsStatus("error");
+    });
 
-  // ==========================================
-  // CARGAR SALDO REAL
-  // ==========================================
-
-  useEffect(() => {
-    async function loadPoints() {
-      try {
-        setPointsLoading(true);
-        setPointsError(false);
-
-        const balance = await getPointsBalance();
-        setPoints(balance);
-      } catch (error) {
-        console.error("Error consultando saldo de puntos:", error);
-        setPointsError(true);
-      } finally {
-        setPointsLoading(false);
-      }
-    }
-
-    void loadPoints();
-  }, []);
-
-  // ==========================================
-  // CARGAR ACTIVIDAD RECIENTE
-  // ==========================================
+    return () => request.abort();
+  }, [promotionsAttempt]);
 
   useEffect(() => {
-    async function loadActivity() {
-      try {
-        setActivityLoading(true);
+    let active = true;
 
-        const data = await getPointsHistory();
-        setTransactions(data.slice(0, 5));
-      } catch (error) {
-        console.error("Error cargando actividad de puntos:", error);
-      } finally {
-        setActivityLoading(false);
-      }
-    }
+    getPointsBalance().then((balance) => {
+      if (active) setPoints(balance);
+    }).catch(() => {
+      if (active) setPointsError(true);
+    });
 
-    void loadActivity();
+    getPointsHistory().then((data) => {
+      if (active) setTransactions(data.slice(0, 5));
+    }).catch(() => {
+      if (active) setActivityError(true);
+    });
+
+    return () => { active = false; };
   }, []);
-
-  // ==========================================
-  // CERRAR SESIÓN Y NAVEGACIÓN
-  // ==========================================
 
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    setAuth(null);
+    navigate("/login", { replace: true });
   }
 
-  function goToSettings() {
-    window.location.href = "/configuracion";
-  }
-
-  function goToCode() {
-    window.location.href = "/codigo";
-  }
-
-  function goToQr() {
-    window.location.href = "/qr";
-  }
-
-  function goToPoints() {
-    window.location.href = "/puntos";
-  }
-
-  function goToRewards() {
-    window.location.href = "/canjes";
-  }
-
-  function goToHistory() {
-    window.location.href = "/historial-canjes";
-  }
-
-  // ==========================================
-  // FORMATO DE ACTIVIDAD
-  // ==========================================
-
-  function formatTransactionDate(date: string) {
-    return new Date(date).toLocaleDateString(locale, {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
-  function getTransactionLabel(transaction: PointsTransaction) {
-    if (transaction.description) {
-      return transaction.description;
-    }
-
-    if (transaction.type === "earn") {
-      return t("dashboard.earn");
-    }
-
-    if (transaction.type === "redeem") {
-      return t("dashboard.redeemActivity");
-    }
-
-    return t("dashboard.adjustment");
-  }
-
-  function getTransactionPoints(transaction: PointsTransaction) {
-    const amount = Math.abs(transaction.points);
-
-    if (transaction.type === "redeem") {
-      return `-${amount}`;
-    }
-
-    if (transaction.type === "earn") {
-      return `+${amount}`;
-    }
-
-    return transaction.points > 0 ? `+${amount}` : `-${amount}`;
-  }
-
-  // ==========================================
-  // INTERFAZ
-  // ==========================================
+  const quickActions = [
+    { to: "/qr", label: t("dashboard.scanQR"), Icon: QrCode, color: "peach" },
+    { to: "/codigo", label: t("dashboard.enterCode"), Icon: Ticket, color: "mint" },
+    { to: "/historial-canjes", label: t("dashboard.viewHistory"), Icon: History, color: "lavender" },
+  ];
 
   return (
-    <div className={`dashboard-page ${theme}`}>
-      <div className="dashboard-bg dashboard-bg-left"></div>
-      <div className="dashboard-bg dashboard-bg-right"></div>
-
-      <div className="dashboard-container">
-        {/* ENCABEZADO */}
-        <header className="dashboard-header">
-          <div className="dashboard-brand">
-            <img src={logo} alt="Logo Ñam+" className="brand-logo" />
-
-            <div>
-              <h1 className="dashboard-logo">Ñam+</h1>
-              <p className="dashboard-subtitle">{t("dashboard.welcome")}</p>
-            </div>
-          </div>
-
-          <div className="dashboard-user-box">
-            <span className="dashboard-user">
-              {t("dashboard.hello")},{" "}
-              {user.name || t("dashboard.userFallback")}
-            </span>
-
-            <button className="settings-btn" onClick={goToSettings}>
-              ⚙ {t("dashboard.settings")}
-            </button>
-
-            <button className="logout-btn" onClick={logout}>
-              {t("dashboard.logout")}
+    <div className="home-page">
+      <header className="home-header">
+        <div className="home-width home-header-inner">
+          <Link to="/dashboard" className="home-brand">
+            <span className="home-brand-icon"><Utensils size={20} aria-hidden="true" /></span>
+            Ñam<span>+</span>
+          </Link>
+          <nav className="home-nav" aria-label={t("dashboard.navigation")}>
+            <Link to="/dashboard" aria-current="page"><House size={17} aria-hidden="true" /> {t("dashboard.home")}</Link>
+            <Link to="/promociones"><Tag size={17} aria-hidden="true" /> {t("dashboard.promotionsNav")}</Link>
+            <Link to="/canjes"><Gift size={17} aria-hidden="true" /> {t("dashboard.rewards")}</Link>
+          </nav>
+          <div className="home-account">
+            <Link to="/configuracion" aria-label={t("dashboard.settings")} title={t("dashboard.settings")}>
+              <Settings size={20} aria-hidden="true" />
+            </Link>
+            <button type="button" onClick={logout} aria-label={t("dashboard.logout")} title={t("dashboard.logout")}>
+              <LogOut size={19} aria-hidden="true" />
             </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <main className="dashboard-grid">
-          {/* PUNTOS REALES */}
-          <section className="dashboard-card points-card">
-            <p className="card-label">{t("dashboard.points")}</p>
-
-            {pointsLoading ? (
-              <h2>{t("dashboard.loadingPoints")}</h2>
-            ) : pointsError ? (
-              <h2>{t("dashboard.pointsError")}</h2>
-            ) : (
-              <h2>{points.toLocaleString(locale)} pts</h2>
-            )}
-
-            <span className="card-extra">{t("dashboard.keepEarning")}</span>
-
-            <div className="action-buttons">
-              <button className="primary-btn" onClick={goToPoints}>
-                {t("dashboard.viewPoints")}
-              </button>
-
-              <button className="secondary-btn" onClick={goToRewards}>
-                {t("dashboard.viewRewards")}
-              </button>
+      <main className="home-width home-main">
+        <div className="home-intro">
+          <section className="home-hero">
+            <div className="home-hero-copy">
+              <p className="home-greeting">{t("dashboard.hello")}, {user.name || t("dashboard.userFallback")}</p>
+              <h1>{t("dashboard.heroTitle")}</h1>
+              <Link to="/promociones" className="home-hero-button">
+                {t("dashboard.explorePromotions")} <ArrowRight size={17} aria-hidden="true" />
+              </Link>
             </div>
           </section>
 
-          {/* PROMOCIONES DESTACADAS */}
-          <section className="dashboard-card">
-            <h2 className="section-title">{t("dashboard.promotions")}</h2>
-
-            <div className="promo-list">
-              {promotions.length === 0 ? (
-                <div className="promo-card">
-                  <h3>{t("dashboard.noPromotions")}</h3>
-                </div>
-              ) : (
-                promotions.slice(0, 2).map((promotion) => (
-                  <div
-                    key={promotion._id}
-                    className="promo-card"
-                    onClick={() => {
-                      window.location.href = `/promociones/${promotion._id}`;
-                    }}
-                  >
-                    {promotion.imageUrl && (
-                      <img
-                        src={promotion.imageUrl}
-                        alt={promotion.title}
-                        className="dashboard-promo-image"
-                      />
-                    )}
-
-                    <h3>{promotion.title}</h3>
-                    <p>{promotion.restaurantName}</p>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {promotions.length > 2 && (
-              <div className="action-buttons">
-                <button
-                  type="button"
-                  className="secondary-btn"
-                  onClick={goToRewards}
-                >
-                  {locale === "en-US"
-                    ? "View all promotions →"
-                    : "Ver todas las promociones →"}
-                </button>
-              </div>
-            )}
+          <section className="home-balance" aria-labelledby="home-points-title">
+            <span className="home-balance-icon"><Coins size={25} aria-hidden="true" /></span>
+            <h2 id="home-points-title">{t("dashboard.points")}</h2>
+            <p className="home-points-value" aria-live="polite">
+              {pointsError
+                ? t("dashboard.pointsError")
+                : points === null
+                  ? t("dashboard.loadingPoints")
+                  : <>{points.toLocaleString(locale)} <small>pts</small></>}
+            </p>
+            <p className="home-balance-hint">{t("dashboard.keepEarning")}</p>
+            <Link className="home-text-link" to="/puntos">
+              {t("dashboard.viewPoints")} <ArrowRight size={17} aria-hidden="true" />
+            </Link>
           </section>
+        </div>
 
-          {/* CANJEAR TICKET */}
-          <section className="dashboard-card">
-            <h2 className="section-title">{t("dashboard.redeem")}</h2>
+        <div className="home-workspace">
+          <PromotionCarousel promotions={promotions} status={promotionsStatus} onRetry={() => {
+            setPromotionsStatus("loading");
+            setPromotionsAttempt((attempt) => attempt + 1);
+          }} />
 
-            <div className="action-buttons">
-              <button className="primary-btn" onClick={goToQr}>
-                {t("dashboard.scanQR")}
-              </button>
-
-              <button className="secondary-btn" onClick={goToCode}>
-                {t("dashboard.enterCode")}
-              </button>
-            </div>
+          <section className="home-actions" aria-labelledby="home-actions-title">
+            <h2 id="home-actions-title">{t("dashboard.quickActions")}</h2>
+            <ul>
+              {quickActions.map(({ to, label, Icon, color }) => (
+                <li key={to}>
+                  <Link to={to}>
+                    <span className={`home-action-icon ${color}`}><Icon size={21} aria-hidden="true" /></span>
+                    {label}
+                    <ArrowRight className="home-action-arrow" size={18} aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </section>
+        </div>
 
-          {/* ACTIVIDAD RECIENTE */}
-          <section className="dashboard-card">
-            <h2 className="section-title">{t("dashboard.activity")}</h2>
+        <section className="home-activity" aria-labelledby="home-activity-title">
+          <div className="home-section-heading">
+            <h2 id="home-activity-title">{t("dashboard.activity")}</h2>
+            <Link className="home-text-link" to="/puntos">
+              {t("dashboard.viewPoints")} <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+          </div>
+          {activityError || !transactions?.length ? (
+            <p className="home-activity-empty">
+              {t(activityError ? "dashboard.activityError" : transactions ? "dashboard.noActivity" : "dashboard.loadingActivity")}
+            </p>
+          ) : (
+            <ul className="home-activity-list">
+              {transactions.map((transaction) => {
+                const isCredit = transaction.type === "earn" ||
+                  (transaction.type === "adjustment" && transaction.points > 0);
+                const Icon = isCredit ? ArrowDownLeft : ArrowUpRight;
+                const label = transaction.type === "earn" ? "earn" :
+                  transaction.type === "redeem" ? "redeemActivity" : "adjustment";
 
-            <div className="activity-list">
-              {activityLoading ? (
-                <div className="activity-item">
-                  {t("dashboard.loadingActivity")}
-                </div>
-              ) : transactions.length === 0 ? (
-                <div className="activity-item">
-                  {t("dashboard.noActivity")}
-                </div>
-              ) : (
-                transactions.map((transaction) => (
-                  <div className="activity-item" key={transaction._id}>
+                return (
+                  <li key={transaction._id}>
+                    <span className={`home-action-icon ${isCredit ? "mint" : "peach"}`}><Icon size={19} aria-hidden="true" /></span>
                     <div>
-                      <strong>{getTransactionLabel(transaction)}</strong>
-
-                      <small
-                        style={{
-                          display: "block",
-                          opacity: 0.7,
-                          marginTop: "5px",
-                        }}
-                      >
-                        {formatTransactionDate(transaction.createdAt)}
-                      </small>
+                      <strong>{transaction.description || t(`dashboard.${label}`)}</strong>
+                      <time dateTime={transaction.createdAt}>
+                        {new Date(transaction.createdAt).toLocaleDateString(locale, {
+                          day: "2-digit", month: "short", year: "numeric",
+                        })}
+                      </time>
                     </div>
-
-                    <strong>{getTransactionPoints(transaction)} pts</strong>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <button className="secondary-btn" onClick={goToHistory}>
-              {t("dashboard.viewHistory")}
-            </button>
-          </section>
-        </main>
-      </div>
+                    <strong className={isCredit ? "home-credit" : ""}>
+                      {isCredit ? "+" : "−"}{Math.abs(transaction.points).toLocaleString(locale)} pts
+                    </strong>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </main>
     </div>
   );
 }

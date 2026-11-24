@@ -61,8 +61,14 @@ function withImage(promotion: Promotion): Promotion {
   };
 }
 
-export async function getPromotions(): Promise<Promotion[]> {
-  const { data } = await api.get<Promotion[]>("/api/promotions");
+export function isPromotionAvailable(promotion: Promotion, now: Date): boolean {
+  return promotion.active &&
+    (!promotion.startDate || new Date(promotion.startDate) <= now) &&
+    (!promotion.endDate || new Date(promotion.endDate) >= now);
+}
+
+export async function getPromotions(signal?: AbortSignal): Promise<Promotion[]> {
+  const { data } = await api.get<Promotion[]>("/api/promotions", { signal });
   return data.map(withImage);
 }
 
