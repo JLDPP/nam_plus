@@ -199,20 +199,7 @@ export async function getMyRedemptions(req, res) {
 
 export async function getRestaurantRedemptions(req, res) {
   try {
-    const currentUser = await User.findById(req.userId).select("role");
-
-    if (!currentUser || !["restaurante", "admin"].includes(currentUser.role)) {
-      return res.status(403).json({
-        message: "No tienes permisos para consultar estos canjes.",
-      });
-    }
-
-    const filter =
-      currentUser.role === "admin"
-        ? { active: true }
-        : { owner: req.userId, active: true };
-
-    const restaurantIds = await Restaurant.distinct("_id", filter);
+    const restaurantIds = await Restaurant.distinct("_id", { owner: req.userId, active: true });
     const filtroCatalogo = { restaurant: { $in: restaurantIds } };
 
     const [rewardIds, promotionIds] = await Promise.all([
@@ -259,22 +246,10 @@ export async function completeRedemption(req, res) {
       return res.status(400).json({ message: "ID de canje inválido." });
     }
 
-    const currentUser = await User.findById(req.userId).select("role");
-
-    if (!currentUser || !["restaurante", "admin"].includes(currentUser.role)) {
-      return res.status(403).json({
-        message: "No tienes permisos para confirmar canjes.",
-      });
-    }
-
     const redemption = await Redemption.findById(id).populate("reward");
 
     if (!redemption) {
       return res.status(404).json({ message: "Canje no encontrado." });
-    }
-
-    if (redemption.status !== "pending") {
-      return res.status(409).json({ message: "Este canje ya fue procesado." });
     }
 
     if (!redemption.reward?.restaurant) {
@@ -283,18 +258,20 @@ export async function completeRedemption(req, res) {
       });
     }
 
-    if (currentUser.role === "restaurante") {
-      const restaurant = await Restaurant.exists({
-        _id: redemption.reward.restaurant,
-        owner: req.userId,
-        active: true,
-      });
+    const restaurant = await Restaurant.exists({
+      _id: redemption.reward.restaurant,
+      owner: req.userId,
+      active: true,
+    });
 
-      if (!restaurant) {
-        return res.status(403).json({
-          message: "No puedes confirmar canjes de otro restaurante.",
-        });
-      }
+    if (!restaurant) {
+      return res.status(403).json({
+        message: "No puedes confirmar canjes de otro restaurante.",
+      });
+    }
+
+    if (redemption.status !== "pending") {
+      return res.status(409).json({ message: "Este canje ya fue procesado." });
     }
 
     const updated = await Redemption.findOneAndUpdate(
@@ -334,14 +311,6 @@ export async function cancelRedemption(req, res) {
   let session;
 
   try {
-    const currentUser = await User.findById(req.userId).select("role");
-
-    if (!currentUser || !["restaurante", "admin"].includes(currentUser.role)) {
-      return res.status(403).json({
-        message: "No tienes permisos para cancelar canjes.",
-      });
-    }
-
     session = await mongoose.startSession();
     let resultado;
 
@@ -350,10 +319,6 @@ export async function cancelRedemption(req, res) {
 
       if (!redemption) {
         throw httpError("Canje no encontrado.", 404);
-      }
-
-      if (redemption.status !== "pending") {
-        throw httpError("Solo puedes cancelar canjes pendientes.", 409);
       }
 
       const Catalogo =
@@ -365,16 +330,18 @@ export async function cancelRedemption(req, res) {
         throw httpError("El artículo no tiene un restaurante asignado.", 400);
       }
 
-      if (currentUser.role === "restaurante") {
-        const restaurant = await Restaurant.exists({
-          _id: articulo.restaurant,
-          owner: req.userId,
-          active: true,
-        }).session(session);
+      const restaurant = await Restaurant.exists({
+        _id: articulo.restaurant,
+        owner: req.userId,
+        active: true,
+      }).session(session);
 
-        if (!restaurant) {
-          throw httpError("No puedes cancelar canjes de otro restaurante.", 403);
-        }
+      if (!restaurant) {
+        throw httpError("No puedes cancelar canjes de otro restaurante.", 403);
+      }
+
+      if (redemption.status !== "pending") {
+        throw httpError("Solo puedes cancelar canjes pendientes.", 409);
       }
 
       const updated = await Redemption.findOneAndUpdate(

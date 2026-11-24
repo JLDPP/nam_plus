@@ -1,3 +1,4 @@
+import { useAccount } from "../routes/protected.route";
 import { rewardImageUrl } from "../services/reward.service";
 
 import { useEffect, useRef, useState } from "react";
@@ -35,7 +36,6 @@ interface RewardForm {
   pointsCost: string;
   stock: string;
   active: boolean;
-  restaurantId: string;
 }
 
 const emptyForm: RewardForm = {
@@ -45,7 +45,6 @@ const emptyForm: RewardForm = {
   pointsCost: "",
   stock: "0",
   active: true,
-  restaurantId: "",
 };
 
 // ==========================================
@@ -135,21 +134,7 @@ export default function AdminRecompensas() {
   // CONSULTAR ROL LOCAL
   // ==========================================
 
-  const userRole = (() => {
-    try {
-      const user = JSON.parse(
-        localStorage.getItem("user") || "null"
-      );
-
-      return typeof user?.role === "string"
-        ? user.role
-        : "";
-    } catch {
-      return "";
-    }
-  })();
-
-  const isAdmin = userRole === "admin";
+  const isAdmin = useAccount().role === "admin";
 
   // ==========================================
   // CONSULTAR RECOMPENSAS
@@ -226,7 +211,6 @@ export default function AdminRecompensas() {
       pointsCost: String(reward.pointsCost),
       stock: String(reward.stock),
       active: reward.active,
-      restaurantId: reward.restaurant?._id || "",
     });
 
     setError("");
@@ -293,15 +277,6 @@ export default function AdminRecompensas() {
       return;
     }
 
-    if (
-      !editingId &&
-      isAdmin &&
-      !form.restaurantId.trim()
-    ) {
-      setError("Indica el ID del restaurante.");
-      return;
-    }
-
     const imageUrl = form.imageUrl.trim();
     const payload = {
       name,
@@ -311,7 +286,6 @@ export default function AdminRecompensas() {
       pointsCost,
       stock,
       active: form.active,
-      ...(!editingId && isAdmin ? { restaurantId: form.restaurantId.trim() } : {}),
     };
 
     let body: typeof payload | FormData = payload;
@@ -441,8 +415,7 @@ export default function AdminRecompensas() {
         <h1>Administrar recompensas</h1>
 
         <p>
-          Crea y administra las recompensas
-          disponibles en Ñam+.
+          {isAdmin ? "Edita las recompensas disponibles en Ñam+." : "Crea y administra tus recompensas en Ñam+."}
         </p>
       </header>
 
@@ -480,6 +453,7 @@ export default function AdminRecompensas() {
         {/* ================================= */}
 
         <div className="admin-rewards-toolbar">
+          {!isAdmin && (
           <button
             type="button"
             className="admin-create-btn"
@@ -492,6 +466,7 @@ export default function AdminRecompensas() {
             + Nueva recompensa
           </button>
 
+          )}
           <button
             type="button"
             className="admin-reload-btn"
@@ -671,30 +646,6 @@ export default function AdminRecompensas() {
                   />
                 </label>
 
-                {isAdmin && !editingId && (
-                  <label className="admin-form-full">
-                    ID del restaurante en MongoDB
-
-                    <input
-                      type="text"
-                      value={form.restaurantId}
-                      onChange={(event) =>
-                        setForm({
-                          ...form,
-                          restaurantId:
-                            event.target.value,
-                        })
-                      }
-                      placeholder="ObjectId del restaurante"
-                      required
-                    />
-
-                    <small>
-                      Utiliza el _id del restaurante,
-                      no el del usuario.
-                    </small>
-                  </label>
-                )}
               </div>
 
               <label className="admin-rewards-checkbox">
@@ -754,8 +705,7 @@ export default function AdminRecompensas() {
           <div className="admin-rewards-empty">
             <h2>Sin recompensas</h2>
             <p>
-              Presiona "Nueva recompensa"
-              para comenzar.
+              {isAdmin ? "Los restaurantes todavía no han creado recompensas." : 'Presiona "Nueva recompensa" para comenzar.'}
             </p>
           </div>
         ) : (

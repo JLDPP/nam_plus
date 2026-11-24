@@ -30,7 +30,6 @@ export default function GenerarTicket() {
   const navigate = useNavigate();
 
   const [amount, setAmount] = useState("");
-  const [restaurantId, setRestaurantId] = useState("");
 
   // Correo electrónico del cliente
   const [customerEmail, setCustomerEmail] = useState("");
@@ -41,18 +40,6 @@ export default function GenerarTicket() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const userRole = (() => {
-    try {
-      const user = JSON.parse(
-        localStorage.getItem("user") || "null"
-      );
-      return user?.role || "";
-    } catch {
-      return "";
-    }
-  })();
-
-  const isAdmin = userRole === "admin";
 
   // ==========================================
   // GENERAR TICKET Y ENVIARLO POR CORREO
@@ -99,11 +86,6 @@ export default function GenerarTicket() {
       return;
     }
 
-    if (isAdmin && !restaurantId.trim()) {
-      setError("Indica el ID del restaurante.");
-      return;
-    }
-
     // Evitar generar accidentalmente otro ticket
     // sin advertir que el código anterior se perderá.
     if (ticket) {
@@ -122,9 +104,6 @@ export default function GenerarTicket() {
         {
           amountMXN,
           customerEmail: email,
-          ...(isAdmin
-            ? { restaurantId: restaurantId.trim() }
-            : {}),
         }
       );
 
@@ -238,26 +217,6 @@ export default function GenerarTicket() {
                 autoComplete="email"
                 required
               />
-
-              {isAdmin && (
-                <>
-                  <label htmlFor="ticket-restaurant">
-                    ID del restaurante
-                  </label>
-
-                  <input
-                    id="ticket-restaurant"
-                    type="text"
-                    placeholder="ID de MongoDB del restaurante"
-                    value={restaurantId}
-                    onChange={(event) =>
-                      setRestaurantId(event.target.value)
-                    }
-                    disabled={loading}
-                    required
-                  />
-                </>
-              )}
 
               <div className="ticket-points-preview">
                 <span>Puntos para el cliente</span>

@@ -28,6 +28,8 @@ const userSchema = new mongoose.Schema(
       default: "cliente",
     },
 
+    tokenVersion: { type: Number, default: 0 },
+
     // Puntos acumulados del usuario
     pointsBalance: {
       type: Number,

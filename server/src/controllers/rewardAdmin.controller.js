@@ -238,39 +238,8 @@ export async function getManagedRewards(req, res) {
 export async function createManagedReward(req, res) {
   let image;
   try {
-    const user = await getAuthorizedUser(req.userId);
-
-    const { restaurantId, ...fields } = req.body || {};
-
-    const data = validateRewardFields(fields, true);
-
-    let restaurant;
-
-    if (user.role === "admin") {
-      if (!mongoose.isValidObjectId(restaurantId)) {
-        return res.status(400).json({
-          message: "Selecciona un restaurante válido",
-        });
-      }
-
-      restaurant = await Restaurant.findOne({
-        _id: restaurantId,
-        active: true,
-      });
-    } else {
-      // El restaurante no puede elegir otro propietario.
-      if (restaurantId !== undefined) {
-        return res.status(400).json({
-          message:
-            "La cuenta restaurante no debe enviar restaurantId",
-        });
-      }
-
-      restaurant = await Restaurant.findOne({
-        owner: user._id,
-        active: true,
-      });
-    }
+    const data = validateRewardFields(req.body || {}, true);
+    const restaurant = await Restaurant.findOne({ owner: req.userId, active: true });
 
     if (!restaurant) {
       return res.status(404).json({

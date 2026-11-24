@@ -51,19 +51,6 @@ function handleError(res, error) {
 
 export async function createTicket(req, res) {
   try {
-    const currentUser = await User.findById(req.userId)
-      .select("role");
-
-    if (
-      !currentUser ||
-      !["restaurante", "admin"].includes(currentUser.role)
-    ) {
-      throw httpError(
-        "No tienes permisos para generar tickets",
-        403
-      );
-    }
-
     // ==========================================
     // RECIBIR DATOS DE LA COMPRA Y DEL CLIENTE
     // ==========================================
@@ -138,33 +125,11 @@ export async function createTicket(req, res) {
     // VALIDAR RESTAURANTE
     // ==========================================
 
-    let restaurant;
-
-    if (currentUser.role === "admin") {
-      if (!mongoose.isValidObjectId(restaurantId)) {
-        throw httpError(
-          "Selecciona un restaurante válido",
-          400
-        );
-      }
-
-      restaurant = await Restaurant.findOne({
-        _id: restaurantId,
-        active: true,
-      });
-    } else {
-      if (restaurantId !== undefined) {
-        throw httpError(
-          "No puedes seleccionar otro restaurante",
-          403
-        );
-      }
-
-      restaurant = await Restaurant.findOne({
-        owner: req.userId,
-        active: true,
-      });
+    if (restaurantId !== undefined) {
+      throw httpError("No puedes seleccionar otro restaurante", 403);
     }
+
+    const restaurant = await Restaurant.findOne({ owner: req.userId, active: true });
 
     if (!restaurant) {
       throw httpError(

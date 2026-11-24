@@ -34,7 +34,7 @@ router.use(auth);
 // ==========================================
 
 // Conservar el catálogo actual para los clientes
-router.get("/", getRewards);
+router.get("/", requireRole("cliente"), getRewards);
 
 // ==========================================
 // 2. ADMINISTRACIÓN DE RECOMPENSAS
@@ -50,7 +50,7 @@ router.get(
 // Crear una nueva recompensa
 router.post(
   "/manage",
-  requireRole("restaurante", "admin"),
+  requireRole("restaurante"),
   readRewardUpload,
   createManagedReward
 );

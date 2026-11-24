@@ -19,10 +19,10 @@ router.get("/email-images/qr/:token.png", getTicketQrImage);
 // Las operaciones de tickets requieren autenticación.
 router.use(auth);
 
-// Restaurante o admin genera un ticket.
+// Restaurante genera un ticket.
 router.post(
   "/",
-  requireRole("restaurante", "admin"),
+  requireRole("restaurante"),
   createTicket
 );
 

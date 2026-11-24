@@ -26,27 +26,28 @@ router.post(
 // 2. Historial personal del cliente
 router.get(
   "/history",
+  requireRole("cliente"),
   getMyRedemptions
 );
 
 // 3. Historial de canjes del restaurante
 router.get(
   "/restaurant",
-  requireRole("restaurante", "admin"),
+  requireRole("restaurante"),
   getRestaurantRedemptions
 );
 
 // 4. Confirmar entrega
 router.patch(
   "/:id/complete",
-  requireRole("restaurante", "admin"),
+  requireRole("restaurante"),
   completeRedemption
 );
 
 // 5. Cancelar canje
 router.patch(
   "/:id/cancel",
-  requireRole("restaurante", "admin"),
+  requireRole("restaurante"),
   cancelRedemption
 );
 

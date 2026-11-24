@@ -1,9 +1,10 @@
+import { useAccount } from "../routes/protected.route";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowDownLeft, ArrowRight, ArrowUpRight, Coins, Gift, History,
-  House, LogOut, QrCode, Settings, Ticket, Utensils,
+  House, LogOut, QrCode, Settings, Ticket, UserRound, Utensils,
 } from "lucide-react";
 
 import { setAuth } from "../api";
@@ -16,7 +17,7 @@ export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const locale = i18n.resolvedLanguage?.startsWith("en") ? "en-US" : "es-MX";
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = useAccount();
 
   const [latestRewards, setLatestRewards] = useState<Reward[]>([]);
   const [latestRewardsStatus, setLatestRewardsStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -84,6 +85,9 @@ export default function Dashboard() {
             <Link to="/canjes"><Gift size={17} aria-hidden="true" /> {t("dashboard.rewards")}</Link>
           </nav>
           <div className="home-account">
+            <Link to="/perfil" aria-label={t("account.profile")} title={t("account.profile")}>
+              <UserRound size={20} aria-hidden="true" />
+            </Link>
             <Link to="/configuracion" aria-label={t("dashboard.settings")} title={t("dashboard.settings")}>
               <Settings size={20} aria-hidden="true" />
             </Link>

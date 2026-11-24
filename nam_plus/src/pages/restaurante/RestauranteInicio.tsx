@@ -1,306 +1,85 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Coins, Gift, History, House, Store, Ticket, type LucideIcon } from "lucide-react";
-
+import { useTranslation } from "react-i18next";
+import { Gift, History, House, Settings, Ticket, UserRound } from "lucide-react";
 import { setAuth } from "../../api";
 import logo from "../../assets/logo.jpeg";
-
+import { useAccount } from "../../routes/protected.route";
 import "./restaurante.css";
 
-// TIPOS
-
-type Modulo = {
-  id: string;
-  Icon: LucideIcon;
-  title: string;
-  description: string;
-  color: string;
-  path?: string;
-  action?: string;
-};
-
-// MÓDULOS DEL RESTAURANTE
-
-const modulos: Modulo[] = [
-  {
-    id: "cupones",
-    Icon: Ticket,
-    title: "Generar cupón",
-    description:
-      "Genera tickets con códigos de texto y QR para tus clientes.",
-    color: "cyan",
-    path: "/generar-ticket",
-    action: "Generar código",
-  },
-  {
-    id: "puntos",
-    Icon: Coins,
-    title: "Transferir puntos",
-    description:
-      "Entrega puntos a tus clientes por las compras realizadas.",
-    color: "green",
-    path: "/restaurante/transferir-puntos",
-    action: "Transferir puntos",
-  },
-  {
-    id: "canjes",
-    Icon: History,
-    title: "Historial de canjes",
-    description:
-      "Consulta y administra los canjes de recompensas.",
-    color: "purple",
-    path: "/canjes-restaurante",
-    action: "Consultar canjes",
-  },
-  {
-    id: "perfil",
-    Icon: Store,
-    title: "Perfil del restaurante",
-    description:
-      "Actualiza la información y configuración de tu negocio.",
-    color: "cyan",
-  },
+const modules = [
+  { to: "/generar-ticket", title: "ticket", color: "cyan", Icon: Ticket },
+  { to: "/canjes-restaurante", title: "redemptions", color: "purple", Icon: History },
+  { to: "/admin-recompensas", title: "rewards", color: "green", Icon: Gift },
 ];
 
 export default function RestauranteInicio() {
-  const nav = useNavigate();
-
-  let userName = "Restaurante";
-
-  try {
-    const storedUser = localStorage.getItem("user");
-
-    const user = storedUser
-      ? JSON.parse(storedUser)
-      : null;
-
-    if (
-      typeof user?.name === "string" &&
-      user.name.trim()
-    ) {
-      userName = user.name.trim();
-    }
-  } catch {
-    userName = "Restaurante";
-  }
-
-  // CERRAR SESIÓN
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { name } = useAccount();
 
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     setAuth(null);
-
-    nav("/login", {
-      replace: true,
-    });
+    navigate("/login", { replace: true });
   }
 
   return (
     <div className="rp-layout">
-
-      {/* MENÚ LATERAL */}
-
       <aside className="rp-sidebar">
         <div className="rp-brand">
-          <img
-            src={logo}
-            alt="Ñam+"
-            className="rp-logo"
-          />
-
-          <div>
-            <h2>Ñam+</h2>
-            <span>Restaurantes</span>
-          </div>
+          <img src={logo} alt="" className="rp-logo" />
+          <div><h2>Ñam+</h2><span>{t("account.restaurante")}</span></div>
         </div>
 
-        <p className="rp-menu-label">
-          Herramientas
-        </p>
-
-        <nav
-          className="rp-navigation"
-          aria-label="Menú de restaurantes"
-        >
-          <Link
-            to="/restaurante"
-            className="rp-nav-link rp-nav-active"
-            aria-current="page"
-          >
-            <span className="rp-nav-icon"><House size={17} aria-hidden="true" /></span>
-            Inicio
+        <nav className="rp-navigation" aria-label={t("dashboard.navigation")}>
+          <Link to="/restaurante" className="rp-nav-link rp-nav-active" aria-current="page">
+            <House size={19} aria-hidden="true" /> {t("dashboard.home")}
           </Link>
-
-          {modulos.map((modulo) =>
-            modulo.path ? (
-              <Link
-                key={modulo.id}
-                to={modulo.path}
-                className="rp-nav-link"
-              >
-                <span className="rp-nav-icon">
-                  <modulo.Icon size={19} aria-hidden="true" />
-                </span>
-
-                {modulo.title}
-              </Link>
-            ) : (
-              <a
-                key={modulo.id}
-                href={`#${modulo.id}`}
-                className="rp-nav-link"
-              >
-                <span className="rp-nav-icon">
-                  <modulo.Icon size={19} aria-hidden="true" />
-                </span>
-
-                {modulo.title}
-              </a>
-            )
-          )}
-
-          <Link
-            to="/admin-recompensas"
-            className="rp-nav-link"
-          >
-            <span className="rp-nav-icon"><Gift size={17} aria-hidden="true" /></span>
-            Recompensas
+          {modules.map(({ to, title, Icon }) => (
+            <Link to={to} key={to} className="rp-nav-link">
+              <Icon size={19} aria-hidden="true" /> {t(`restaurantDashboard.${title}`)}
+            </Link>
+          ))}
+          <Link to="/perfil" className="rp-nav-link">
+            <UserRound size={19} aria-hidden="true" /> {t("account.profile")}
+          </Link>
+          <Link to="/configuracion" className="rp-nav-link">
+            <Settings size={19} aria-hidden="true" /> {t("dashboard.settings")}
           </Link>
         </nav>
 
-        {/* USUARIO */}
-
         <div className="rp-sidebar-footer">
           <div className="rp-account">
-            <div className="rp-avatar">
-              {userName.charAt(0).toUpperCase()}
-            </div>
-
-            <div className="rp-account-info">
-              <strong>{userName}</strong>
-              <span>Cuenta de restaurante</span>
-            </div>
+            <span className="rp-avatar" aria-hidden="true">{name.charAt(0).toUpperCase()}</span>
+            <div className="rp-account-info"><strong>{name}</strong></div>
           </div>
-
-          <button
-            className="rp-logout"
-            type="button"
-            onClick={logout}
-          >
-            Cerrar sesión
-          </button>
+          <button className="rp-logout" type="button" onClick={logout}>{t("dashboard.logout")}</button>
         </div>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
-
       <main className="rp-main">
-        <header className="rp-header">
-          <div>
-            <span className="rp-eyebrow">
-              PORTAL DE RESTAURANTES
-            </span>
-
-            <h1>Panel de administración</h1>
-
-            <p>
-              Gestiona las operaciones de tu
-              restaurante desde un solo lugar.
-            </p>
-          </div>
-
-          <span className="rp-role">
-            Restaurante
-          </span>
-        </header>
-
-        {/* BIENVENIDA */}
-
+        <header className="rp-header"><h1>{t("restaurantDashboard.title")}</h1></header>
         <section className="rp-welcome">
           <div>
-            <h2>¡Bienvenido, {userName}!</h2>
-
-            <p>
-              Acredita puntos por las compras y gestiona
-              las recompensas y los canjes de tus clientes.
-            </p>
+            <h2>{t("restaurantDashboard.welcome", { name })}</h2>
+            <p>{t("restaurantDashboard.description")}</p>
           </div>
-
-          <img
-            src={logo}
-            alt=""
-            className="rp-welcome-logo"
-          />
+          <img src={logo} alt="" className="rp-welcome-logo" />
         </section>
 
-        {/* HERRAMIENTAS */}
-
-        <div className="rp-section-heading">
-          <h2>Herramientas de administración</h2>
-        </div>
-
-        <section className="rp-grid">
-          {modulos.map((modulo) => (
-            <article
-              key={modulo.id}
-              id={modulo.id}
-              className="rp-card"
-            >
-              <div
-                className={
-                  `rp-card-icon rp-icon-${modulo.color}`
-                }
-                aria-hidden="true"
-              >
-                <modulo.Icon size={19} aria-hidden="true" />
-              </div>
-
-              <h3>{modulo.title}</h3>
-
-              <p>{modulo.description}</p>
-
-              {modulo.path ? (
-                <Link
-                  to={modulo.path}
-                  className="rp-card-button"
-                >
-                  {modulo.action}
-
-                  <span aria-hidden="true">→</span>
-                </Link>
-              ) : (
-                <div className="rp-card-pending">
-                  Pendiente de integración
-                </div>
-              )}
+        <div className="rp-grid">
+          {modules.map(({ to, title, color, Icon }) => (
+            <article key={to} className="rp-card">
+              <div className={`rp-card-icon rp-icon-${color}`}><Icon size={20} aria-hidden="true" /></div>
+              <h3>{t(`restaurantDashboard.${title}`)}</h3>
+              <p>{t(`restaurantDashboard.${title}Description`)}</p>
+              <Link to={to} className="rp-card-button">
+                {t(`restaurantDashboard.${title}Action`)} <span aria-hidden="true">→</span>
+              </Link>
             </article>
           ))}
-        </section>
-
-        {/* RECOMPENSAS */}
-
-        <section className="rp-extra">
-          <div>
-            <h3>Administración de recompensas</h3>
-
-            <p>
-              Accede al catálogo de recompensas
-              existente en Ñam+.
-            </p>
-          </div>
-
-          <Link
-            to="/admin-recompensas"
-            className="rp-card-button"
-          >
-            Administrar recompensas
-          </Link>
-        </section>
-
-        <footer className="rp-footer">
-          Ñam+ · Portal de restaurantes
-        </footer>
+        </div>
       </main>
     </div>
   );
