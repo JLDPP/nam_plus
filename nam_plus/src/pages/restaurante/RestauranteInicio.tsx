@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Coins, Gift, History, House, Receipt, Store, Tag, Ticket, type LucideIcon } from "lucide-react";
+import { Coins, Gift, History, House, Store, Ticket, type LucideIcon } from "lucide-react";
 
 import { setAuth } from "../../api";
 import logo from "../../assets/logo.jpeg";
@@ -32,16 +32,6 @@ const modulos: Modulo[] = [
     action: "Generar código",
   },
   {
-    id: "promociones",
-    Icon: Tag,
-    title: "Publicar promociones",
-    description:
-      "Crea ofertas y beneficios exclusivos para tus clientes.",
-    color: "orange",
-    path: "/restaurante/promociones",
-    action: "Publicar promoción",
-  },
-  {
     id: "puntos",
     Icon: Coins,
     title: "Transferir puntos",
@@ -60,16 +50,6 @@ const modulos: Modulo[] = [
     color: "purple",
     path: "/canjes-restaurante",
     action: "Consultar canjes",
-  },
-  {
-    id: "historial-promociones",
-    Icon: Receipt,
-    title: "Historial de promociones",
-    description:
-      "Consulta tus promociones activas, vencidas y pausadas.",
-    color: "orange",
-    path: "/restaurante/promociones/historial",
-    action: "Consultar historial",
   },
   {
     id: "perfil",
@@ -242,9 +222,8 @@ export default function RestauranteInicio() {
             <h2>¡Bienvenido, {userName}!</h2>
 
             <p>
-              Publica promociones, recompensa la
-              lealtad de tus clientes y administra
-              tus operaciones.
+              Acredita puntos por las compras y gestiona
+              las recompensas y los canjes de tus clientes.
             </p>
           </div>
 

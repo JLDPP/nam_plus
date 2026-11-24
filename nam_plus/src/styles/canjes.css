@@ -308,3 +308,8 @@
 
 
 }
+
+.redeem-back-btn { text-decoration: none; }
+.redeem-balance-card a { color: var(--nam-accent); }
+.reward-image-placeholder { position: relative; color: var(--nam-accent); }
+.reward-image-placeholder .reward-image { position: absolute; inset: 0; height: 100%; }

@@ -37,11 +37,13 @@ const rewardDetails = {
 export async function createRedemption(req, res) {
   const { rewardId, promotionId, expectedPointsCost } = req.body ?? {};
 
-  const esPromocion = promotionId !== undefined;
-  const itemId = esPromocion ? promotionId : rewardId;
-  const Catalogo = esPromocion ? Promotion : Reward;
+  if (promotionId !== undefined) {
+    return res.status(400).json({
+      message: "Los puntos solo se pueden canjear por recompensas del catálogo.",
+    });
+  }
 
-  if (!itemId || !mongoose.Types.ObjectId.isValid(itemId)) {
+  if (!rewardId || !mongoose.Types.ObjectId.isValid(rewardId)) {
     return res.status(400).json({
       message: "El artículo seleccionado para canje no es válido.",
     });
@@ -54,24 +56,13 @@ export async function createRedemption(req, res) {
     let resultado;
 
     await session.withTransaction(async () => {
-      const articulo = await Catalogo.findOne({
-        _id: itemId,
+      const articulo = await Reward.findOne({
+        _id: rewardId,
         active: true,
       }).session(session);
 
       if (!articulo) {
         throw httpError("El artículo no existe o está desactivado.", 404);
-      }
-
-      if (esPromocion) {
-        const ahora = new Date();
-
-        if (
-          (articulo.startDate && articulo.startDate > ahora) ||
-          (articulo.endDate && articulo.endDate < ahora)
-        ) {
-          throw httpError("Esta promoción está fuera de vigencia.", 409);
-        }
       }
 
       // El costo real siempre se toma de MongoDB.
@@ -81,11 +72,8 @@ export async function createRedemption(req, res) {
         throw httpError("Este artículo no tiene un costo de canje válido.", 400);
       }
 
-      if (esPromocion && expectedPointsCost !== costo) {
-        throw httpError(
-          "El costo cambió. Actualiza la promoción antes de canjear.",
-          409
-        );
+      if (expectedPointsCost !== undefined && expectedPointsCost !== costo) {
+        throw httpError("El costo cambió. Consulta el catálogo antes de canjear.", 409);
       }
 
       if (!Number.isSafeInteger(articulo.stock) || articulo.stock < 1) {
@@ -118,7 +106,7 @@ export async function createRedemption(req, res) {
         );
       }
 
-      const inventario = await Catalogo.updateOne(
+      const inventario = await Reward.updateOne(
         {
           _id: articulo._id,
           active: true,
@@ -136,14 +124,14 @@ export async function createRedemption(req, res) {
         [{
           user: req.userId,
           reward: articulo._id,
-          rewardModel: Catalogo.modelName,
+          rewardModel: Reward.modelName,
           pointsSpent: costo,
           status: "pending",
         }],
         { session }
       );
 
-      const nombre = articulo.name ?? articulo.title;
+      const nombre = articulo.name;
 
       await PointsTransaction.create(
         [{
@@ -409,7 +397,7 @@ export async function cancelRedemption(req, res) {
         throw httpError("Usuario del canje no encontrado.", 404);
       }
 
-      const stockResult = await Catalogo.updateOne(
+      const stockResult = await Reward.updateOne(
         { _id: articulo._id },
         { $inc: { stock: 1 } },
         { session }
@@ -419,7 +407,7 @@ export async function cancelRedemption(req, res) {
         throw new Error("No fue posible restaurar el inventario.");
       }
 
-      const nombre = articulo.name ?? articulo.title;
+      const nombre = articulo.name;
 
       await PointsTransaction.create(
         [{

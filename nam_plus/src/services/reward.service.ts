@@ -13,9 +13,9 @@ export interface Reward {
 }
 
 // Obtener las recompensas disponibles
-export async function getRewards(): Promise<Reward[]> {
+export async function getRewards(signal?: AbortSignal): Promise<Reward[]> {
   const response = await api.get<Reward[]>(
-    "/api/rewards"
+    "/api/rewards", { signal }
   );
 
   return response.data;

@@ -62,7 +62,7 @@ export default function Register() {
   }
 
   return (
-    <AuthLayout title="Crear cuenta" description="Únete a Ñam+ y empieza a disfrutar promociones y recompensas.">
+    <AuthLayout title="Crear cuenta" description="Únete a Ñam+ y canjea los puntos de tus compras por recompensas.">
       <form
         className="auth-form"
         onSubmit={onSubmit}

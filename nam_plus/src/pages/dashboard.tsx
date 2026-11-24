@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowDownLeft, ArrowRight, ArrowUpRight, Coins, Gift, History,
-  House, LogOut, QrCode, Settings, Tag, Ticket, Utensils,
+  House, LogOut, QrCode, Settings, Ticket, Utensils,
 } from "lucide-react";
 
 import { setAuth } from "../api";
-import PromotionCarousel from "../components/PromotionCarousel";
-import { getPromotions, isPromotionAvailable, type Promotion } from "../services/promotion.service";
+import RewardCarousel from "../components/RewardCarousel";
+import { getRewards, type Reward } from "../services/reward.service";
 import { getPointsBalance, getPointsHistory, type PointsTransaction } from "../services/points.service";
 import "../styles/dashboard.css";
 
@@ -18,9 +18,9 @@ export default function Dashboard() {
   const locale = i18n.resolvedLanguage?.startsWith("en") ? "en-US" : "es-MX";
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [promotionsStatus, setPromotionsStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [promotionsAttempt, setPromotionsAttempt] = useState(0);
+  const [latestRewards, setLatestRewards] = useState<Reward[]>([]);
+  const [latestRewardsStatus, setLatestRewardsStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [latestRewardsAttempt, setLatestRewardsAttempt] = useState(0);
   const [points, setPoints] = useState<number | null>(null);
   const [pointsError, setPointsError] = useState(false);
   const [transactions, setTransactions] = useState<PointsTransaction[] | null>(null);
@@ -29,20 +29,16 @@ export default function Dashboard() {
   useEffect(() => {
     const request = new AbortController();
 
-    getPromotions(request.signal).then((data) => {
+    getRewards(request.signal).then((data) => {
       if (request.signal.aborted) return;
-      const now = new Date();
-      // The API returns newest first.
-      setPromotions(data.filter((item) =>
-        isPromotionAvailable(item, now) && (item.stock == null || item.stock > 0)
-      ).slice(0, 5));
-      setPromotionsStatus("ready");
+      setLatestRewards(data.filter((item) => item.active && item.stock > 0).slice(0, 5));
+      setLatestRewardsStatus("ready");
     }).catch(() => {
-      if (!request.signal.aborted) setPromotionsStatus("error");
+      if (!request.signal.aborted) setLatestRewardsStatus("error");
     });
 
     return () => request.abort();
-  }, [promotionsAttempt]);
+  }, [latestRewardsAttempt]);
 
   useEffect(() => {
     let active = true;
@@ -85,7 +81,6 @@ export default function Dashboard() {
           </Link>
           <nav className="home-nav" aria-label={t("dashboard.navigation")}>
             <Link to="/dashboard" aria-current="page"><House size={17} aria-hidden="true" /> {t("dashboard.home")}</Link>
-            <Link to="/promociones"><Tag size={17} aria-hidden="true" /> {t("dashboard.promotionsNav")}</Link>
             <Link to="/canjes"><Gift size={17} aria-hidden="true" /> {t("dashboard.rewards")}</Link>
           </nav>
           <div className="home-account">
@@ -105,8 +100,8 @@ export default function Dashboard() {
             <div className="home-hero-copy">
               <p className="home-greeting">{t("dashboard.hello")}, {user.name || t("dashboard.userFallback")}</p>
               <h1>{t("dashboard.heroTitle")}</h1>
-              <Link to="/promociones" className="home-hero-button">
-                {t("dashboard.explorePromotions")} <ArrowRight size={17} aria-hidden="true" />
+              <Link to="/canjes" className="home-hero-button">
+                {t("dashboard.viewRewards")} <ArrowRight size={17} aria-hidden="true" />
               </Link>
             </div>
           </section>
@@ -129,9 +124,9 @@ export default function Dashboard() {
         </div>
 
         <div className="home-workspace">
-          <PromotionCarousel promotions={promotions} status={promotionsStatus} onRetry={() => {
-            setPromotionsStatus("loading");
-            setPromotionsAttempt((attempt) => attempt + 1);
+          <RewardCarousel rewards={latestRewards} status={latestRewardsStatus} onRetry={() => {
+            setLatestRewardsStatus("loading");
+            setLatestRewardsAttempt((attempt) => attempt + 1);
           }} />
 
           <section className="home-actions" aria-labelledby="home-actions-title">

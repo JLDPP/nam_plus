@@ -23,8 +23,6 @@ import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
 import Codigo from "./pages/codigo";
 import Qr from "./pages/qr";
-import Promociones from "./pages/promociones";
-import PromocionDetalle from "./pages/promocionDetalle";
 import Puntos from "./pages/puntos";
 import Canjes from "./pages/canjes";
 import { HistorialCanjes } from "./pages/historialCanjes";
@@ -32,7 +30,6 @@ import { HistorialCanjes } from "./pages/historialCanjes";
 // RESTAURANTES
 
 import RestauranteInicio from "./pages/restaurante/RestauranteInicio";
-import RestaurantePromociones from "./pages/restaurante/RestaurantePromociones";
 import RestauranteTransferirPuntos from "./pages/restaurante/RestauranteTransferirPuntos";
 
 import CanjesRestaurante from "./pages/canjesRestaurante";
@@ -149,30 +146,9 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* PUBLICAR PROMOCIONES */}
-
         <Route
-          path="/restaurante/promociones"
-          element={
-            <ProtectedRoute>
-              <RestauranteRoute soloRestaurante>
-                <RestaurantePromociones mode="publicar" />
-              </RestauranteRoute>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* HISTORIAL DE PROMOCIONES */}
-
-        <Route
-          path="/restaurante/promociones/historial"
-          element={
-            <ProtectedRoute>
-              <RestauranteRoute soloRestaurante>
-                <RestaurantePromociones mode="historial" />
-              </RestauranteRoute>
-            </ProtectedRoute>
-          }
+          path="/restaurante/promociones/*"
+          element={<ProtectedRoute><RestauranteRoute><Navigate to="/admin-recompensas" replace /></RestauranteRoute></ProtectedRoute>}
         />
 
         {/* CONFIGURACIÓN */}
@@ -208,25 +184,7 @@ ReactDOM.createRoot(
           }
         />
 
-        {/* PROMOCIONES */}
-
-        <Route
-          path="/promociones"
-          element={
-            <ProtectedRoute>
-              <Promociones />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/promociones/:id"
-          element={
-            <ProtectedRoute>
-              <PromocionDetalle />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/promociones/*" element={<Navigate to="/canjes" replace />} />
 
         {/* PUNTOS */}
 

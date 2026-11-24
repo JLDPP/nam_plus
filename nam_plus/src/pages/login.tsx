@@ -94,7 +94,7 @@ export default function Login() {
   }
 
   return (
-    <AuthLayout title="Iniciar sesión" description="Descubre promociones, acumula puntos y disfruta tus restaurantes favoritos.">
+    <AuthLayout title="Iniciar sesión" description="Acumula puntos con tus compras y canjéalos por recompensas.">
       <form
         className="auth-form"
         onSubmit={onSubmit}

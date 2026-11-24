@@ -22,17 +22,20 @@ export interface Redemption {
 // Respuesta del backend al realizar un canje
 export interface RedemptionResponse {
   message: string;
+  pointsBalance: number;
   redemption: Redemption;
 }
 
 // Realizar un canje
 export async function redeemReward(
-  rewardId: string
+  rewardId: string,
+  expectedPointsCost: number
 ): Promise<RedemptionResponse> {
   const response = await api.post<RedemptionResponse>(
     "/api/redemptions",
     {
       rewardId,
+      expectedPointsCost,
     }
   );
 
