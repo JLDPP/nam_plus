@@ -189,16 +189,8 @@
     padding: 20px 15px;
   }
 
-  .points-header {
-    padding-top: 55px;
-  }
-
   .points-header h1 {
     font-size: 26px;
-  }
-
-  .points-back-btn {
-    top: 0;
   }
 
   .points-total {
@@ -211,5 +203,18 @@
 
   .points-actions {
     flex-direction: column;
+  }
+}
+
+.points-info-item > div { min-width: 0; overflow-wrap: anywhere; }
+
+@media (max-width: 720px) {
+  .points-back-btn {
+    position: static;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    min-height: 44px;
+    margin-bottom: 12px;
   }
 }

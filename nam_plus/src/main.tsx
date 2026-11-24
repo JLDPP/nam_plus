@@ -11,6 +11,7 @@ import {
 import "./i18n";
 import "@fontsource-variable/nunito";
 import "./index.css";
+import "./styles/motion.css";
 
 import Login from "./pages/login";
 import Register from "./pages/register";

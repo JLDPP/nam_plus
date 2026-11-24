@@ -183,6 +183,6 @@ button, input, textarea, select { font: inherit; }
   *, *::before, *::after {
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;
-    animation-duration: .01ms !important;
+    animation: none !important;
   }
 }

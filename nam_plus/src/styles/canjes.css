@@ -221,38 +221,10 @@
 }
 
 @media (max-width: 600px) {
-  .redeem-page {
-    padding: 20px 15px;
-  }
-
-  .redeem-header {
-    padding-top: 55px;
-  }
-
-  .redeem-header h1 {
-    font-size: 25px;
-  }
-
-  .redeem-back-btn {
-    top: 0;
-  }
-
-  .reward-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .redeem-top-actions {
-    flex-direction: column;
-  }
-
-  .redeem-top-actions button {
-    width: 100%;
-  }
-
-
-
-
-
+  .redeem-page { padding: 20px 15px; }
+  .redeem-header h1 { font-size: 25px; }
+  .reward-grid { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* Saldo disponible del usuario */
 .redeem-balance-card {
@@ -284,32 +256,19 @@
   font-size: 14px;
 }
 
-/* Información de puntos */
-.redeem-insufficient {
-  color: var(--nam-error);
-  font-size: 13px;
-  font-weight: 600;
-  margin: 12px 0;
-}
-
-.redeem-available {
-  color: var(--nam-green);
-  font-size: 13px;
-  font-weight: 600;
-  margin: 12px 0;
-}
-
-/* Recompensas que no se pueden canjear */
-.reward-redeem-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-
-
-}
-
 .redeem-back-btn { text-decoration: none; }
+.reward-content { overflow-wrap: anywhere; }
 .redeem-balance-card a { color: var(--nam-accent); }
 .reward-image-placeholder { position: relative; color: var(--nam-accent); }
 .reward-image-placeholder .reward-image { position: absolute; inset: 0; height: 100%; }
+
+@media (max-width: 720px) {
+  .redeem-back-btn {
+    position: static;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    min-height: 44px;
+    margin-bottom: 12px;
+  }
+}

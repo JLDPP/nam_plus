@@ -201,10 +201,6 @@
     padding: 24px 14px;
   }
 
-  .history-header {
-    padding-top: 45px;
-  }
-
   .history-header h1 {
     font-size: 26px;
   }
@@ -233,5 +229,18 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+  }
+}
+
+.history-details { overflow-wrap: anywhere; }
+
+@media (max-width: 720px) {
+  .history-back-btn {
+    position: static;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    min-height: 44px;
+    margin-bottom: 12px;
   }
 }

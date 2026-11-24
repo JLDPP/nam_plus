@@ -521,21 +521,6 @@
     border-bottom: 1px solid var(--rp-border);
   }
 
-  .rp-brand {
-    margin-bottom: 20px;
-  }
-
-  .rp-navigation {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-
-  .rp-nav-link {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
   .rp-sidebar-footer {
     display: flex;
     align-items: center;
@@ -613,4 +598,37 @@
   .rp-card:hover {
     transform: none;
   }
+}
+
+.rp-mobile-toggle { display: none; }
+
+@media (max-width: 900px) {
+  .rp-sidebar { overflow: visible; padding: 14px 16px; }
+  .rp-mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .rp-brand { margin: 0; padding: 0; }
+  .rp-logo { width: 42px; height: 42px; }
+  .rp-mobile-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 13px;
+    border-radius: 12px;
+    border: 1px solid var(--rp-border);
+    background: var(--nam-soft);
+    color: var(--nam-ink);
+    cursor: pointer;
+  }
+  .rp-navigation {
+    display: none;
+    flex-direction: column;
+    overflow: visible;
+    padding: 0;
+    margin-top: 12px;
+  }
+  .rp-navigation[data-open="true"] { display: flex; }
+  .rp-nav-link { white-space: normal; }
+  .rp-nav-link svg { flex: none; }
+  .rp-account { min-width: 0; }
+  .rp-logout { min-height: 44px; flex: none; }
 }

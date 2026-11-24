@@ -1,0 +1,47 @@
+@keyframes nam-panel-in {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nam-slide-in {
+  from { opacity: .28; transform: translateX(var(--slide-offset)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(
+    .auth-shell, .home-hero, .home-balance, .home-promotions, .home-actions, .home-activity,
+    .rp-welcome, .rp-card, .rp-navigation[data-open="true"], .account-card, .settings-card,
+    .points-balance-card, .points-info-card, .reward-card, .history-card, .history-summary,
+    .admin-rewards-form-card, .admin-reward-card, .ticket-form-card, .ticket-result-card,
+    .restaurant-redemption-card, .code-container, .qr-scanner-card, .qr-result
+  ) {
+    animation: nam-panel-in 310ms cubic-bezier(.22, .68, .35, 1) backwards;
+  }
+
+  :is(.home-balance, .home-actions, .rp-card:nth-child(2), .settings-card:nth-of-type(2)) { animation-delay: 55ms; }
+  :is(.home-activity, .rp-card:nth-child(3)) { animation-delay: 110ms; }
+
+  .home-promo-slide[data-direction="next"] { --slide-offset: 27px; }
+  .home-promo-slide[data-direction="previous"] { --slide-offset: -27px; }
+  .home-promo-slide[data-direction] {
+    animation: nam-slide-in 300ms cubic-bezier(.21, .69, .33, 1) backwards;
+  }
+
+  .home-carousel-dots button::before {
+    transition: width 170ms ease, background-color 170ms ease, border-color 170ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :is(.home-actions a, .account-dashboard-link, .home-hero-button) {
+      transition: translate 170ms ease, border-color 170ms ease, background-color 170ms ease;
+    }
+    :is(.home-actions a, .account-dashboard-link, .home-hero-button):hover { translate: 0 -2px; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  :is(.reward-card, .points-redeem-btn, .option-btn, .code-submit-btn):hover {
+    transform: none !important;
+  }
+}

@@ -262,3 +262,5 @@
     width: 100%;
   }
 }
+
+.restaurant-redemption-info { min-width: 0; overflow-wrap: anywhere; }

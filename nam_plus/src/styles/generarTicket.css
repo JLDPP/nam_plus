@@ -10,6 +10,7 @@
 .ticket-container {
   max-width: 1100px;
   margin: 0 auto;
+  overflow-wrap: anywhere;
 }
 
 .ticket-header {
@@ -212,3 +213,6 @@
     padding: 20px;
   }
 }
+
+.ticket-form-card, .ticket-result-card { min-width: 0; }
+.ticket-points-preview, .ticket-result-info p { flex-wrap: wrap; }

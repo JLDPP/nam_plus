@@ -109,6 +109,7 @@
     "unknown": "Desconocido"
   },
   "restaurantDashboard": {
+    "menu": "Menú",
     "title": "Panel de restaurante",
     "welcome": "¡Bienvenido, {{name}}!",
     "description": "Acredita puntos por compras y gestiona las recompensas y canjes de tus clientes.",

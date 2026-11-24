@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type PointerEvent } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Gift } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -12,13 +12,34 @@ type Props = {
 
 export default function RewardCarousel({ rewards, status, onRetry }: Props) {
   const { t, i18n } = useTranslation();
-  const [index, setIndex] = useState(0);
+  const [{ index, direction }, setSlide] = useState({ index: 0, direction: 0 });
+  const gesture = useRef<{ id: number; x: number; y: number } | null>(null);
   const count = rewards.length;
   const selected = Math.min(index, Math.max(0, count - 1));
   const reward = rewards[selected];
 
   function move(step: number) {
-    setIndex((current) => (Math.min(current, count - 1) + step + count) % count);
+    if (count < 2) return;
+    setSlide((current) => ({
+      index: (Math.min(current.index, count - 1) + step + count) % count,
+      direction: step,
+    }));
+  }
+
+  function startSwipe(event: PointerEvent) {
+    if (count < 2 || !event.isPrimary || event.pointerType === "mouse") return;
+    gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  }
+
+  function finishSwipe(event: PointerEvent) {
+    if (gesture.current?.id !== event.pointerId) return;
+    const { x, y } = gesture.current;
+    gesture.current = null;
+    const horizontal = event.clientX - x;
+    const vertical = event.clientY - y;
+    if (Math.abs(horizontal) >= 36 && Math.abs(horizontal) > Math.abs(vertical) * 1.35) {
+      move(horizontal < 0 ? 1 : -1);
+    }
   }
 
   return (
@@ -44,8 +65,11 @@ export default function RewardCarousel({ rewards, status, onRetry }: Props) {
         </div>
       ) : (
         <>
-          <div aria-live="polite">
-            <article className="home-promo-slide" key={reward._id}>
+          <div className="home-carousel-viewport" aria-live="polite"
+            onPointerDown={startSwipe} onPointerUp={finishSwipe}
+            onPointerCancel={() => { gesture.current = null; }}>
+            <article className="home-promo-slide" key={reward._id}
+              data-direction={direction === 0 ? undefined : direction > 0 ? "next" : "previous"}>
               <div className="home-promo-media">
                 <Gift size={42} aria-hidden="true" />
                 {reward.imageUrl && (
@@ -63,7 +87,11 @@ export default function RewardCarousel({ rewards, status, onRetry }: Props) {
           </div>
 
           {count > 1 && (
-            <div className="home-carousel-controls">
+            <div className="home-carousel-controls" onKeyDown={(event) => {
+              if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+              event.preventDefault();
+              move(event.key === "ArrowRight" ? 1 : -1);
+            }}>
               <button type="button" onClick={() => move(-1)} aria-label={t("dashboard.previousReward")}>
                 <ChevronLeft size={20} aria-hidden="true" />
               </button>
@@ -74,7 +102,7 @@ export default function RewardCarousel({ rewards, status, onRetry }: Props) {
                     type="button"
                     aria-label={t("dashboard.rewardPosition", { position: position + 1, count })}
                     aria-current={selected === position ? "true" : undefined}
-                    onClick={() => setIndex(position)}
+                    onClick={() => setSlide({ index: position, direction: Math.sign(position - selected) })}
                   />
                 ))}
               </div>

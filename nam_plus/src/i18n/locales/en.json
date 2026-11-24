@@ -109,6 +109,7 @@
     "unknown": "Unknown"
   },
   "restaurantDashboard": {
+    "menu": "Menu",
     "title": "Restaurant dashboard",
     "welcome": "Welcome, {{name}}!",
     "description": "Award points for purchases and manage your customers’ rewards and redemptions.",

@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Gift, History, House, Settings, Ticket, UserRound } from "lucide-react";
+import { Gift, History, House, Menu, Settings, X, Ticket, UserRound } from "lucide-react";
 import { setAuth } from "../../api";
 import logo from "../../assets/logo.jpeg";
 import { useAccount } from "../../routes/protected.route";
@@ -16,6 +17,8 @@ export default function RestauranteInicio() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { name } = useAccount();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const MenuIcon = menuOpen ? X : Menu;
 
   function logout() {
     localStorage.removeItem("token");
@@ -27,13 +30,20 @@ export default function RestauranteInicio() {
   return (
     <div className="rp-layout">
       <aside className="rp-sidebar">
-        <div className="rp-brand">
-          <img src={logo} alt="" className="rp-logo" />
-          <div><h2>Ñam+</h2><span>{t("account.restaurante")}</span></div>
+        <div className="rp-mobile-bar">
+          <div className="rp-brand">
+            <img src={logo} alt="" className="rp-logo" />
+            <div><h2>Ñam+</h2><span>{t("account.restaurante")}</span></div>
+          </div>
+          <button type="button" className="rp-mobile-toggle" aria-expanded={menuOpen}
+            aria-controls="restaurant-navigation" onClick={() => setMenuOpen((open) => !open)}>
+            <MenuIcon size={19} aria-hidden="true" /> {t("restaurantDashboard.menu")}
+          </button>
         </div>
 
-        <nav className="rp-navigation" aria-label={t("dashboard.navigation")}>
-          <Link to="/restaurante" className="rp-nav-link rp-nav-active" aria-current="page">
+        <nav id="restaurant-navigation" className="rp-navigation" data-open={menuOpen}
+          aria-label={t("dashboard.navigation")}>
+          <Link to="/restaurante" className="rp-nav-link rp-nav-active" aria-current="page" onClick={() => setMenuOpen(false)}>
             <House size={19} aria-hidden="true" /> {t("dashboard.home")}
           </Link>
           {modules.map(({ to, title, Icon }) => (
