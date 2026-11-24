@@ -1,3 +1,4 @@
+import { rewardImageUrl } from "../services/reward.service";
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
@@ -108,6 +109,21 @@ export default function AdminRecompensas() {
     ...emptyForm,
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const imageInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreview(null);
+      return;
+    }
+
+    const preview = URL.createObjectURL(imageFile);
+    setImagePreview(preview);
+    return () => URL.revokeObjectURL(preview);
+  }, [imageFile]);
+
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
@@ -181,7 +197,13 @@ export default function AdminRecompensas() {
   // FORMULARIO: CREAR RECOMPENSA
   // ==========================================
 
+  function clearImageFile() {
+    setImageFile(null);
+    if (imageInput.current) imageInput.current.value = "";
+  }
+
   function openCreate() {
+    clearImageFile();
     setEditingId(null);
     setForm({ ...emptyForm });
     setError("");
@@ -194,6 +216,7 @@ export default function AdminRecompensas() {
   // ==========================================
 
   function openEdit(reward: Reward) {
+    clearImageFile();
     setEditingId(reward._id);
 
     setForm({
@@ -218,6 +241,7 @@ export default function AdminRecompensas() {
   function closeForm() {
     if (savingRef.current) return;
 
+    clearImageFile();
     setShowForm(false);
     setEditingId(null);
     setForm({ ...emptyForm });
@@ -278,44 +302,42 @@ export default function AdminRecompensas() {
       return;
     }
 
+    const imageUrl = form.imageUrl.trim();
     const payload = {
       name,
       description: form.description.trim(),
-      imageUrl: form.imageUrl.trim(),
+      // Las rutas de archivos guardados ya están asociadas a la recompensa.
+      ...(!imageFile && !imageUrl.startsWith("/") ? { imageUrl } : {}),
       pointsCost,
       stock,
       active: form.active,
+      ...(!editingId && isAdmin ? { restaurantId: form.restaurantId.trim() } : {}),
     };
+
+    let body: typeof payload | FormData = payload;
+    let headers;
+    if (imageFile) {
+      body = new FormData();
+      body.append("reward", JSON.stringify(payload));
+      body.append("image", imageFile);
+      headers = { "Content-Type": "multipart/form-data" };
+    }
 
     savingRef.current = true;
     setSaving(true);
 
     try {
-      let successMessage = "";
+      await api.request({
+        method: editingId ? "patch" : "post",
+        url: editingId ? `/api/rewards/manage/${editingId}` : "/api/rewards/manage",
+        data: body,
+        headers,
+      });
+      const successMessage = editingId
+        ? "Recompensa actualizada correctamente."
+        : "Recompensa creada correctamente.";
 
-      if (editingId) {
-        await api.patch(
-          `/api/rewards/manage/${editingId}`,
-          payload
-        );
-
-        successMessage =
-          "Recompensa actualizada correctamente.";
-      } else {
-        await api.post("/api/rewards/manage", {
-          ...payload,
-          ...(isAdmin
-            ? {
-                restaurantId:
-                  form.restaurantId.trim(),
-              }
-            : {}),
-        });
-
-        successMessage =
-          "Recompensa creada correctamente.";
-      }
-
+      clearImageFile();
       setShowForm(false);
       setEditingId(null);
       setForm({ ...emptyForm });
@@ -588,21 +610,50 @@ export default function AdminRecompensas() {
                   />
                 </label>
 
-                <label>
-                  URL de la imagen
-
-                  <input
-                    type="url"
-                    value={form.imageUrl}
-                    onChange={(event) =>
-                      setForm({
-                        ...form,
-                        imageUrl: event.target.value,
-                      })
-                    }
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                  />
-                </label>
+                <div className="admin-form-full admin-reward-upload">
+                  <label>
+                    Imagen de la recompensa
+                    <input
+                      ref={imageInput}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      aria-describedby="reward-image-formats"
+                      disabled={saving}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+                        setError("");
+                        if (file && file.size > 5 * 1024 * 1024) {
+                          clearImageFile();
+                          setError("La imagen debe pesar máximo 5 MB.");
+                          return;
+                        }
+                        setImageFile(file);
+                      }}
+                    />
+                  </label>
+                  <small id="reward-image-formats">JPG, PNG o WebP. Máximo 5 MB.</small>
+                  {(imagePreview || form.imageUrl) && (
+                    <div className="admin-reward-preview">
+                      <img src={imagePreview || rewardImageUrl(form.imageUrl)} alt="Vista previa de la recompensa" />
+                      <button type="button" className="admin-reload-btn" disabled={saving} onClick={() => {
+                        if (imageFile) clearImageFile();
+                        else setForm({ ...form, imageUrl: "" });
+                      }}>
+                        {imageFile ? "Descartar selección" : "Quitar imagen"}
+                      </button>
+                    </div>
+                  )}
+                  <label>
+                    O usa una URL de imagen
+                    <input
+                      type="url"
+                      value={form.imageUrl.startsWith("/") ? "" : form.imageUrl}
+                      disabled={saving || imageFile !== null}
+                      onChange={(event) => setForm({ ...form, imageUrl: event.target.value })}
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                    />
+                  </label>
+                </div>
 
                 <label className="admin-form-full">
                   Descripción
@@ -716,7 +767,7 @@ export default function AdminRecompensas() {
               >
                 {reward.imageUrl ? (
                   <img
-                    src={reward.imageUrl}
+                    src={rewardImageUrl(reward.imageUrl)}
                     alt={reward.name}
                     className="admin-reward-image"
                     loading="lazy"

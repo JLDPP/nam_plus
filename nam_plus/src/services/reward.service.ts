@@ -12,6 +12,13 @@ export interface Reward {
   active: boolean;
 }
 
+export function rewardImageUrl(imageUrl: string): string {
+  if (!/^\/api\/(rewards|promotions)\/images\//.test(imageUrl)) return imageUrl;
+
+  const base = new URL(api.defaults.baseURL || "/", window.location.origin);
+  return new URL(imageUrl, base).href;
+}
+
 // Obtener las recompensas disponibles
 export async function getRewards(signal?: AbortSignal): Promise<Reward[]> {
   const response = await api.get<Reward[]>(

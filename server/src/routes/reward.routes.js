@@ -1,5 +1,7 @@
 
-import { Router } from "express";
+import express, { Router } from "express";
+import { readImageUpload } from "../middleware/promotionImage.js";
+import { rewardImageDirectory } from "../middleware/rewardImage.js";
 
 import { auth } from "../middleware/auth.js";
 import { requireRole } from "../middleware/requireRole.js";
@@ -16,6 +18,9 @@ import {
 } from "../controllers/rewardAdmin.controller.js";
 
 const router = Router();
+const readRewardUpload = readImageUpload("reward", "Los datos de la recompensa no son válidos.");
+
+router.use("/images", express.static(rewardImageDirectory, { index: false }));
 
 // ==========================================
 // AUTENTICACIÓN
@@ -45,6 +50,7 @@ router.get(
 router.post(
   "/manage",
   requireRole("restaurante", "admin"),
+  readRewardUpload,
   createManagedReward
 );
 
@@ -52,6 +58,7 @@ router.post(
 router.patch(
   "/manage/:id",
   requireRole("restaurante", "admin"),
+  readRewardUpload,
   updateManagedReward
 );
 

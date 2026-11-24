@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import Reward from "../models/Reward.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js";
+import { saveRewardImage } from "../middleware/rewardImage.js";
 
 // ==========================================
 // FUNCIONES AUXILIARES
@@ -26,12 +27,21 @@ async function getAuthorizedUser(userId) {
 function sendError(res, error) {
   console.error("Error administrando recompensas:", error);
 
-  return res.status(error.statusCode || 500).json({
+  const status = error.statusCode || error.status || 500;
+  return res.status(status).json({
     message:
-      error.statusCode && error.statusCode < 500
+      status < 500
         ? error.message
         : "Error interno al administrar recompensas",
   });
+}
+
+async function discardFailedImage(image) {
+  if (image) {
+    await image.discard().catch((error) => {
+      console.error("Error limpiando imagen de recompensa:", error);
+    });
+  }
 }
 
 function validateRewardFields(data, creating = false) {
@@ -226,6 +236,7 @@ export async function getManagedRewards(req, res) {
 // ==========================================
 
 export async function createManagedReward(req, res) {
+  let image;
   try {
     const user = await getAuthorizedUser(req.userId);
 
@@ -267,18 +278,22 @@ export async function createManagedReward(req, res) {
       });
     }
 
+    image = await saveRewardImage(req.file);
     const reward = await Reward.create({
       ...data,
+      ...(image ? { imageUrl: image.url } : {}),
       restaurant: restaurant._id,
       restaurantName: restaurant.name,
       active: data.active ?? true,
     });
 
+    image = null;
     return res.status(201).json({
       message: "Recompensa creada correctamente",
       reward,
     });
   } catch (error) {
+    await discardFailedImage(image);
     return sendError(res, error);
   }
 }
@@ -288,6 +303,7 @@ export async function createManagedReward(req, res) {
 // ==========================================
 
 export async function updateManagedReward(req, res) {
+  let image;
   try {
     const user = await getAuthorizedUser(req.userId);
 
@@ -299,21 +315,25 @@ export async function updateManagedReward(req, res) {
     const fields = req.body || {};
     const data = validateRewardFields(fields);
 
-    if (Object.keys(data).length === 0) {
+    if (Object.keys(data).length === 0 && !req.file) {
       return res.status(400).json({
         message: "No se enviaron cambios válidos",
       });
     }
 
+    image = await saveRewardImage(req.file);
     Object.assign(reward, data);
+    if (image) reward.imageUrl = image.url;
 
     await reward.save();
+    image = null;
 
     return res.json({
       message: "Recompensa actualizada correctamente",
       reward,
     });
   } catch (error) {
+    await discardFailedImage(image);
     return sendError(res, error);
   }
 }

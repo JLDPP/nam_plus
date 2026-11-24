@@ -1,3 +1,4 @@
+import { rewardImageUrl } from "../services/reward.service";
 
 /*
   ARCHIVO: historialCanjes.tsx
@@ -245,7 +246,7 @@ export function HistorialCanjes() {
                 {/* IMAGEN */}
                 {redemption.reward?.imageUrl ? (
                   <img
-                    src={redemption.reward.imageUrl}
+                    src={rewardImageUrl(redemption.reward.imageUrl)}
                     alt={
                       redemption.reward.name ||
                       t("history.reward")

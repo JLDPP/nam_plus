@@ -35,3 +35,6 @@ Desktop.ini
 # Archivos temporales
 *.tmp
 *.temp
+
+# Imágenes subidas desde la aplicación
+/src/uploads/recompensas/

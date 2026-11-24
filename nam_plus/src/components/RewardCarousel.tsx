@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Gift } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import type { Reward } from "../services/reward.service";
+import { rewardImageUrl, type Reward } from "../services/reward.service";
 
 type Props = {
   rewards: Reward[];
@@ -49,7 +49,7 @@ export default function RewardCarousel({ rewards, status, onRetry }: Props) {
               <div className="home-promo-media">
                 <Gift size={42} aria-hidden="true" />
                 {reward.imageUrl && (
-                  <img src={reward.imageUrl} alt="" onError={(event) => {
+                  <img src={rewardImageUrl(reward.imageUrl)} alt="" onError={(event) => {
                     event.currentTarget.hidden = true;
                   }} />
                 )}

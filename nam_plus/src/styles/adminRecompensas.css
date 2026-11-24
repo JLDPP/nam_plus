@@ -332,3 +332,23 @@
     flex: 1;
   }
 }
+
+.admin-reward-upload {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-reward-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-reward-preview img {
+  width: min(100%, 220px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--nam-soft);
+}

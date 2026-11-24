@@ -18,38 +18,44 @@ const receiveImage = multer({
   },
 }).single("image");
 
-export function readPromotionUpload(req, res, next) {
-  // Si el restaurante solo cambia el texto, la petición llega como JSON.
-  if (!req.is("multipart/form-data")) {
-    return next();
-  }
+export function readImageUpload(field, invalidMessage) {
+  return (req, res, next) => {
+    // Si el restaurante solo cambia el texto, la petición llega como JSON.
+    if (!req.is("multipart/form-data")) {
+      return next();
+    }
 
-  receiveImage(req, res, (error) => {
-    if (error) {
-      if (error.code === "LIMIT_FILE_SIZE") {
-        return res.status(413).json({
-          message: "La imagen debe pesar máximo 5 MB.",
+    receiveImage(req, res, (error) => {
+      if (error) {
+        if (error.code === "LIMIT_FILE_SIZE") {
+          return res.status(413).json({
+            message: "La imagen debe pesar máximo 5 MB.",
+          });
+        }
+
+        return res.status(400).json({
+          message: "No se pudo recibir la imagen.",
         });
       }
 
-      return res.status(400).json({
-        message: "No se pudo recibir la imagen.",
-      });
-    }
+      try {
+        const body = JSON.parse(req.body[field]);
+        if (!body || typeof body !== "object" || Array.isArray(body)) {
+          return res.status(400).json({ message: invalidMessage });
+        }
+        req.body = body;
+      } catch {
+        return res.status(400).json({
+          message: invalidMessage,
+        });
+      }
 
-    try {
-      req.body = JSON.parse(req.body.promotion);
-    } catch {
-      return res.status(400).json({
-        message: "Los datos de la promoción no son válidos.",
-      });
-    }
-
-    next();
-  });
+      next();
+    });
+  };
 }
 
-export async function savePromotionImage(file) {
+export async function saveImage(file, directory, publicPath) {
   if (!file) return null;
 
   const image = sharp(file.buffer, {
@@ -72,15 +78,19 @@ export async function savePromotionImage(file) {
     throw error;
   }
 
-  await mkdir(imageDirectory, { recursive: true });
+  await mkdir(directory, { recursive: true });
 
   const filename = `${randomUUID()}.webp`;
-  const destination = path.join(imageDirectory, filename);
+  const destination = path.join(directory, filename);
 
   await writeFile(destination, bytes, { flag: "wx" });
 
   return {
-    url: `/api/promotions/images/${filename}`,
+    url: `${publicPath}/${filename}`,
     discard: () => unlink(destination),
   };
+}
+
+export function savePromotionImage(file) {
+  return saveImage(file, imageDirectory, "/api/promotions/images");
 }

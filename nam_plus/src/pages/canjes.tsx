@@ -3,7 +3,7 @@ import { isAxiosError } from "axios";
 import { Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getRewards, type Reward } from "../services/reward.service";
+import { getRewards, rewardImageUrl, type Reward } from "../services/reward.service";
 import { redeemReward } from "../services/redemption.service";
 import { getPointsBalance } from "../services/points.service";
 import "../styles/canjes.css";
@@ -118,7 +118,7 @@ export default function Canjes() {
                 <article className="reward-card" key={reward._id}>
                   <div className="reward-image-placeholder" aria-hidden="true">
                     <Gift size={34} />
-                    {reward.imageUrl && <img className="reward-image" src={reward.imageUrl} alt="" loading="lazy"
+                    {reward.imageUrl && <img className="reward-image" src={rewardImageUrl(reward.imageUrl)} alt="" loading="lazy"
                       onError={(event) => { event.currentTarget.hidden = true; }} />}
                   </div>
                   <div className="reward-content">
