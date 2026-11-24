@@ -18,7 +18,10 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(morgan("dev", {
+  // El enlace cifrado del QR permite ver el código y se trata como una credencial.
+  skip: (req) => req.path.startsWith("/api/tickets/email-images/qr/"),
+}));
 
 app.get("/", (req, res) => {
   res.json({

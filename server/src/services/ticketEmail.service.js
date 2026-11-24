@@ -1,9 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import nodemailer from "nodemailer";
-import QRCode from "qrcode";
-
-const logoAsset = new URL("../assets/nam-plus-logo.jpg", import.meta.url);
+import { hostedTicketImages, renderTicketQr, ticketLogoPath } from "./ticketEmailImages.js";
 
 // ==========================================
 // FUNCIONES AUXILIARES
@@ -70,18 +68,27 @@ export async function sendTicketEmail({
   // GENERAR CÓDIGO QR
   // ==========================================
 
-  const ticketId = randomUUID();
-  const logoCid = `logo.${ticketId}@nam-plus.local`;
-  const qrCid = `qr.${ticketId}@nam-plus.local`;
-  const [logoBuffer, qrBuffer] = await Promise.all([
-    readFile(logoAsset),
-    QRCode.toBuffer(code, {
-      type: "png",
-      width: 400,
-      margin: 4,
-      errorCorrectionLevel: "M",
-    }),
-  ]);
+  const hostedImages = hostedTicketImages(code, expiresAt);
+  let logoSource = hostedImages?.logo;
+  let qrSource = hostedImages?.qr;
+  const attachments = [];
+
+  if (!hostedImages) {
+    const id = randomUUID();
+    const logoCid = `logo.${id}@nam-plus.local`;
+    const qrCid = `qr.${id}@nam-plus.local`;
+    const [logoBuffer, qrBuffer] = await Promise.all([
+      readFile(ticketLogoPath),
+      renderTicketQr(code),
+    ]);
+
+    logoSource = `cid:${logoCid}`;
+    qrSource = `cid:${qrCid}`;
+    attachments.push(
+      { filename: "nam-plus-logo.jpg", content: logoBuffer, contentType: "image/jpeg", contentDisposition: "inline", cid: logoCid },
+      { filename: "ticket-qr.png", content: qrBuffer, contentType: "image/png", contentDisposition: "inline", cid: qrCid },
+    );
+  }
 
   const restaurant = escapeHTML(restaurantName);
   const safeCode = escapeHTML(code);
@@ -148,7 +155,7 @@ export async function sendTicketEmail({
       >
 
         <img
-          src="cid:${logoCid}"
+          src="${escapeHTML(logoSource)}"
           alt="Ñam+"
           width="112"
           height="112"
@@ -284,7 +291,7 @@ export async function sendTicketEmail({
         </p>
 
         <img
-          src="cid:${qrCid}"
+          src="${escapeHTML(qrSource)}"
           alt="Código QR para acumular puntos en Ñam+"
           width="250"
           height="250"
@@ -499,27 +506,6 @@ export async function sendTicketEmail({
 </body>
 </html>
 `;
-
-  // ==========================================
-  // IMÁGENES INCRUSTADAS EN EL CORREO
-  // ==========================================
-
-  const attachments = [
-    {
-      filename: "nam-plus-logo.jpg",
-      content: logoBuffer,
-      contentType: "image/jpeg",
-      contentDisposition: "inline",
-      cid: logoCid,
-    },
-    {
-      filename: "ticket-qr.png",
-      content: qrBuffer,
-      contentType: "image/png",
-      contentDisposition: "inline",
-      cid: qrCid,
-    },
-  ];
 
   // ==========================================
   // ENVIAR CORREO

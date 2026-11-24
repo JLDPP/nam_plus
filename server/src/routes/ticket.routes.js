@@ -1,5 +1,6 @@
 
 import { Router } from "express";
+import { getTicketQrImage, ticketLogoPath } from "../services/ticketEmailImages.js";
 
 import { auth } from "../middleware/auth.js";
 import { requireRole } from "../middleware/requireRole.js";
@@ -11,7 +12,11 @@ import {
 
 const router = Router();
 
-// Todas las rutas requieren autenticación.
+// Los clientes de correo cargan las imágenes sin una sesión de Ñam+.
+router.get("/email-images/logo.jpg", (_req, res) => res.sendFile(ticketLogoPath));
+router.get("/email-images/qr/:token.png", getTicketQrImage);
+
+// Las operaciones de tickets requieren autenticación.
 router.use(auth);
 
 // Restaurante o admin genera un ticket.
