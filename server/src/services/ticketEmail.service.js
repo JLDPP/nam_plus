@@ -40,14 +40,14 @@ export async function sendTicketEmail({
   // Validar configuración del correo
   if (
     !SMTP_HOST ||
-    !SMTP_PORT ||
+    !Number.isInteger(Number(SMTP_PORT)) ||
+    Number(SMTP_PORT) < 1 ||
+    Number(SMTP_PORT) > 65535 ||
     !SMTP_USER ||
     !SMTP_PASS ||
     !SMTP_FROM
   ) {
-    throw new Error(
-      "Faltan variables SMTP en el archivo .env"
-    );
+    throw Object.assign(new Error("Configuración SMTP incompleta o inválida."), { code: "SMTP_CONFIG" });
   }
 
   // ==========================================
@@ -58,6 +58,9 @@ export async function sendTicketEmail({
     host: SMTP_HOST,
     port: Number(SMTP_PORT),
     secure: Number(SMTP_PORT) === 465,
+    connectionTimeout: 5_000,
+    greetingTimeout: 5_000,
+    socketTimeout: 8_000,
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
@@ -68,7 +71,14 @@ export async function sendTicketEmail({
   // GENERAR CÓDIGO QR
   // ==========================================
 
-  const hostedImages = hostedTicketImages(code, expiresAt);
+  let hostedImages;
+  try {
+    hostedImages = hostedTicketImages(code, expiresAt);
+  } catch (cause) {
+    throw Object.assign(new Error("Configuración de imágenes del correo inválida.", { cause }), {
+      code: "EMAIL_IMAGE_CONFIG",
+    });
+  }
   let logoSource = hostedImages?.logo;
   let qrSource = hostedImages?.qr;
   const attachments = [];

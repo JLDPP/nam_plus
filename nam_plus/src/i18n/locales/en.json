@@ -138,6 +138,13 @@
     "synced": "Synced",
     "rejected": "Rejected",
     "emailSent": "Coupon generated and emailed.",
+    "emailPending": "The coupon is ready and the email is still being processed. Use the QR or manual code and check delivery in Sync.",
+    "emailFailure": {
+      "configuration": "The coupon is ready. Check the server email settings. You can share the manual code.",
+      "authentication": "The coupon is ready. Gmail rejected SMTP authentication. Check the app password on the server.",
+      "connection": "The coupon is ready. The server could not reach SMTP. You can share the manual code.",
+      "recipient": "The coupon is ready. SMTP rejected the sending or recipient address. Check the email addresses."
+    },
     "emailUnknown": "Coupon generated. Share the manual code if the email did not arrive.",
     "dismiss": "Remove from list",
     "purchasePending": "Purchase saved on this device. The coupon will be issued when the connection returns.",

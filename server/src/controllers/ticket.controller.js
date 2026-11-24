@@ -1,6 +1,7 @@
 
 import mongoose from "mongoose";
 import { randomBytes, createHash, createHmac } from "node:crypto";
+import { setTimeout as delay } from "node:timers/promises";
 
 import Ticket from "../models/Ticket.js";
 import Restaurant from "../models/Restaurant.js";
@@ -43,18 +44,49 @@ function generateCode(userId, operationId) {
   return `NAM-${random.toUpperCase()}`;
 }
 
+const emailPendingFor = 60_000;
+
 function issuedTicketResponse(ticket, code, restaurantName, recipient) {
+  const pending = ticket.emailSent === undefined && Date.now() - ticket.createdAt.getTime() < emailPendingFor;
   return {
     message: ticket.emailSent
       ? "Ticket generado y enviado por correo correctamente"
-      : "Ticket generado. El envío del correo no está confirmado.",
+      : pending ? "Ticket generado. Correo en proceso." : "Ticket generado. El envío del correo no está confirmado.",
     ticket: {
       id: ticket._id, code, restaurantName,
       amountMXN: ticket.amountCents / 100, points: ticket.points,
       status: ticket.status, expiresAt: ticket.expiresAt,
     },
-    email: { sent: ticket.emailSent === true, recipient },
+    email: { sent: ticket.emailSent === true, pending, recipient, error: ticket.emailError },
   };
+}
+
+function emailFailure(code) {
+  if (code === "SMTP_CONFIG" || code === "EMAIL_IMAGE_CONFIG") return "configuration";
+  if (code === "EAUTH") return "authentication";
+  if (["ECONNECTION", "ETIMEDOUT", "ESOCKET", "EDNS", "ETLS"].includes(code)) return "connection";
+  if (code === "EENVELOPE") return "recipient";
+  return "unknown";
+}
+
+async function deliverTicket(ticket, recipient, code, restaurantName) {
+  try {
+    await sendTicketEmail({
+      recipient, code, restaurantName,
+      amountMXN: ticket.amountCents / 100, points: ticket.points, expiresAt: ticket.expiresAt,
+    });
+    ticket.emailSent = true;
+  } catch (error) {
+    ticket.emailSent = false;
+    ticket.emailError = emailFailure(error.code);
+    console.error("Fallo de correo de cupón:", ticket.emailError);
+  }
+
+  try {
+    await ticket.save();
+  } catch (error) {
+    console.error("No se pudo guardar el estado del correo del cupón:", error.name);
+  }
 }
 
 function handleError(res, error) {
@@ -173,10 +205,7 @@ export async function createTicket(req, res) {
       if (ticket.issuePayloadHash !== issuePayloadHash || ticket.codeHash !== codeHash) {
         throw httpError("La operación ya fue registrada con otros datos o con una clave anterior.", 409);
       }
-      // Otra solicitud puede estar enviando el mensaje. No se envía de nuevo.
-      if (ticket.emailSent === undefined && Date.now() - ticket.createdAt.getTime() < 120_000) {
-        throw httpError("El cupón se está procesando. Se comprobará de nuevo.", 503);
-      }
+      // El cupón ya existe aunque el envío siga en curso.
       return res.status(200).json(issuedTicketResponse(ticket, code, restaurant.name, recipient));
     };
 
@@ -199,18 +228,9 @@ export async function createTicket(req, res) {
       return existingResponse(existing);
     }
 
-    let emailSent = false;
-    try {
-      await sendTicketEmail({
-        recipient, code, restaurantName: restaurant.name,
-        amountMXN: amountCents / 100, points: ticket.points, expiresAt: ticket.expiresAt,
-      });
-      emailSent = true;
-    } catch (error) {
-      console.error("Error al enviar el cupón:", error.code || error.name);
-    }
-    ticket.emailSent = emailSent;
-    await ticket.save();
+    const delivery = deliverTicket(ticket, recipient, code, restaurant.name);
+    // Devuelve el QR aunque el servidor de correo tarde en responder.
+    await Promise.race([delivery, delay(5_000, undefined, { ref: false })]);
 
     return res.status(201).json(issuedTicketResponse(ticket, code, restaurant.name, recipient));
   } catch (error) {

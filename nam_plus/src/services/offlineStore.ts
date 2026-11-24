@@ -9,7 +9,7 @@ export type Purchase = { amountMXN: number; customerEmail: string };
 export type Claim = { code: string };
 type OperationState =
   | { status: "pending" }
-  | { status: "synced"; result?: { code: string; emailSent: boolean } }
+  | { status: "synced"; result?: { code: string; emailSent: boolean; emailPending?: boolean; emailError?: string } }
   | { status: "rejected"; message: string };
 export type Operation = {
   id: string;

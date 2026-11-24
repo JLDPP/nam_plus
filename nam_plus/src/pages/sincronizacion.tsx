@@ -51,7 +51,9 @@ export default function Sincronizacion() {
             <strong>{t(`offline.${operation.status}`)}</strong>
             {operation.status === "rejected" && <p role="status">{operation.message}</p>}
             {operation.status === "synced" && operation.result && (
-              <p>{t(operation.result.emailSent ? "offline.emailSent" : "offline.emailUnknown")}
+              <p>{operation.result.emailSent ? t("offline.emailSent")
+                : operation.result.emailPending ? t("offline.emailPending")
+                : t(`offline.emailFailure.${operation.result.emailError || "unknown"}`, { defaultValue: t("offline.emailUnknown") })}
                 <br /><code>{operation.result.code}</code>
               </p>
             )}

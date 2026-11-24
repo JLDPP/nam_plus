@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import axios from "axios";
 
@@ -94,17 +94,14 @@ export default function GenerarTicket() {
 
       setTicket(data.ticket);
 
-      // Confirmar estado del envío
-      if (data.email?.sent) {
-        setMessage(
-          `Ticket generado y enviado correctamente a ${data.email.recipient}.`
-        );
+      if (data.email.sent) {
+        setMessage(t("offline.emailSent"));
+      } else if (data.email.pending) {
+        setMessage(t("offline.emailPending"));
       } else {
-        setError(
-          "El ticket se generó correctamente, pero no fue posible enviar el correo. " +
-          "Puedes entregar el QR o copiar el código manual que aparece en pantalla. " +
-          "No generes otro ticket para la misma compra."
-        );
+        setError(t(`offline.emailFailure.${data.email.error || "unknown"}`, {
+          defaultValue: t("offline.emailUnknown"),
+        }));
       }
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
@@ -293,6 +290,7 @@ export default function GenerarTicket() {
         {message && (
           <div className="ticket-success" role="status">
             {message}
+            {ticket && <> <Link to="/sincronizacion">{t("offline.queue")}</Link></>}
           </div>
         )}
 

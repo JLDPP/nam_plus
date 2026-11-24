@@ -46,6 +46,7 @@ const ticketSchema = new mongoose.Schema(
     issueOperationId: String,
     issuePayloadHash: String,
     emailSent: Boolean,
+    emailError: String,
     claimOperationId: String,
 
     redeemedBy: {

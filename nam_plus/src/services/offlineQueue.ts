@@ -8,7 +8,7 @@ const notify = () => window.dispatchEvent(new Event(queueChanged));
 
 export type IssuedCoupon = {
   ticket: { id: string; code: string; restaurantName: string; amountMXN: number; points: number; status: string; expiresAt: string };
-  email: { sent: boolean; recipient: string };
+  email: { sent: boolean; pending?: boolean; error?: string; recipient: string };
 };
 
 export type ClaimedCoupon = {
@@ -39,7 +39,9 @@ async function executeOperation(operation: Operation, token: string): Promise<Re
     const status = isAxiosError(error) ? error.response?.status : undefined;
     if (status && status >= 400 && status < 500 && ![401, 408, 429].includes(status)) {
       const message = isAxiosError<{ message?: string }>(error) ? error.response?.data?.message : undefined;
-      await saveOperation({ ...operation, status: "rejected", message: message || "El servidor rechazó la operación." });
+      await saveOperation(operation.status === "synced" && operation.result
+        ? { ...operation, result: { ...operation.result, emailPending: false } }
+        : { ...operation, status: "rejected", message: message || "El servidor rechazó la operación." });
       notify();
       throw error;
     }
@@ -47,7 +49,10 @@ async function executeOperation(operation: Operation, token: string): Promise<Re
   }
 
   await saveOperation({ ...operation, status: "synced",
-    ...("ticket" in data ? { result: { code: data.ticket.code, emailSent: data.email.sent } } : {}),
+    ...("ticket" in data ? { result: {
+      code: data.ticket.code, emailSent: data.email.sent,
+      emailPending: data.email.pending, emailError: data.email.error,
+    } } : {}),
   });
   notify();
   if (operation.kind === "claim") window.dispatchEvent(new Event("nam-plus:points-updated"));
@@ -90,7 +95,9 @@ export function syncQueue(account: Account) {
   syncing = (async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const operations = (await listOperations(account.id)).filter((item) => item.status === "pending");
+    const operations = (await listOperations(account.id)).filter((item) =>
+      item.status === "pending" || (item.status === "synced" && item.result?.emailPending)
+    );
     if (!operations.length) return;
     const current = await getOwnAccount();
     if (current.id !== account.id || current.role !== account.role) return;

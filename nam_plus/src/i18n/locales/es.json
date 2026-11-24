@@ -138,6 +138,13 @@
     "synced": "Sincronizada",
     "rejected": "Rechazada",
     "emailSent": "Cupón generado y enviado.",
+    "emailPending": "El cupón ya está listo. El correo sigue en proceso. Puedes usar el QR o el código manual y consultar el envío en Sincronización.",
+    "emailFailure": {
+      "configuration": "El cupón está listo. Revisa la configuración del correo en el servidor. Puedes entregar el código manual.",
+      "authentication": "El cupón está listo. Gmail rechazó la autenticación SMTP. Revisa la contraseña de aplicación en el servidor.",
+      "connection": "El cupón está listo. El servidor no pudo conectarse a SMTP. Puedes entregar el código manual.",
+      "recipient": "El cupón está listo. SMTP rechazó la dirección de envío o del destinatario. Revisa el correo."
+    },
     "emailUnknown": "Cupón generado. Entrega el código manual si el correo no llegó.",
     "dismiss": "Quitar del listado",
     "purchasePending": "Compra guardada en este dispositivo. El cupón se generará al volver la conexión.",
