@@ -1,3 +1,4 @@
+import InstallPwa from "../components/InstallPwa";
 
 /*
   ARCHIVO: configuracion.tsx
@@ -223,6 +224,7 @@ export default function Configuracion() {
           </div>
         </section>
 
+        <InstallPwa />
       </div>
     </div>
   );

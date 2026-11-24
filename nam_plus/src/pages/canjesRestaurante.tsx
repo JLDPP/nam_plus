@@ -1,3 +1,4 @@
+import { useOffline } from "../routes/protected.route";
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,7 @@ interface RestaurantRedemption {
 
 export default function CanjesRestaurante() {
   const navigate = useNavigate();
+  const offline = useOffline();
 
   const [redemptions, setRedemptions] = useState<
     RestaurantRedemption[]
@@ -75,7 +77,7 @@ export default function CanjesRestaurante() {
   // CONFIRMAR ENTREGA
   // ==========================================
   async function confirmDelivery(id: string) {
-    if (processingRef.current) return;
+    if (offline || processingRef.current) return;
 
     const confirmed = window.confirm(
       "¿Confirmas que entregaste esta recompensa al cliente?"
@@ -115,7 +117,7 @@ export default function CanjesRestaurante() {
   // CANCELAR CANJE Y DEVOLVER PUNTOS
   // ==========================================
   async function cancelRedemption(id: string) {
-    if (processingRef.current) return;
+    if (offline || processingRef.current) return;
 
     const confirmed = window.confirm(
       "¿Seguro que deseas cancelar este canje?\n\n" +
@@ -292,7 +294,7 @@ export default function CanjesRestaurante() {
                     <div className="restaurant-action-buttons">
                       <button
                         className="restaurant-confirm-btn"
-                        disabled={processingId !== null}
+                        disabled={offline || processingId !== null}
                         onClick={() =>
                           void confirmDelivery(redemption._id)
                         }
@@ -305,7 +307,7 @@ export default function CanjesRestaurante() {
 
                       <button
                         className="restaurant-cancel-btn"
-                        disabled={processingId !== null}
+                        disabled={offline || processingId !== null}
                         onClick={() =>
                           void cancelRedemption(redemption._id)
                         }

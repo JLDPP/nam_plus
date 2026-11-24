@@ -67,10 +67,6 @@ export default function Codigo() {
       // Conservamos el mensaje real del backend.
       setServerMessage(result.message);
 
-      console.log(
-        "Resultado del código:",
-        result
-      );
     } catch (error) {
       console.error(
         "Error procesando el código:",

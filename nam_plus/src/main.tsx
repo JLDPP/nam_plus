@@ -17,6 +17,7 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
 import Configuracion from "./pages/configuracion";
+import Sincronizacion from "./pages/sincronizacion";
 import Perfil from "./pages/perfil";
 import AdminInicio from "./pages/adminInicio";
 import AdminCuentas from "./pages/adminCuentas";
@@ -29,6 +30,7 @@ import RestauranteInicio from "./pages/restaurante/RestauranteInicio";
 import CanjesRestaurante from "./pages/canjesRestaurante";
 import AdminRecompensas from "./pages/adminRecompensas";
 import GenerarTicket from "./pages/generarTicket";
+import { registerPwa } from "./services/pwa";
 import ProtectedRoute, { useAccount } from "./routes/protected.route";
 
 function DashboardPorRol() {
@@ -40,6 +42,8 @@ function DashboardPorRol() {
 document.documentElement.dataset.theme =
   localStorage.getItem("theme") === "dark" ? "dark" : "light";
 
+registerPwa();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -48,8 +52,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPorRol /></ProtectedRoute>} />
         <Route path="/configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
-        <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+        <Route path="/perfil" element={<ProtectedRoute onlineOnly><Perfil /></ProtectedRoute>} />
 
+        <Route path="/sincronizacion" element={<ProtectedRoute roles={["cliente", "restaurante"]}><Sincronizacion /></ProtectedRoute>} />
         <Route path="/qr" element={<ProtectedRoute roles={["cliente"]}><Qr /></ProtectedRoute>} />
         <Route path="/codigo" element={<ProtectedRoute roles={["cliente"]}><Codigo /></ProtectedRoute>} />
         <Route path="/puntos" element={<ProtectedRoute roles={["cliente"]}><Puntos /></ProtectedRoute>} />

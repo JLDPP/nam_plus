@@ -43,6 +43,11 @@ const ticketSchema = new mongoose.Schema(
       required: true,
     },
 
+    issueOperationId: String,
+    issuePayloadHash: String,
+    emailSent: Boolean,
+    claimOperationId: String,
+
     redeemedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -68,6 +73,11 @@ ticketSchema.index({
   restaurant: 1,
   createdAt: -1,
 });
+
+ticketSchema.index(
+  { issuedBy: 1, issueOperationId: 1 },
+  { unique: true, partialFilterExpression: { issueOperationId: { $type: "string" } } }
+);
 
 export default mongoose.models.Ticket ||
   mongoose.model("Ticket", ticketSchema);

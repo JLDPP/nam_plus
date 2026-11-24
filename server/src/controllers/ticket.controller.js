@@ -1,6 +1,6 @@
 
 import mongoose from "mongoose";
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes, createHash, createHmac } from "node:crypto";
 
 import Ticket from "../models/Ticket.js";
 import Restaurant from "../models/Restaurant.js";
@@ -24,12 +24,37 @@ function hashCode(code) {
     .digest("hex");
 }
 
-function generateCode() {
-  const random = randomBytes(16)
-    .toString("hex")
-    .toUpperCase();
+function operationIdFrom(body) {
+  const id = body?.operationId;
+  if (id !== undefined && (typeof id !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id))) {
+    throw httpError("Identificador de operación inválido", 400);
+  }
+  return id;
+}
 
-  return `NAM-${random}`;
+function generateCode(userId, operationId) {
+  const random = operationId
+    ? createHmac("sha256", process.env.JWT_SECRET)
+        .update(`nam-plus/issue/v1:${userId}:${operationId}`)
+        .digest("hex").slice(0, 32)
+    : randomBytes(16).toString("hex");
+
+  return `NAM-${random.toUpperCase()}`;
+}
+
+function issuedTicketResponse(ticket, code, restaurantName, recipient) {
+  return {
+    message: ticket.emailSent
+      ? "Ticket generado y enviado por correo correctamente"
+      : "Ticket generado. El envío del correo no está confirmado.",
+    ticket: {
+      id: ticket._id, code, restaurantName,
+      amountMXN: ticket.amountCents / 100, points: ticket.points,
+      status: ticket.status, expiresAt: ticket.expiresAt,
+    },
+    email: { sent: ticket.emailSent === true, recipient },
+  };
 }
 
 function handleError(res, error) {
@@ -138,82 +163,56 @@ export async function createTicket(req, res) {
       );
     }
 
-    // ==========================================
-    // GENERAR CÓDIGO ÚNICO DEL TICKET
-    // ==========================================
+    const operationId = operationIdFrom(req.body);
+    const code = generateCode(req.userId, operationId);
+    const codeHash = hashCode(code);
+    const issuePayloadHash = hashCode(JSON.stringify([restaurant.id, amountCents, recipient]));
+    const operationFilter = { issuedBy: req.userId, issueOperationId: operationId };
 
-    const code = generateCode();
+    const existingResponse = (ticket) => {
+      if (ticket.issuePayloadHash !== issuePayloadHash || ticket.codeHash !== codeHash) {
+        throw httpError("La operación ya fue registrada con otros datos o con una clave anterior.", 409);
+      }
+      // Otra solicitud puede estar enviando el mensaje. No se envía de nuevo.
+      if (ticket.emailSent === undefined && Date.now() - ticket.createdAt.getTime() < 120_000) {
+        throw httpError("El cupón se está procesando. Se comprobará de nuevo.", 503);
+      }
+      return res.status(200).json(issuedTicketResponse(ticket, code, restaurant.name, recipient));
+    };
 
-    const expiresAt = new Date(
-      Date.now() + 30 * 24 * 60 * 60 * 1000
-    );
-
-    // ==========================================
-    // GUARDAR TICKET EN MONGODB
-    // ==========================================
-
-    const ticket = await Ticket.create({
-      restaurant: restaurant._id,
-      codeHash: hashCode(code),
-      amountCents,
-      points: 100,
-      status: "issued",
-      issuedBy: req.userId,
-      expiresAt,
-    });
-
-    // ==========================================
-    // ENVIAR TICKET QR POR CORREO ELECTRÓNICO
-    // ==========================================
-
-    let emailSent = false;
-
-    try {
-      await sendTicketEmail({
-        recipient,
-        code,
-        restaurantName: restaurant.name,
-        amountMXN: amountCents / 100,
-        points: ticket.points,
-        expiresAt: ticket.expiresAt,
-      });
-
-      emailSent = true;
-
-      console.log(
-        "Ticket enviado correctamente por correo"
-      );
-    } catch (emailError) {
-      console.error(
-        "Error al enviar el ticket por correo:",
-        emailError
-      );
+    if (operationId) {
+      const existing = await Ticket.findOne(operationFilter);
+      if (existing) return existingResponse(existing);
     }
 
-    // ==========================================
-    // RESPUESTA AL FRONTEND
-    // ==========================================
+    let ticket;
+    try {
+      ticket = await Ticket.create({
+        restaurant: restaurant.id, codeHash, amountCents, points: 100,
+        issuedBy: req.userId, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        ...(operationId ? { issueOperationId: operationId, issuePayloadHash } : {}),
+      });
+    } catch (error) {
+      if (!operationId || error.code !== 11000) throw error;
+      const existing = await Ticket.findOne(operationFilter);
+      if (!existing) throw error;
+      return existingResponse(existing);
+    }
 
-    // El código original se devuelve al generarlo.
-    // No se almacena en texto plano.
-    return res.status(201).json({
-      message: emailSent
-        ? "Ticket generado y enviado por correo correctamente"
-        : "Ticket generado, pero no se pudo enviar el correo",
-      ticket: {
-        id: ticket._id,
-        code,
-        restaurantName: restaurant.name,
-        amountMXN: amountCents / 100,
-        points: ticket.points,
-        status: ticket.status,
-        expiresAt: ticket.expiresAt,
-      },
-      email: {
-        sent: emailSent,
-        recipient,
-      },
-    });
+    let emailSent = false;
+    try {
+      await sendTicketEmail({
+        recipient, code, restaurantName: restaurant.name,
+        amountMXN: amountCents / 100, points: ticket.points, expiresAt: ticket.expiresAt,
+      });
+      emailSent = true;
+    } catch (error) {
+      console.error("Error al enviar el cupón:", error.code || error.name);
+    }
+    ticket.emailSent = emailSent;
+    await ticket.save();
+
+    return res.status(201).json(issuedTicketResponse(ticket, code, restaurant.name, recipient));
   } catch (error) {
     return handleError(res, error);
   }
@@ -243,15 +242,8 @@ export async function claimTicket(req, res) {
   let session;
 
   try {
-    const currentUser = await User.findById(req.userId)
-      .select("role");
-
-    if (!currentUser || currentUser.role !== "cliente") {
-      throw httpError(
-        "Solo los clientes pueden acumular puntos",
-        403
-      );
-    }
+    const operationId = operationIdFrom(req.body);
+    const codeHash = hashCode(code);
 
     session = await mongoose.startSession();
 
@@ -261,7 +253,7 @@ export async function claimTicket(req, res) {
       // Solo puede reclamarse un ticket no usado.
       const ticket = await Ticket.findOneAndUpdate(
         {
-          codeHash: hashCode(code),
+          codeHash,
           status: "issued",
           expiresAt: { $gt: new Date() },
         },
@@ -270,6 +262,7 @@ export async function claimTicket(req, res) {
             status: "redeemed",
             redeemedBy: req.userId,
             redeemedAt: new Date(),
+            ...(operationId ? { claimOperationId: operationId } : {}),
           },
         },
         {
@@ -279,6 +272,17 @@ export async function claimTicket(req, res) {
       );
 
       if (!ticket) {
+        const previous = operationId && await Ticket.findOne({
+          codeHash, redeemedBy: req.userId, claimOperationId: operationId,
+        }).populate("restaurant", "name").session(session);
+        if (previous) {
+          const account = await User.findById(req.userId).select("pointsBalance").session(session);
+          result = {
+            ticketId: previous.id, restaurantName: previous.restaurant?.name,
+            pointsEarned: previous.points, balanceAfter: account?.pointsBalance ?? 0,
+          };
+          return;
+        }
         throw httpError(
           "El ticket no existe, ya fue usado o está vencido",
           409

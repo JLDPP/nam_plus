@@ -178,7 +178,6 @@ export default function Qr() {
       // Se conserva la respuesta real del backend.
       setServerMessage(result.message);
 
-      console.log("Resultado del QR:", result);
     } catch (error) {
       console.error(
         "Error procesando el QR:",

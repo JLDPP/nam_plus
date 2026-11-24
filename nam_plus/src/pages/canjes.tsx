@@ -1,3 +1,4 @@
+import { useOffline } from "../routes/protected.route";
 import { useEffect, useRef, useState } from "react";
 import { isAxiosError } from "axios";
 import { Gift } from "lucide-react";
@@ -9,6 +10,7 @@ import { getPointsBalance } from "../services/points.service";
 import "../styles/canjes.css";
 
 export default function Canjes() {
+  const offline = useOffline();
   const { t, i18n } = useTranslation();
   const locale = i18n.resolvedLanguage?.startsWith("en") ? "en-US" : "es-MX";
   const [rewards, setRewards] = useState<Reward[] | null>(null);
@@ -36,7 +38,7 @@ export default function Canjes() {
   }, [t]);
 
   async function redeem(reward: Reward) {
-    if (submitting.current || uncertain || points === null || points < reward.pointsCost || reward.stock < 1) return;
+    if (offline || submitting.current || uncertain || points === null || points < reward.pointsCost || reward.stock < 1) return;
     if (!window.confirm(t("rewards.confirmRedeem", { name: reward.name, points: reward.pointsCost }))) return;
 
     submitting.current = true;
@@ -132,9 +134,9 @@ export default function Canjes() {
                         : t("rewards.outOfStock")}</span>
                     </div>
                     <button type="button" className="reward-redeem-btn"
-                      disabled={!canRedeem || pending !== null || uncertain}
+                      disabled={offline || !canRedeem || pending !== null || uncertain}
                       onClick={() => void redeem(reward)}>
-                      {t(pending === reward._id ? "rewards.processing" : reward.stock < 1
+                      {t(offline ? "offline.requiresOnline" : pending === reward._id ? "rewards.processing" : reward.stock < 1
                         ? "rewards.outOfStock" : points === null ? "rewards.balanceUnavailable"
                         : points < reward.pointsCost ? "rewards.insufficientShort" : "rewards.redeemButton")}
                     </button>

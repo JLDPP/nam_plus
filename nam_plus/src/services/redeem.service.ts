@@ -1,22 +1,6 @@
-
-/*
-  ARCHIVO: redeem.service.ts
-
-  FUNCIÓN:
-  Centraliza la validación de tickets QR y códigos manuales.
-
-  MODIFICACIONES:
-  - Se conserva redeemCode().
-  - Se eliminó la simulación de 500 ms.
-  - Se conecta al backend real de Ñam+.
-  - Se utiliza el token JWT mediante api.
-  - Se valida el formato del código.
-  - Se muestran los mensajes reales del servidor.
-  - Se devuelven los puntos ganados y el saldo actualizado.
-*/
-
 import axios from "axios";
-import { api } from "../api";
+import { submitClaim, type ClaimedCoupon } from "./offlineQueue";
+import i18n from "../i18n";
 
 // ==========================================
 // TIPOS
@@ -30,14 +14,6 @@ export type RedeemResult = {
   balanceAfter?: number;
   restaurantName?: string;
   ticketId?: string;
-};
-
-type ClaimTicketResponse = {
-  message: string;
-  ticketId: string;
-  restaurantName: string;
-  pointsEarned: number;
-  balanceAfter: number;
 };
 
 // ==========================================
@@ -99,12 +75,11 @@ export async function redeemCode(
   }
 
   try {
-    const { data } = await api.post<ClaimTicketResponse>(
-      "/api/tickets/claim",
-      {
-        code: cleanCode,
-      }
-    );
+    const result = await submitClaim({ code: cleanCode });
+    if (result.status === "pending") {
+      return { success: false, message: i18n.t("offline.claimPending"), code: cleanCode };
+    }
+    const data = result.data as ClaimedCoupon;
 
     return {
       success: true,
@@ -116,9 +91,7 @@ export async function redeemCode(
       balanceAfter: data.balanceAfter,
     };
   } catch (error: unknown) {
-    console.error("Error validando ticket:", error);
-
-    let message = "No fue posible validar el ticket.";
+    let message = i18n.t("offline.saveError");
 
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;

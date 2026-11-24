@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 
 export async function auth(req, res, next) {
+  res.set("Cache-Control", "no-store");
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
 

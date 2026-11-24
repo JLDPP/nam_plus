@@ -1,4 +1,4 @@
-import { useAccount } from "../routes/protected.route";
+import { useAccount, useOffline } from "../routes/protected.route";
 import { rewardImageUrl } from "../services/reward.service";
 
 import { useEffect, useRef, useState } from "react";
@@ -90,6 +90,7 @@ function getErrorMessage(error: unknown): string {
 
 export default function AdminRecompensas() {
   const navigate = useNavigate();
+  const offline = useOffline();
 
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
@@ -241,7 +242,7 @@ export default function AdminRecompensas() {
   ) {
     event.preventDefault();
 
-    if (savingRef.current) return;
+    if (offline || savingRef.current) return;
 
     setError("");
     setMessage("");
@@ -336,7 +337,7 @@ export default function AdminRecompensas() {
   // ==========================================
 
   async function changeStatus(reward: Reward) {
-    if (processingRef.current) return;
+    if (offline || processingRef.current) return;
 
     const action = reward.active
       ? "desactivar"
@@ -459,7 +460,7 @@ export default function AdminRecompensas() {
             className="admin-create-btn"
             onClick={openCreate}
             disabled={
-              saving ||
+              offline || saving ||
               processingId !== null
             }
           >
@@ -473,7 +474,7 @@ export default function AdminRecompensas() {
             onClick={() => void loadRewards()}
             disabled={
               loading ||
-              saving ||
+              offline || saving ||
               processingId !== null
             }
           >
@@ -507,7 +508,7 @@ export default function AdminRecompensas() {
         {/* FORMULARIO */}
         {/* ================================= */}
 
-        {showForm && (
+        {showForm && !offline && (
           <section className="admin-rewards-form-card">
             <div className="admin-rewards-form-heading">
               <h2>
@@ -770,7 +771,7 @@ export default function AdminRecompensas() {
                       className="admin-edit-btn"
                       onClick={() => openEdit(reward)}
                       disabled={
-                        saving ||
+                        offline || saving ||
                         processingId !== null
                       }
                     >
@@ -785,7 +786,7 @@ export default function AdminRecompensas() {
                           : "admin-activate-btn"
                       }
                       disabled={
-                        saving ||
+                        offline || saving ||
                         processingId !== null
                       }
                       onClick={() =>

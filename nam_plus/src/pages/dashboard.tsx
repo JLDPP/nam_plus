@@ -44,19 +44,26 @@ export default function Dashboard() {
   useEffect(() => {
     let active = true;
 
-    getPointsBalance().then((balance) => {
-      if (active) setPoints(balance);
-    }).catch(() => {
-      if (active) setPointsError(true);
-    });
+    const refresh = () => {
+      getPointsBalance().then((balance) => {
+        if (active) setPoints(balance);
+      }).catch(() => {
+        if (active) setPointsError(true);
+      });
 
-    getPointsHistory().then((data) => {
-      if (active) setTransactions(data.slice(0, 5));
-    }).catch(() => {
-      if (active) setActivityError(true);
-    });
+      getPointsHistory().then((data) => {
+        if (active) setTransactions(data.slice(0, 5));
+      }).catch(() => {
+        if (active) setActivityError(true);
+      });
 
-    return () => { active = false; };
+    };
+    refresh();
+    window.addEventListener("nam-plus:points-updated", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("nam-plus:points-updated", refresh);
+    };
   }, []);
 
   function logout() {

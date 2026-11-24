@@ -4,37 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import axios from "axios";
 
-import { api } from "../api";
+import { useTranslation } from "react-i18next";
+import { submitPurchase, type IssuedCoupon } from "../services/offlineQueue";
 import "../styles/generarTicket.css";
-
-interface Ticket {
-  id: string;
-  code: string;
-  restaurantName: string;
-  amountMXN: number;
-  points: number;
-  status: string;
-  expiresAt: string;
-}
-
-interface TicketResponse {
-  message: string;
-  ticket: Ticket;
-  email: {
-    sent: boolean;
-    recipient: string;
-  };
-}
 
 export default function GenerarTicket() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [amount, setAmount] = useState("");
 
   // Correo electrónico del cliente
   const [customerEmail, setCustomerEmail] = useState("");
 
-  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<IssuedCoupon["ticket"] | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -99,13 +82,15 @@ export default function GenerarTicket() {
     setLoading(true);
 
     try {
-      const { data } = await api.post<TicketResponse>(
-        "/api/tickets",
-        {
-          amountMXN,
-          customerEmail: email,
-        }
-      );
+      const result = await submitPurchase({ amountMXN, customerEmail: email });
+      if (result.status === "pending") {
+        setTicket(null);
+        setAmount("");
+        setCustomerEmail("");
+        setMessage(t("offline.purchasePending"));
+        return;
+      }
+      const data = result.data as IssuedCoupon;
 
       setTicket(data.ticket);
 
@@ -122,15 +107,13 @@ export default function GenerarTicket() {
         );
       }
     } catch (err: unknown) {
-      console.error("Error generando ticket:", err);
-
       if (axios.isAxiosError(err)) {
         setError(
           err.response?.data?.message ||
             "No fue posible generar el ticket."
         );
       } else {
-        setError("Ocurrió un error inesperado.");
+        setError(t("offline.saveError"));
       }
     } finally {
       setLoading(false);
