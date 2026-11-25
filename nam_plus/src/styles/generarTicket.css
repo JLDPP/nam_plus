@@ -77,6 +77,11 @@
   min-width: 0;
 }
 
+.ticket-recipient-hint {
+  color: var(--nam-muted);
+  margin-top: -6px;
+}
+
 .ticket-form-card input:focus {
   outline: none;
   border-color: var(--nam-green);

@@ -131,7 +131,7 @@ export async function createTicket(req, res) {
       );
     }
 
-    const recipient = customerEmail.trim();
+    const recipient = customerEmail.trim().toLowerCase();
 
     // ==========================================
     // VALIDAR IMPORTE DE COMPRA
@@ -206,6 +206,9 @@ export async function createTicket(req, res) {
     const operationFilter = { issuedBy: req.userId, issueOperationId: operationId };
 
     const existingResponse = (ticket) => {
+      if (!ticket.recipientUser) {
+        throw httpError("Ese cupón se emitió sin una cuenta destinataria. Emite uno nuevo para el cliente registrado.", 409);
+      }
       if (ticket.issuePayloadHash !== issuePayloadHash || ticket.codeHash !== codeHash) {
         throw httpError("La operación ya fue registrada con otros datos o con una clave anterior.", 409);
       }
@@ -218,9 +221,15 @@ export async function createTicket(req, res) {
       if (existing) return existingResponse(existing);
     }
 
+    const customer = await User.findOne({ email: recipient, role: "cliente" }).select("_id");
+    if (!customer) {
+      throw httpError("Ingresa el correo de una cuenta de cliente registrada en Ñam+.", 422);
+    }
+
     let ticket;
     try {
       ticket = await Ticket.create({
+        recipientUser: customer._id,
         restaurant: restaurant.id, codeHash, amountCents, points,
         issuedBy: req.userId, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         ...(operationId ? { issueOperationId: operationId, issuePayloadHash } : {}),
@@ -274,10 +283,11 @@ export async function claimTicket(req, res) {
     let result = null;
 
     await session.withTransaction(async () => {
-      // Solo puede reclamarse un ticket no usado.
+      // La titularidad y el estado se comprueban en la misma escritura.
       const ticket = await Ticket.findOneAndUpdate(
         {
           codeHash,
+          recipientUser: req.userId,
           status: "issued",
           expiresAt: { $gt: new Date() },
         },
@@ -308,7 +318,7 @@ export async function claimTicket(req, res) {
           return;
         }
         throw httpError(
-          "El ticket no existe, ya fue usado o está vencido",
+          "El cupón no está disponible para tu cuenta, ya fue usado o venció.",
           409
         );
       }
@@ -339,7 +349,7 @@ export async function claimTicket(req, res) {
 
       // Incrementar saldo de forma atómica.
       const user = await User.findOneAndUpdate(
-        { _id: req.userId, pointsBalance: { $lte: Number.MAX_SAFE_INTEGER - ticket.points } },
+        { _id: req.userId, role: "cliente", pointsBalance: { $lte: Number.MAX_SAFE_INTEGER - ticket.points } },
         {
           $inc: {
             pointsBalance: ticket.points,
@@ -353,7 +363,7 @@ export async function claimTicket(req, res) {
 
       if (!user) {
         throw httpError(
-          "No se pudieron acreditar los puntos sin exceder el saldo máximo.",
+          "No se pudieron acreditar los puntos en esta cuenta.",
           409
         );
       }

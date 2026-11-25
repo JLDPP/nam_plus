@@ -469,10 +469,8 @@ export async function sendTicketEmail({
           font-size:12px;
           line-height:20px;
         ">
-          Este ticket es único y solo
-          puede canjearse una vez.
-          Conserva este correo hasta
-          acumular tus puntos.
+          Solo la cuenta de Ñam+ a la que se envió
+          este cupón puede acreditar sus puntos una vez.
         </p>
 
       </td>
@@ -533,7 +531,7 @@ export async function sendTicketEmail({
       `Puntos ganados: ${safePoints}`,
       `Código manual: ${code}`,
       `Válido hasta: ${expiration}`,
-      "Este ticket solo puede utilizarse una vez.",
+      "Solo la cuenta de Ñam+ a la que se envió este cupón puede acreditar sus puntos una vez.",
     ].join("\n"),
     attachments,
   });

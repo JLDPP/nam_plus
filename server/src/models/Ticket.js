@@ -49,6 +49,13 @@ const ticketSchema = new mongoose.Schema(
     emailError: String,
     claimOperationId: String,
 
+    recipientUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      immutable: true,
+    },
+
     redeemedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

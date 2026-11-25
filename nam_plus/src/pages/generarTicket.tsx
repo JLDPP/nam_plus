@@ -15,7 +15,7 @@ export default function GenerarTicket() {
   const [amount, setAmount] = useState("");
   const [points, setPoints] = useState("");
 
-  // Correo electrónico del cliente
+  // Correo registrado del cliente
   const [customerEmail, setCustomerEmail] = useState("");
 
   const [ticket, setTicket] = useState<IssuedCoupon["ticket"] | null>(null);
@@ -63,7 +63,7 @@ export default function GenerarTicket() {
     }
 
     // Validar correo electrónico
-    const email = customerEmail.trim();
+    const email = customerEmail.trim().toLowerCase();
 
     if (
       !email ||
@@ -190,12 +190,13 @@ export default function GenerarTicket() {
               {/* CORREO ELECTRÓNICO DEL CLIENTE */}
 
               <label htmlFor="ticket-customer-email">
-                Correo electrónico del cliente
+                Correo registrado del cliente
               </label>
 
               <input
                 id="ticket-customer-email"
                 type="email"
+                aria-describedby="ticket-recipient-hint"
                 placeholder="cliente@gmail.com"
                 value={customerEmail}
                 onChange={(event) =>
@@ -206,6 +207,10 @@ export default function GenerarTicket() {
                 autoComplete="email"
                 required
               />
+
+              <small id="ticket-recipient-hint" className="ticket-recipient-hint">
+                Solo la cuenta de cliente asociada a este correo podrá usar el cupón.
+              </small>
 
               <label htmlFor="ticket-points">Puntos del cupón</label>
               <input
