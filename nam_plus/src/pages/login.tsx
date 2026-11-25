@@ -1,4 +1,5 @@
 import AuthLayout from "../components/AuthLayout";
+import InstallPwa from "../components/InstallPwa";
 
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -189,6 +190,7 @@ export default function Login() {
         </Link>
       </div>
 
+      <InstallPwa />
     </AuthLayout>
   );
 }

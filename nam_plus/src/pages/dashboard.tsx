@@ -12,7 +12,6 @@ import RewardCarousel from "../components/RewardCarousel";
 import { getRewards, type Reward } from "../services/reward.service";
 import { getPointsBalance, getPointsHistory, type PointsTransaction } from "../services/points.service";
 import "../styles/dashboard.css";
-import InstallPwa from "../components/InstallPwa";
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
@@ -157,7 +156,6 @@ export default function Dashboard() {
           </section>
         </div>
                   
-              <InstallPwa />
         <section className="home-activity" aria-labelledby="home-activity-title">
           <div className="home-section-heading">
             <h2 id="home-activity-title">{t("dashboard.activity")}</h2>
