@@ -5,7 +5,7 @@ const storeName = "records";
 let database: Promise<IDBDatabase> | undefined;
 
 export type StoredSession = { signature: string; account: Account; savedAt: number; expiresAt: number };
-export type Purchase = { amountMXN: number; customerEmail: string };
+export type Purchase = { amountMXN: number; customerEmail: string; points?: number };
 export type Claim = { code: string };
 type OperationState =
   | { status: "pending" }

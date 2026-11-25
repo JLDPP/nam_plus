@@ -85,7 +85,7 @@ async function submit(input: { kind: "purchase"; body: Purchase } | { kind: "cla
   return syncOperation(operation, token);
 }
 
-export const submitPurchase = (body: Purchase) => submit({ kind: "purchase", body });
+export const submitPurchase = (body: Purchase & { points: number }) => submit({ kind: "purchase", body });
 export const submitClaim = (body: Claim) => submit({ kind: "claim", body });
 
 let syncing: Promise<void> | undefined;

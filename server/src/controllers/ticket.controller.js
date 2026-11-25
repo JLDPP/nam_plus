@@ -116,6 +116,7 @@ export async function createTicket(req, res) {
       amountMXN,
       restaurantId,
       customerEmail,
+      points: requestedPoints,
     } = req.body || {};
 
     // Validar correo electrónico del cliente
@@ -139,7 +140,7 @@ export async function createTicket(req, res) {
     if (
       typeof amountMXN !== "number" ||
       !Number.isFinite(amountMXN) ||
-      amountMXN < 0
+      amountMXN <= 0
     ) {
       throw httpError(
         "Ingresa un importe de compra válido",
@@ -153,6 +154,7 @@ export async function createTicket(req, res) {
 
     if (
       !Number.isSafeInteger(amountCents) ||
+      amountCents < 1 ||
       amountCents > 100000000
     ) {
       throw httpError(
@@ -170,12 +172,13 @@ export async function createTicket(req, res) {
       );
     }
 
-    // Regla inicial: compras desde $500 reciben 100 puntos.
-    if (amountCents < 50000) {
-      throw httpError(
-        "La compra debe ser de al menos $500 MXN",
-        400
-      );
+    const operationId = operationIdFrom(req.body);
+    // Las operaciones guardadas con la versión anterior no incluían puntos.
+    const legacyPurchase = requestedPoints === undefined && operationId !== undefined && amountCents >= 50_000;
+    const points = legacyPurchase ? 100 : requestedPoints;
+
+    if (!Number.isSafeInteger(points) || points < 1) {
+      throw httpError("Ingresa una cantidad entera de puntos mayor a cero", 400);
     }
 
     // ==========================================
@@ -195,10 +198,11 @@ export async function createTicket(req, res) {
       );
     }
 
-    const operationId = operationIdFrom(req.body);
     const code = generateCode(req.userId, operationId);
     const codeHash = hashCode(code);
-    const issuePayloadHash = hashCode(JSON.stringify([restaurant.id, amountCents, recipient]));
+    const purchasePayload = [restaurant.id, amountCents, recipient];
+    if (!legacyPurchase) purchasePayload.push(points);
+    const issuePayloadHash = hashCode(JSON.stringify(purchasePayload));
     const operationFilter = { issuedBy: req.userId, issueOperationId: operationId };
 
     const existingResponse = (ticket) => {
@@ -217,7 +221,7 @@ export async function createTicket(req, res) {
     let ticket;
     try {
       ticket = await Ticket.create({
-        restaurant: restaurant.id, codeHash, amountCents, points: 100,
+        restaurant: restaurant.id, codeHash, amountCents, points,
         issuedBy: req.userId, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         ...(operationId ? { issueOperationId: operationId, issuePayloadHash } : {}),
       });
@@ -335,7 +339,7 @@ export async function claimTicket(req, res) {
 
       // Incrementar saldo de forma atómica.
       const user = await User.findOneAndUpdate(
-        { _id: req.userId },
+        { _id: req.userId, pointsBalance: { $lte: Number.MAX_SAFE_INTEGER - ticket.points } },
         {
           $inc: {
             pointsBalance: ticket.points,
@@ -349,8 +353,8 @@ export async function claimTicket(req, res) {
 
       if (!user) {
         throw httpError(
-          "No se encontró la cuenta del cliente",
-          404
+          "No se pudieron acreditar los puntos sin exceder el saldo máximo.",
+          409
         );
       }
 

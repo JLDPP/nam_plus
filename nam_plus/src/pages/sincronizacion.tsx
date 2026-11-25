@@ -46,7 +46,7 @@ export default function Sincronizacion() {
             <h2>{t(`offline.${operation.kind}`)}</h2>
             <p>{new Date(operation.createdAt).toLocaleString(i18n.resolvedLanguage)}</p>
             <p>{operation.kind === "purchase"
-              ? `${operation.body.customerEmail} · ${operation.body.amountMXN.toLocaleString(i18n.resolvedLanguage, { style: "currency", currency: "MXN" })}`
+              ? `${operation.body.customerEmail} · ${operation.body.amountMXN.toLocaleString(i18n.resolvedLanguage, { style: "currency", currency: "MXN" })} · ${(operation.body.points ?? 100).toLocaleString(i18n.resolvedLanguage)} pts`
               : `…${operation.body.code.slice(-6)}`}</p>
             <strong>{t(`offline.${operation.status}`)}</strong>
             {operation.status === "rejected" && <p role="status">{operation.message}</p>}

@@ -13,6 +13,7 @@ export default function GenerarTicket() {
   const { t } = useTranslation();
 
   const [amount, setAmount] = useState("");
+  const [points, setPoints] = useState("");
 
   // Correo electrónico del cliente
   const [customerEmail, setCustomerEmail] = useState("");
@@ -39,19 +40,25 @@ export default function GenerarTicket() {
     setMessage("");
 
     const amountMXN = Number(amount);
+    const couponPoints = Number(points);
 
     // Validar importe de compra
     if (
       !Number.isFinite(amountMXN) ||
-      amountMXN < 500 ||
-      !Number.isInteger(Math.round(amountMXN * 100)) ||
+      amountMXN <= 0 ||
+      amountMXN > 1_000_000 ||
       Math.abs(
         amountMXN * 100 - Math.round(amountMXN * 100)
       ) > 0.000001
     ) {
       setError(
-        "Ingresa un importe válido de al menos $500 MXN, con máximo dos decimales."
+        "Ingresa un importe mayor que cero, con máximo dos decimales."
       );
+      return;
+    }
+
+    if (!Number.isSafeInteger(couponPoints) || couponPoints < 1) {
+      setError("Ingresa una cantidad entera de puntos mayor a cero.");
       return;
     }
 
@@ -82,10 +89,11 @@ export default function GenerarTicket() {
     setLoading(true);
 
     try {
-      const result = await submitPurchase({ amountMXN, customerEmail: email });
+      const result = await submitPurchase({ amountMXN, customerEmail: email, points: couponPoints });
       if (result.status === "pending") {
         setTicket(null);
         setAmount("");
+        setPoints("");
         setCustomerEmail("");
         setMessage(t("offline.purchasePending"));
         return;
@@ -167,9 +175,10 @@ export default function GenerarTicket() {
               <input
                 id="ticket-amount"
                 type="number"
-                min="500"
+                min="0.01"
+                max="1000000"
                 step="0.01"
-                placeholder="Ej. 500"
+                placeholder="Ej. 150.00"
                 value={amount}
                 onChange={(event) =>
                   setAmount(event.target.value)
@@ -198,15 +207,19 @@ export default function GenerarTicket() {
                 required
               />
 
-              <div className="ticket-points-preview">
-                <span>Puntos para el cliente</span>
-
-                <strong>
-                  {Number(amount) >= 500
-                    ? "100 puntos"
-                    : "0 puntos"}
-                </strong>
-              </div>
+              <label htmlFor="ticket-points">Puntos del cupón</label>
+              <input
+                id="ticket-points"
+                type="number"
+                inputMode="numeric"
+                min="1"
+                step="1"
+                placeholder="Ej. 35"
+                value={points}
+                onChange={(event) => setPoints(event.target.value)}
+                disabled={loading}
+                required
+              />
 
               <button
                 type="submit"
