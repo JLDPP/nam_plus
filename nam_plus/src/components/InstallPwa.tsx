@@ -6,27 +6,40 @@ export default function InstallPwa() {
   const { t } = useTranslation();
   const [installed, setInstalled] = useState(isStandalone);
   const [help, setHelp] = useState(false);
+
   useEffect(() => {
-    const done = () => { setInstalled(true); setHelp(false); };
-    const update = () => setHelp(false);
-    window.addEventListener("appinstalled", done);
-    window.addEventListener(installPromptChanged, update);
+    const onInstalled = () => {
+      setInstalled(true);
+      setHelp(false);
+    };
+    const hideHelp = () => setHelp(false);
+
+    window.addEventListener("appinstalled", onInstalled);
+    window.addEventListener(installPromptChanged, hideHelp);
+
     return () => {
-      window.removeEventListener("appinstalled", done);
-      window.removeEventListener(installPromptChanged, update);
+      window.removeEventListener("appinstalled", onInstalled);
+      window.removeEventListener(installPromptChanged, hideHelp);
     };
   }, []);
 
   if (installed) return null;
+
   return (
-    <section className="settings-card">
-      <div className="pwa-install">
-        <h2>{t("offline.desktopApp")}</h2>
-        {help && <p role="status">{t("offline.installHelp")}</p>}
-      </div>
-      <button type="button" className="option-btn" onClick={() => {
-        void installApp().then((prompted) => setHelp(!prompted)).catch(() => setHelp(true));
-      }}>{t("offline.install")}</button>
-    </section>
+    <div className="footer-links">
+      <button
+        type="button"
+        className="btn ghost"
+        onClick={() => {
+          void installApp()
+            .then((installed) => setHelp(!installed))
+            .catch(() => setHelp(true));
+        }}
+      >
+        {t("offline.install")}
+      </button>
+
+      {help && <p className="muted" role="status">{t("offline.installHelp")}</p>}
+    </div>
   );
 }
