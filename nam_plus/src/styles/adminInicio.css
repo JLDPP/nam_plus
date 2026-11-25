@@ -1,0 +1,115 @@
+.admin-home {
+  display: grid;
+  gap: 23px;
+}
+
+.admin-home-top,
+.admin-home-actions,
+.admin-home-brand {
+  display: flex;
+  align-items: center;
+}
+
+.admin-home-top { justify-content: space-between; gap: 12px; }
+.admin-home-brand { gap: 8px; font-size: 1.4rem; font-weight: 950; }
+.admin-home-brand svg { color: var(--nam-accent); }
+.admin-home-actions { gap: 8px; }
+
+.admin-home-actions > * {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--nam-border);
+  border-radius: 14px;
+  color: var(--nam-ink);
+  background: var(--nam-surface);
+  cursor: pointer;
+}
+
+.admin-home-actions > *:hover { background: var(--nam-soft); }
+
+.admin-home-hero {
+  min-height: 196px;
+  display: flex;
+  align-items: center;
+  padding: clamp(22px, 5vw, 55px);
+  border-radius: 25px;
+  background:
+    linear-gradient(90deg, #762516 0%, #8e2d1d 36%, #8d2b1ca0 64%, #84271615),
+    url("../assets/tacos-hero.webp") right 45% / cover #8e2d1d;
+  color: #fffaf1;
+  box-shadow: var(--nam-shadow);
+}
+
+.admin-home-hero > div { max-width: 610px; overflow-wrap: anywhere; }
+.admin-home-hero h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -.045em; }
+.admin-home-hero p { margin: 11px 0 0; font-size: 1rem; font-weight: 800; }
+
+.admin-home-metrics,
+.admin-home-columns { display: grid; gap: 14px; }
+.admin-home-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
+.admin-home-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.admin-home-metric { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 13px; align-items: center; }
+.admin-home-metric .admin-home-icon { grid-row: span 2; }
+.admin-home-metric dt { color: var(--nam-muted); font-size: .88rem; font-weight: 800; }
+.admin-home-metric dd { margin: 0; font-size: 1.75rem; font-weight: 950; line-height: 1.15; }
+
+.admin-home-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  font-weight: 950;
+}
+
+.admin-home-icon.peach { background: var(--nam-peach); color: var(--nam-accent); }
+.admin-home-icon.mint { background: var(--nam-mint); color: var(--nam-green); }
+.admin-home-icon.lavender { background: var(--nam-lavender); color: var(--nam-purple); }
+
+.admin-home-tools > h2,
+.admin-home-section-title { margin-bottom: 12px; }
+
+.admin-home-tool,
+.admin-home-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+}
+
+.admin-home-tool {
+  padding-inline: 9px;
+  border-radius: 12px;
+  color: var(--nam-ink);
+  text-decoration: none;
+}
+
+.admin-home-tool:hover { background: var(--nam-soft); }
+.admin-home-arrow { color: var(--nam-accent); }
+.admin-home-tool small,
+.admin-home-list small { display: block; color: var(--nam-muted); font-size: .83rem; font-weight: 650; }
+.admin-home-section-title { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 5px 12px; }
+.admin-home-section-title a { font-size: .85rem; }
+.admin-home-list { margin: 0; padding: 0; list-style: none; }
+.admin-home-list li + li { border-top: 1px solid var(--nam-border); }
+.admin-home-list time { font-size: .77rem; color: var(--nam-muted); }
+.admin-home-state { color: var(--nam-muted); }
+
+@media (max-width: 720px) {
+  .admin-home-columns { grid-template-columns: minmax(0, 1fr); }
+  .admin-home-metric { grid-template-columns: minmax(0, 1fr); row-gap: 5px; padding: 12px; }
+  .admin-home-metric .admin-home-icon { grid-row: auto; width: 35px; height: 35px; }
+}
+
+@media (max-width: 420px) {
+  .admin-home { gap: 15px; }
+  .admin-home-hero { min-height: 160px; }
+  .admin-home-metrics { gap: 6px; }
+  .admin-home-metric dt { font-size: .74rem; }
+  .admin-home-metric dd { font-size: 1.4rem; }
+  .admin-home-list li { grid-template-columns: auto minmax(0, 1fr); }
+  .admin-home-list time { grid-column: 2; }
+}

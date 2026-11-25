@@ -5,6 +5,8 @@ import { z } from "zod";
 import User from "../models/User.js";
 import Restaurant from "../models/Restaurant.js";
 import PointsTransaction from "../models/PointsTransaction.js";
+import Reward from "../models/Reward.js";
+import { mailDomainStatus } from "../services/emailDomain.js";
 
 const profileFields = {
   name: z.string().trim().min(1).max(120),
@@ -54,8 +56,17 @@ function safe(handler) {
   };
 }
 
+async function newEmailError(email) {
+  const status = await mailDomainStatus(email);
+  if (status === "invalid") return { status: 422, message: "El dominio de este correo no admite correo. Revisa la dirección." };
+  if (status === "unavailable") return { status: 503, message: "No pudimos verificar el dominio del correo. Intenta de nuevo en unos momentos." };
+  return null;
+}
+
 export const registerAccount = safe(async (req, res) => {
   const { name, email, password: secret } = z.object(createFields).parse(req.body);
+  const invalidEmail = await newEmailError(email);
+  if (invalidEmail) return res.status(invalidEmail.status).json({ message: invalidEmail.message });
   const user = await User.create({ name, email, password: await bcrypt.hash(secret, 10), role: "cliente" });
   return res.status(201).json(sessionFor(user));
 });
@@ -102,8 +113,24 @@ export const listAccounts = safe(async (_req, res) => {
   return res.json(users.map(publicAccount));
 });
 
+export const getAdminOverview = safe(async (_req, res) => {
+  const [clients, restaurants, activeRewards, recentAccounts] = await Promise.all([
+    User.countDocuments({ role: "cliente" }),
+    User.countDocuments({ role: "restaurante" }),
+    Reward.countDocuments({ active: true }),
+    User.find({ role: { $in: ["cliente", "restaurante"] } })
+      .sort({ createdAt: -1, _id: -1 }).limit(4).select("name role createdAt"),
+  ]);
+  return res.json({
+    clients, restaurants, activeRewards,
+    recentAccounts: recentAccounts.map(({ id, name, role, createdAt }) => ({ id, name, role, createdAt })),
+  });
+});
+
 export const createAccount = safe(async (req, res) => {
   const { password: secret, restaurantName, ...fields } = managedInput.parse(req.body);
+  const invalidEmail = await newEmailError(fields.email);
+  if (invalidEmail) return res.status(invalidEmail.status).json({ message: invalidEmail.message });
   const data = { ...fields, password: await bcrypt.hash(secret, 10) };
 
   const user = fields.role === "restaurante"

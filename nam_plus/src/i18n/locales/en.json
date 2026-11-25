@@ -108,6 +108,22 @@
     "cancelled": "Cancelled",
     "unknown": "Unknown"
   },
+  "adminDashboard": {
+    "welcome": "Hello, {{name}}",
+    "summary": "Ñam+ overview",
+    "clients": "Customers",
+    "restaurants": "Restaurants",
+    "activeRewards": "Active rewards",
+    "tools": "Tools",
+    "accountsDescription": "Create accounts, edit their details, and adjust points.",
+    "rewardsDescription": "Edit the catalog and check inventory.",
+    "profileDescription": "Update your details or change your password.",
+    "recentAccounts": "Recent accounts",
+    "viewAccounts": "View all",
+    "loadError": "The overview could not be loaded.",
+    "loading": "Loading overview…",
+    "noAccounts": "There are no customer or restaurant accounts yet."
+  },
   "restaurantDashboard": {
     "menu": "Menu",
     "title": "Restaurant dashboard",

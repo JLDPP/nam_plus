@@ -108,6 +108,22 @@
     "cancelled": "Cancelado",
     "unknown": "Desconocido"
   },
+  "adminDashboard": {
+    "welcome": "Hola, {{name}}",
+    "summary": "Resumen de Ñam+",
+    "clients": "Clientes",
+    "restaurants": "Restaurantes",
+    "activeRewards": "Recompensas activas",
+    "tools": "Herramientas",
+    "accountsDescription": "Crea cuentas, edita sus datos y ajusta puntos.",
+    "rewardsDescription": "Edita el catálogo y consulta su inventario.",
+    "profileDescription": "Actualiza tus datos o cambia tu contraseña.",
+    "recentAccounts": "Cuentas recientes",
+    "viewAccounts": "Ver todas",
+    "loadError": "No se pudo cargar el resumen.",
+    "loading": "Cargando resumen…",
+    "noAccounts": "Todavía no hay cuentas de clientes ni de restaurantes."
+  },
   "restaurantDashboard": {
     "menu": "Menú",
     "title": "Panel de restaurante",
