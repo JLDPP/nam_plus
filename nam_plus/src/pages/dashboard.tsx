@@ -56,8 +56,8 @@ export default function Dashboard() {
       }).catch(() => {
         if (active) setActivityError(true);
       });
-
     };
+
     refresh();
     window.addEventListener("nam-plus:points-updated", refresh);
     return () => {
@@ -195,6 +195,29 @@ export default function Dashboard() {
               })}
             </ul>
           )}
+        </section>
+
+        <section className="home-actions" aria-labelledby="home-legal-title">
+          <h2 id="home-legal-title">Documentos legales</h2>
+          <ul>
+            {[
+              ["Terminos y Condiciones (1) (1).pdf", "Términos y condiciones"],
+              ["Aviso de Privacidad (1).pdf", "Aviso de privacidad"],
+              ["POLÍTICAS DE USO Y SERVICIO (1).pdf", "Políticas de uso y servicio"],
+            ].map(([archivo, titulo]) => (
+              <li key={archivo}>
+                <a
+                  href={`/legal/${encodeURIComponent(archivo)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="home-action-icon peach" aria-hidden="true">PDF</span>
+                  <span>{titulo} (PDF)</span>
+                  <ArrowUpRight className="home-action-arrow" size={18} aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
       </main>
     </div>
